@@ -1,0 +1,90 @@
+import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import api from "../../services/api"; // 🧩 thêm dòng này
+import styles from "./login.module.css";
+
+const Login = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
+  const from = location.state?.from?.pathname || "/dashboard";
+
+  // 🧩 thêm state
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({
+  name: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+  day: "",
+  month: "",
+  year: "",
+  role: "student", // ✅ thêm dòng này
+});
+
+
+const handleLogin = async (e) => {
+  e.preventDefault();
+
+  const email = e.target.email.value;
+  const password = e.target.password.value;
+
+  const res = await login(email, password);
+
+if (res.success) {
+  navigate("/dashboard"); // tất cả roles đều vào đây
+}
+};
+
+
+  return (
+    <div className={styles.container}>
+      <h1 className={styles.title}>Login Page</h1>
+
+      {error && <p className={styles.error}>{error}</p>}
+
+      <form onSubmit={handleLogin}>
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Email:</label>
+          <input
+            type="email"
+            name="email"
+            className={styles.input}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Password:</label>
+          <input
+            type="password"
+            name="password"
+            className={styles.input}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+
+        <button type="submit" className={styles.button} disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
+      </form>
+
+      <p className={styles.switchText}>
+        Don't have an account?{" "}
+        <a href="/register" className={styles.link}>
+          Sign up!
+        </a>
+      </p>
+    </div>
+  );
+};
+
+export default Login;
