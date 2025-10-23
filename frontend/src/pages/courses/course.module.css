@@ -1,0 +1,109 @@
+.pageContainer {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-4); /* 32px */
+}
+
+.pageTitle {
+  font-size: 2.25rem; /* 36px */
+  font-weight: 800;
+  margin-bottom: var(--spacing-1);
+  color: var(--color-gray-1200);
+  margin: 20px 0;
+}
+
+.pageSubtitle {
+  font-size: 1.125rem;
+  color: var(--color-gray-500);
+  margin-top: 0;
+  margin-bottom: var(--spacing-4);
+}
+
+.courseGrid {
+  display: grid;
+  /* Tạo các cột co giãn với chiều rộng tối thiểu 300px */
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: var(--spacing-3); /* 24px */
+}
+
+.courseCard {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-gray-200);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease-in-out;
+}
+
+.courseCard:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+.cardImage {
+  height: 140px;
+}
+
+.cardContent {
+  padding: var(--spacing-3);
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Quan trọng: để đẩy nút xuống dưới */
+}
+
+.cardContent h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  flex-grow: 1; /* Đẩy các phần tử khác xuống */
+}
+
+.teacherName {
+  font-size: 0.9rem;
+  color: var(--color-gray-500);
+  margin-bottom: 16px;
+}
+
+.btn {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.btnEnroll {
+  background-color: var(--color-student-primary);
+  color: white;
+}
+.btnEnroll:hover {
+  background-color: var(--color-student-primary-hover);
+}
+
+.btnUnenroll {
+  background-color: var(--color-success-light);
+  color: var(--color-success-hover);
+  cursor: not-allowed;
+}
+
+.tag {
+  background-color: var(--color-teacher-primary-light);
+  color: var(--color-teacher-primary);
+  padding: 12px;
+  border-radius: var(--border-radius-md);
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.loadingText, .noCoursesText {
+  font-size: 1.2rem;
+  color: var(--color-gray-500);
+  text-align: center;
+  padding: var(--spacing-6);
+}
