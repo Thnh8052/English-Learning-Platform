@@ -9,6 +9,7 @@ import NotFound from "../pages/notFound/NotFound.jsx";
 import Dashboard from "../pages/dashboard/Dashboard.jsx";
 import Profile from "../pages/profile/Profile.jsx";
 import ProtectedRoute from "../components/ProtectedRoutes.jsx";
+import CourseDetailPage from "../pages/courses/CourseDetailPage.jsx";
 
 
 const router = createBrowserRouter([
@@ -23,6 +24,7 @@ const router = createBrowserRouter([
       { path: "register", element: <Register /> },
       { path: "courses", element: <Courses /> },
       { path: "discussion", element: <Discussion /> },
+      { path: "courses/:courseId", element: <CourseDetailPage /> }, 
 
       {
         element: <ProtectedRoute />,

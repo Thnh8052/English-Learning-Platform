@@ -5,6 +5,7 @@ import connectDB from "./src/config/database.js";
 import authRoutes from "./src/routes/auth.routes.js";
 import testRoutes from "./src/routes/test.routes.js";
 import courseRoutes from "./src/routes/courses.routes.js";
+import lessonRoutes from "./src/routes/lesson.routes.js";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import morgan from "morgan";
@@ -20,6 +21,7 @@ app.use(morgan("dev"));
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/test', testRoutes); // Thêm route để test phân quyền
+app.use('/api/lessons', lessonRoutes);
 
 // rate limit (ví dụ cho auth)
 const authLimiter = rateLimit({

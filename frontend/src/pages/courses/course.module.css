@@ -22,7 +22,7 @@
 .courseGrid {
   display: grid;
   /* Tạo các cột co giãn với chiều rộng tối thiểu 300px */
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: var(--spacing-3); /* 24px */
 }
 
@@ -40,6 +40,7 @@
 .courseCard:hover {
   transform: translateY(-5px);
   box-shadow: var(--shadow-md);
+  cursor: pointer;
 }
 
 .cardImage {
@@ -58,6 +59,7 @@
   font-weight: 600;
   margin: 0 0 8px 0;
   flex-grow: 1; /* Đẩy các phần tử khác xuống */
+  color: black;
 }
 
 .teacherName {
@@ -106,4 +108,105 @@
   color: var(--color-gray-500);
   text-align: center;
   padding: var(--spacing-6);
+}
+.cardMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.bestsellerTag {
+  background-color: var(--color-warning-light);
+  color: var(--color-warning-hover);
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  border-radius: var(--border-radius-sm);
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.ratingAverage {
+  font-weight: 700;
+  color: #b4690e; /* Màu cam đậm cho rating */
+}
+
+.rating svg {
+  color: #f59e0b; /* var(--color-warning) */
+}
+
+.ratingCount {
+  color: var(--color-gray-500);
+}
+
+/* Container cho card và tooltip */
+.courseCardContainer {
+  position: relative;
+}
+
+.tooltipContainer {
+  position: absolute;
+  top: 20px;
+  left: calc(100% + 8px); /* Đặt bên phải card, cách 16px */
+  width: 320px;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-3);
+  z-index: 10;
+  
+  /* Hiệu ứng ban đầu */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-10px); /* Bắt đầu hơi lùi lại */
+  transition: all 0.2s ease-in-out;
+  pointer-events: none; /* Quan trọng: để không bị nhấp nháy */
+}
+
+/* Khi hover vào container, hiển thị tooltip */
+.courseCardContainer:hover .tooltipContainer {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+
+}
+
+.tooltipContainer h4 {
+  font-size: 15px;
+  margin-bottom: 8px;
+  color: black;
+}
+
+.tooltipMeta {
+  font-size: 13px;
+  color: black;
+  margin-bottom: 12px;
+}
+
+.tooltipSummary {
+  font-size: 13px;
+  color: black;
+  margin-bottom: 14px;
+}
+
+.tooltipChecklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 12px;
+  color: rgb(85, 85, 85);
+}
+.tooltipChecklist li {
+  margin-bottom: 8px;
+}
+.cardLink {
+  text-decoration: none;
+  color: inherit;
+  display: block;
 }
