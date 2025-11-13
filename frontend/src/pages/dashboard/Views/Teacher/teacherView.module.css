@@ -1,20 +1,23 @@
 /* ==========================================================================
-   COURSE CAROUSEL CONTAINER (SAO CHÉP TỪ STUDENT VIEW)
+   COURSE CAROUSEL CONTAINER
    ========================================================================== */
 .carouselContainer {
   position: relative;
   max-width: fit-content;
   margin: 0 auto;
 }
+
 :root {
   --card-width: 280px;
   --gap: 24px;
 }
+
 .scrollWrapper {
   width: calc((var(--card-width) * 4) + (var(--gap) * 3));
   overflow: hidden;
   scroll-behavior: smooth;
 }
+
 .courseList {
   display: flex;
   flex-wrap: nowrap;
@@ -26,31 +29,209 @@
    CAROUSEL NAVIGATION BUTTONS
    ========================================================================== */
 .navButton {
-  position: absolute; top: 40%; transform: translateY(-50%); z-index: 10;
-  background-color: white; border: 1px solid var(--color-gray-300); border-radius: 50%;
-  width: 44px; height: 44px; cursor: pointer; display: flex; align-items: center;
-  justify-content: center; box-shadow: var(--shadow-md); transition: all 0.2s ease;
+  position: absolute;
+  top: 40%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-300);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  transition: all 0.2s ease;
 }
-.navButton:hover { background-color: var(--color-gray-100); transform: translateY(-50%) scale(1.05); }
-.navButton:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.navButton:hover {
+  background-color: var(--color-gray-100);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.navButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .navButton.left { left: -22px; }
 .navButton.right { right: -22px; }
-.navButton svg { width: 24px; height: 24px; stroke: var(--color-gray-700); }
+
+.navButton svg {
+  width: 24px;
+  height: 24px;
+  stroke: var(--color-gray-700);
+}
 
 /* ==========================================================================
-   COURSE CARD STYLES
+   COURSE CARD STYLING (TỔNG THỂ)
    ========================================================================== */
 .courseCard {
   width: var(--card-width);
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
   background-color: var(--color-white);
   border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
+  box-shadow: var(--shadow-sm);
   border: 1px solid var(--color-gray-200);
+  overflow: hidden;
+  transition: all 0.25s ease-in-out;
 }
-.courseCardImage { height: 120px; background-color: var(--color-gray-200); }
-.courseCardContent { padding: var(--spacing-2); }
-.courseCardContent h4 { font-size: 1rem; font-weight: 600; margin: 0 0 4px 0; }
-.courseCardContent a { color: var(--color-gray-900); text-decoration: none; }
-.courseCardContent a:hover { color: var(--color-teacher-primary); }
+
+.courseCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ==========================================================================
+   CARD IMAGE & STATUS BADGE
+   ========================================================================== */
+.cardImage {
+  position: relative;
+  height: 120px;
+  background-color: var(--color-gray-200);
+  border-bottom: 1px solid var(--color-gray-100);
+}
+
+.badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: var(--border-radius-full);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.badge.draft { background-color: var(--color-gray-500); }
+.badge.pending { background-color: var(--color-warning-hover); }
+.badge.published { background-color: var(--color-success-hover); }
+.badge.requiresChanges { background-color: var(--color-error-hover); }
+
+/* ==========================================================================
+   CARD CONTENT
+   ========================================================================== */
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding: var(--spacing-2);
+  gap: 8px;
+}
+
+.cardContent h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-gray-900);
+  margin: 0;
+  line-height: 1.3;
+  min-height: 2.4em;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.cardDescription {
+  color: var(--color-gray-600);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  flex-grow: 1;
+  margin-bottom: var(--spacing-2);
+}
+
+/* ==========================================================================
+   CARD ACTIONS
+   ========================================================================== */
+.cardActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-2);
+  border-top: 1px solid var(--color-gray-200);
+  padding-top: var(--spacing-2);
+  margin-top: auto;
+}
+
+.cardActions .btn {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: var(--border-radius-md);
+  transition: all 0.2s ease-in-out;
+}
+
+/* Nút "Edit" */
+.cardActions .btn-secondary {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-800);
+  border: 1px solid var(--color-gray-300);
+}
+.cardActions .btn-secondary:hover {
+  background-color: var(--color-gray-200);
+}
+
+/* Nút "Submit for Review" */
+.cardActions .btn-primary-teacher {
+  background-color: var(--color-teacher-primary);
+  color: var(--color-white);
+}
+.cardActions .btn-primary-teacher:hover {
+  background-color: var(--color-teacher-primary-hover);
+}
+
+/* ==========================================================================
+   HEADER & TAB STYLING
+   ========================================================================== */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-3);
+}
+
+.header h3 {
+  margin-bottom: 0;
+}
+
+/* Tabs */
+.tabContainer {
+  display: flex;
+  gap: 8px;
+  border-bottom: 2px solid var(--color-gray-200);
+  margin-bottom: var(--spacing-3);
+}
+
+.tabButton {
+  padding: 12px 16px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-gray-500);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s ease-in-out;
+}
+
+.tabButton:hover {
+  color: var(--color-teacher-primary);
+}
+
+.tabButton.active {
+  color: var(--color-teacher-primary);
+  border-bottom-color: var(--color-teacher-primary);
+}
+
+/* ==========================================================================
+   COURSE GRID LAYOUT
+   ========================================================================== */
+.courseGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-3);
+}

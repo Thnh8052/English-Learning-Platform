@@ -187,3 +187,61 @@
   margin-bottom: 12px;
   font-size: 0.9rem;
 }
+
+/* nội dung khóa học */
+.accordionContainer {
+    border: 1px solid var(--color-gray-200);
+}
+.accordionItem:not(:last-child) {
+    border-bottom: 1px solid var(--color-gray-200);
+}
+.accordionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--color-gray-50);
+    padding: var(--spacing-2);
+    cursor: pointer;
+    font-weight: 700;
+}
+.accordionHeader:hover {
+    background-color: var(--color-gray-100);
+}
+.accordionTitle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.accordionIcon {
+    transition: transform 0.2s ease-in-out;
+}
+.accordionIcon.open {
+    transform: rotate(180deg);
+}
+.moduleMeta {
+    font-weight: 400;
+    font-size: 0.9rem;
+    color: var(--color-gray-600);
+}
+.lessonItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px var(--spacing-3);
+    text-decoration: none;
+    color: var(--color-gray-800);
+    transition: background-color 0.2s;
+    border-top: 1px solid var(--color-gray-100);
+}
+.lessonItem:hover {
+    background-color: var(--color-gray-50);
+}
+.lessonTitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.lessonDuration {
+    font-size: 0.9rem;
+    color: var(--color-gray-500);
+}

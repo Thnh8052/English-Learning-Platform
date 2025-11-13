@@ -1,13 +1,13 @@
 import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 
-// 🔐 Tạo JWT
+//Tạo JWT
 const generateToken = (user) =>
   jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 
-// 🧩 Đăng ký
+//Đăng ký
 export const register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
@@ -39,7 +39,7 @@ export const register = async (req, res) => {
   }
 };
 
-// 🧠 Đăng nhập
+// Đăng nhập
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -63,7 +63,7 @@ export const login = async (req, res) => {
   }
 };
 
-// 👤 Lấy thông tin người dùng
+// Lấy thông tin người dùng
 export const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");

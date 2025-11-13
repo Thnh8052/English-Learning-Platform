@@ -16,30 +16,6 @@
   cursor: pointer;
 }
 
-/* SearchBar */
-.searchBar {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
-
-.searchBar input {
-  width: 60%;
-  max-width: 400px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-surface);
-  color: var(--color-text-base);
-  transition: 0.2s;
-}
-
-.searchBar input:focus {
-  border-color: var(--color-primary);
-  outline: none;
-  background: var(--color-bg-hover);
-}
-
 /* Notification */
 .rightSection {
   display: flex;

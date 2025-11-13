@@ -1,0 +1,112 @@
+/* ============================
+   FIX: đảm bảo input/select/textarea hiển thị chữ (scoped)
+   Áp dụng chỉ cho các phần tử nằm trong .form hoặc .grid
+   ============================ */
+
+/* ----- Inputs (text, email, number, v.v.) ----- */
+.form input,
+.grid input {
+  color: #000 !important;
+  background-color: #fff !important;
+  border: 1px solid var(--color-gray-300);
+  caret-color: #000 !important;
+  appearance: auto !important;
+  -webkit-appearance: textfield !important;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+}
+
+/* ----- Textareas ----- */
+.form textarea,
+.grid textarea {
+  color: #000 !important;
+  background-color: #fff !important;
+  border: 1px solid var(--color-gray-300);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  resize: vertical;
+  overflow: auto;
+  caret-color: #000 !important;
+}
+
+/* ----- Selects ----- */
+.form select,
+.grid select {
+  color: #000 !important;
+  background-color: #fff !important;
+  border: 1px solid var(--color-gray-300);
+  padding: 0.45rem 0.75rem;
+  border-radius: 6px;
+  appearance: menulist !important;
+  -webkit-appearance: menulist-button !important;
+  caret-color: #000 !important;
+}
+
+/* ----- Options inside selects ----- */
+.form select option,
+.grid select option {
+  color: #000 !important;
+  background-color: #fff !important;
+}
+
+/* ----- Placeholder text ----- */
+.form input::placeholder,
+.form textarea::placeholder,
+.grid input::placeholder,
+.grid textarea::placeholder {
+  color: #6b7280;
+}
+
+/* ----- Autofill (Chrome) ----- */
+.form input:-webkit-autofill,
+.form textarea:-webkit-autofill,
+.grid input:-webkit-autofill,
+.grid textarea:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px #fff inset !important;
+  box-shadow: 0 0 0px 1000px #fff inset !important;
+  -webkit-text-fill-color: #000 !important;
+  caret-color: #000 !important;
+}
+
+/* ----- Focus state ----- */
+.form input:focus,
+.form textarea:focus,
+.form select:focus,
+.grid input:focus,
+.grid textarea:focus,
+.grid select:focus {
+  outline: none;
+  border-color: var(--color-info);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+}
+
+/* ----- Edge/IE select arrow fix ----- */
+.form select::-ms-expand,
+.grid select::-ms-expand {
+  color: #000;
+  background: #fff;
+}
+
+/* ----- Ensure form controls use light color-scheme (helps Chrome/Edge dark native) ----- */
+.form input,
+.form textarea,
+.form select,
+.grid input,
+.grid textarea,
+.grid select {
+  color-scheme: light !important;
+}
+
+/* Keep existing classes untouched */
+.errorText {
+  color: var(--color-error);
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-gray-200);
+}

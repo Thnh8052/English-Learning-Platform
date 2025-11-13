@@ -33,7 +33,7 @@ const handleSubmit = async (e) => {
   setError("");
 
   if (formData.password !== formData.confirmPassword) {
-    setError("Passwords do not match.");
+    setError("Mật khẩu đã nhập không khớp");
     return;
   }
 
@@ -45,7 +45,7 @@ const res = await register({
 });
 
   if (res.success) {
-    navigate("/dashboard");
+    navigate("/");
   } else {
     setError(res.message);
   }
@@ -81,7 +81,7 @@ const res = await register({
           />
         </div>
 
-        {/* Role */}
+        {/* Phân Role gv và hs */}
         <div className={styles.formGroup}>
           <label className={styles.label}>Role</label>
           <select
@@ -95,9 +95,9 @@ const res = await register({
           </select>
         </div>
 
-        {/* Date of Birth */}
+        {/* Ngày sinh */}
         <div className={styles.formGroup}>
-          <label className={styles.label}>Date of Birth</label>
+          <label className={styles.label}>Ngày sinh</label>
           <div className={styles.dobGroup}>
             <input
               type="number"
@@ -185,9 +185,9 @@ const res = await register({
       </form>
 
       <p className={styles.switchText}>
-        Already have an account?{" "}
+       Đã có tài khoản?{" "}
         <a href="/login" className={styles.link}>
-          Login
+          Đăng nhập ngay!
         </a>
       </p>
     </div>

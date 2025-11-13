@@ -27,7 +27,7 @@ export const authorizeRoles = (...roles) => {
     if (!roles.includes(req.user.role)) {
       return res
         .status(403)
-        .json({ message: "Access denied: insufficient privileges" });
+        .json({ message: "Từ chối quyền truy cập" });
     }
     next();
   };

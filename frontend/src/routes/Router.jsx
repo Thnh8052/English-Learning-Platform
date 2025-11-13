@@ -10,6 +10,12 @@ import Dashboard from "../pages/dashboard/Dashboard.jsx";
 import Profile from "../pages/profile/Profile.jsx";
 import ProtectedRoute from "../components/ProtectedRoutes.jsx";
 import CourseDetailPage from "../pages/courses/CourseDetailPage.jsx";
+import CreateCoursePage from "../pages/teacher/createCourse.jsx";
+import AdminReviewPage from '../pages/admin/adminReviewPage.jsx';
+import EditCoursePage from "../pages/teacher/editCoursePage.jsx";
+import LessonView from '../pages/lessons/LessonView.jsx';
+
+
 
 
 const router = createBrowserRouter([
@@ -24,7 +30,9 @@ const router = createBrowserRouter([
       { path: "register", element: <Register /> },
       { path: "courses", element: <Courses /> },
       { path: "discussion", element: <Discussion /> },
-      { path: "courses/:courseId", element: <CourseDetailPage /> }, 
+      { path: "courses/:courseId", element: <CourseDetailPage /> },
+      { path: "lessons/:lessonId", element: <LessonView /> },
+
 
       {
         element: <ProtectedRoute />,
@@ -33,6 +41,9 @@ const router = createBrowserRouter([
       { path: "teacher", element: <Dashboard /> },
       { path: "admin", element: <Dashboard /> },
       { path: "profile", element: <Profile /> },
+      { path: "teacher/create-course", element: <CreateCoursePage /> },
+      { path: "admin/review/:courseId", element: <AdminReviewPage /> },
+      { path: "teacher/edit-course/:courseId", element: <EditCoursePage /> },
         ],   
       },   
     ],
