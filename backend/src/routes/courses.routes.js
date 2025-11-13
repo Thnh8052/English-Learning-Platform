@@ -6,12 +6,16 @@ import { authorizeRoles } from "../middleware/auth.middleware.js";
 
 import {
   getAllCourses,
-  getCourseById,       // <-- BƯỚC 1: IMPORT HÀM MỚI
+  getCourseById,
   createCourse,
   updateCourse,        // <-- Import luôn hàm update để dùng sau
   enrollInCourse,
   getMyEnrolledCourses,
   getMyTeachingCourses,
+  getCourseContent,
+  submitForReview,
+  retractCourse,
+  deleteCourse,
 } from "../controllers/courses.controller.js";
 
 const router = express.Router();
@@ -30,9 +34,10 @@ router.get('/my-teaching-courses', protect, authorizeRoles('teacher'), getMyTeac
 
 
 // --- CÁC ROUTE CÓ ĐƯỜNG DẪN ĐỘNG (VỚI :id) ĐẶT Ở DƯỚI ---
+router.get('/:id/content', getCourseContent);//Lấy nội dung khóa học
 
 // GET /api/courses/:id -> Lấy chi tiết một khóa học
-router.get('/:id', getCourseById); // <-- BƯỚC 2: THÊM ROUTE CÒN THIẾU
+router.get('/:id', getCourseById); // Lấy khóa học theo ID
 
 // POST /api/courses/:id/enroll -> Học viên ghi danh
 router.post('/:id/enroll', protect, authorizeRoles('student'), enrollInCourse);
@@ -40,11 +45,18 @@ router.post('/:id/enroll', protect, authorizeRoles('student'), enrollInCourse);
 // PUT /api/courses/:id -> Giáo viên cập nhật khóa học
 router.put('/:id', protect, authorizeRoles('teacher'), updateCourse);
 
+// POST /api/courses/:id/submit-for-review -> Giáo viên gửi khóa học để xem xét
+router.post('/:id/submit-for-review', protect, authorizeRoles('teacher'), submitForReview);
+// POST /api/courses/:id/retract -> Giáo viên rút lại khóa học từ xem xét
+router.post('/:id/retract', protect, authorizeRoles('teacher'), retractCourse);
+router.delete('/:id', protect, authorizeRoles('teacher'), deleteCourse);
 
 // --- CÁC ROUTE KHÁC ---
 
 // POST /api/courses -> Giáo viên tạo khóa học mới
 router.post('/', protect, authorizeRoles('teacher'), createCourse);
+
+
 
 
 export default router;

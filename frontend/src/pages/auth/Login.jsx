@@ -10,7 +10,7 @@ const Login = () => {
   const { login } = useAuth();
   const from = location.state?.from?.pathname || "/dashboard";
 
-  // 🧩 thêm state
+  //thêm state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,7 +23,7 @@ const Login = () => {
   day: "",
   month: "",
   year: "",
-  role: "student", // ✅ thêm dòng này
+  role: "student",
 });
 
 
@@ -36,7 +36,9 @@ const handleLogin = async (e) => {
   const res = await login(email, password);
 
 if (res.success) {
-  navigate("/dashboard"); // tất cả roles đều vào đây
+  navigate("/"); // tất cả roles đều vào trang chủ web
+} else {
+  setError(res.message);
 }
 };
 
@@ -78,9 +80,9 @@ if (res.success) {
       </form>
 
       <p className={styles.switchText}>
-        Don't have an account?{" "}
+        Chưa có tài khoản?{" "}
         <a href="/register" className={styles.link}>
-          Sign up!
+          Đăng ký ngay!
         </a>
       </p>
     </div>

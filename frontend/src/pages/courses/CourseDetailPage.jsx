@@ -1,11 +1,11 @@
-// src/pages/courses/CourseDetail.jsx
-
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCourses } from '../../contexts/CoursesContext';
 import api from '../../services/api';
 import styles from './courseDetail.module.css';
+import CourseContentAccordion from '../../components/course/CourseContentAccordion'; //thêm nội dung khóa học
+
 
 // --- Các Icon SVG ---
 const CheckIcon = () => <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.052-.143z" clipRule="evenodd" /></svg>;
@@ -48,6 +48,7 @@ const CourseDetailPage = () => {
   const { courseId } = useParams();
   const { myCourses, enrollCourse } = useCourses();
   const [course, setCourse] = useState(null);
+  const [modules, setModules] = useState([]);
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -55,14 +56,12 @@ const CourseDetailPage = () => {
     const fetchCourseData = async () => {
       setLoading(true);
       try {
-        const [courseRes, lessonsRes] = await Promise.all([
+        const [courseRes, contentRes] = await Promise.all([
             api.get(`/courses/${courseId}`),
-            // --- SỬA THÀNH ĐƯỜNG DẪN ĐÚNG ---
-            // Gọi đến route "/lessons" chứ không phải "/courses"
-            api.get(`/lessons/course/${courseId}`) 
+            api.get(`/courses/${courseId}/content`)
         ]);
         setCourse(courseRes.data);
-        setLessons(lessonsRes.data);
+        setModules(contentRes.data);
     } catch (error) {
         console.error("Failed to fetch course data", error);
     } finally {
@@ -108,18 +107,7 @@ const CourseDetailPage = () => {
 
           <div className={styles.sectionBox}>
             <h3>Nội dung khóa học</h3>
-            {lessons.length > 0 ? (
-              lessons.map(lesson => (
-                <div key={lesson._id} className={styles.accordionContent}>
-                  <Link to={`/lessons/${lesson._id}`} className={styles.lessonItem}>
-                    <span>{lesson.title}</span>
-                    <span>▶ Bắt đầu</span>
-                  </Link>
-                </div>
-              ))
-            ) : (
-              <p>Nội dung khóa học đang được cập nhật</p>
-            )}
+            <CourseContentAccordion modules={modules} />
           </div>
         </main>
 

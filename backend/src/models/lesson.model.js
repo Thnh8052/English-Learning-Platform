@@ -1,37 +1,42 @@
 import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
-const lessonSchema = new Schema(
-  {
-    title: { 
-        type: String, 
-        required: [true, "Tiêu đề bài học là bắt buộc"], 
-        trim: true 
-    },
-    // Loại bài học/bài tập, sau này có thể mở rộng thêm Reading, Listening
+const lessonSchema = new Schema({
+    title: { type: String, required: true },
+
+    // Mở rộng 'type' để phân biệt các loại bài học
     type: { 
         type: String, 
-        enum: ['Writing', 'Speaking'], 
-        required: true 
+        enum: ['video', 'reading','listening_audio','speaking_prompt', 'quiz', 'assignment'], 
+        default: 'reading' 
     },
-    // Nội dung đề bài, có thể chứa HTML
-    prompt: { 
-        type: String, 
-        required: [true, "Nội dung đề bài là bắt buộc"] 
+
+    duration: { 
+        type: Number, 
+        default: 0 // Đơn vị là giây
     },
-    // Liên kết bài học này với một khóa học cụ thể
-    course: {
+
+    prompt: { type: String }, // Giữ lại cho bài assignment/reading
+
+    isPreviewable: { type: Boolean, default: false }, // Cho phép xem trước không?
+
+    module: {
       type: Schema.Types.ObjectId,
-      ref: 'Course', // Tham chiếu đến model 'Course'
+      ref: 'Module',
       required: true,
-      index: true, // Thêm index để tăng tốc độ truy vấn các bài học theo khóa học
+      index: true
     },
-    // Bạn có thể thêm các trường khác sau này, ví dụ:
-    // videoUrl: { type: String },
-    // duration: { type: Number }, // tính bằng phút
-  },
-  { timestamps: true }
-);
+
+    order: {
+        type: Number,
+        required: true
+    },
+
+    // Trường mới cho file upload
+    fileUrl: { type: String },
+
+    fileType: { type: String } // 'video/mp4', 'application/pdf', ...
+}, { timestamps: true });
 
 const Lesson = mongoose.model("Lesson", lessonSchema);
 export default Lesson;

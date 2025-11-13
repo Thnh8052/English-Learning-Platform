@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import StudentHeader from "../layout/StudentHeader.jsx";
+import StudentHeader from "../layout/Header.jsx";
 import Footer from "../layout/Footer.jsx";
 
 export function Layout() {

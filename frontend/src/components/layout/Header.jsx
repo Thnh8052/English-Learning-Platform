@@ -2,8 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
-import styles from "./StudentHeader.module.css";
+import styles from "./Header.module.css";
 import avatarDefault from "../../assets/default-avatar.png";
+import Searchbar from "./searchBar";
+
 
 export default function StudentHeader() {
   const { user } = useAuth();
@@ -12,7 +14,6 @@ export default function StudentHeader() {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
-  const [searchValue, setSearchValue] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
 
@@ -40,15 +41,7 @@ export default function StudentHeader() {
         IELTS Hub
       </NavLink>
 
-      {/* SearchBar */}
-      <div className={styles.searchBar}>
-        <input
-          type="text"
-          placeholder="Search courses, lessons..."
-          value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
-        />
-      </div>
+      <Searchbar />
 
       {/*Bên phải */}
       <div className={styles.rightSection}>
