@@ -59,6 +59,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("user");
     setUser(null);
   };
+  //Cập nhật dữ liệu xác thực (dùng sau khi đặt lại mật khẩu)
     const setAuthData = (userData) => {
     localStorage.setItem("token", userData.token);
     localStorage.setItem("user", JSON.stringify(userData.user));
