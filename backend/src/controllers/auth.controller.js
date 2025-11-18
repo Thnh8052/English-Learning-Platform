@@ -121,7 +121,11 @@ export const forgotPassword = async (req, res) => {
     res.status(500).json({ message: 'Error sending email.' });
   }
 };
-
+/**
+ * @desc    Đặt lại mật khẩu người dùng
+ * @route   PUT /api/auth/reset-password/:token
+ * @access  Public
+ */
 export const resetPassword = async (req, res) => {
   try {
     const resetPasswordToken = crypto
