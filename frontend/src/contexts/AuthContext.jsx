@@ -7,7 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Khi mở trang → kiểm tra token trong localStorage
+  //Khi mở trang → kiểm tra token trong localStorage
   useEffect(() => {
     const token = localStorage.getItem("token");
     const savedUser = localStorage.getItem("user");
@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  // ✅ Đăng ký
+  //Đăng ký
   const register = async (formData) => {
     try {
       const res = await api.post("/auth/register", formData);
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ✅ Đăng nhập
+  //Đăng nhập
   const login = async (email, password) => {
     try {
       const res = await api.post("/auth/login", { email, password });
@@ -53,19 +53,25 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // 🚪 Đăng xuất
+  //Đăng xuất
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
   };
+    const setAuthData = (userData) => {
+    localStorage.setItem("token", userData.token);
+    localStorage.setItem("user", JSON.stringify(userData.user));
+    setUser(userData.user);
+  };
 
   return (
-    <AuthContext.Provider value={{ user, loading, register, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, register, login, logout, setAuthData }}>
       {!loading && children}
     </AuthContext.Provider>
   );
 };
+
 
 export const useAuth = () => useContext(AuthContext);
 export default AuthContext;
