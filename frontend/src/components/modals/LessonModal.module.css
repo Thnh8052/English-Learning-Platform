@@ -1,8 +1,3 @@
-/* ============================
-   FIX: đảm bảo input/select/textarea hiển thị chữ (scoped)
-   Áp dụng chỉ cho các phần tử nằm trong .form hoặc .grid
-   ============================ */
-
 /* ----- Inputs (text, email, number, v.v.) ----- */
 .form input,
 .grid input {

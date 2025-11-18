@@ -16,7 +16,7 @@ const lessonSchema = new Schema({
         default: 0 // Đơn vị là giây
     },
 
-    prompt: { type: String }, // Giữ lại cho bài assignment/reading
+    prompt: { type: String },
 
     isPreviewable: { type: Boolean, default: false }, // Cho phép xem trước không?
 

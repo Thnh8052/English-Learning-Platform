@@ -15,14 +15,18 @@ router.get('/:id', getLessonById);
 // GET /api/lessons/course/:courseId -> Lấy tất cả bài học trong một khóa học
 router.get('/course/:courseId', getLessonsByCourse);
 
-// POST /api/lessons -> Tạo bài học mới (chỉ giáo viên)
-router.post('/', protect, authorizeRoles('teacher'), upload.single('lessonFile'), createLesson);
+router.use(protect, authorizeRoles('teacher'));
 
-// PUT /api/lessons/:id -> Cập nhật bài học
-router.put("/:id", protect, authorizeRoles('teacher'), updateLesson);
-
-// DELETE /api/lessons/:id -> Xóa bài học
-router.delete("/:id", protect, authorizeRoles('teacher'), deleteLesson);
+router.post(
+    '/', 
+    upload.fields([
+        { name: 'promptFile', maxCount: 1 },
+        { name: 'lessonFile', maxCount: 1 }
+    ]), 
+    createLesson
+);
+router.put('/:id', updateLesson);
+router.delete('/:id', deleteLesson);
 
 
 export default router;

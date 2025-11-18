@@ -140,45 +140,54 @@ export const getLessonsByCourse = async (req, res) => {
 // };
 
 export const createLesson = async (req, res) => {
-  try {
-    console.log("--- BẮT ĐẦU createLesson ---");
-    console.log("Dữ liệu nhận được (req.body):", req.body);
-    console.log("File nhận được từ Multer-Cloudinary (req.file):", req.file);
+    try {
+        if (!req.body) {
+            return res.status(400).json({ message: 'Invalid form data.' });
+        }
+        
+        const { title, type, moduleId, promptText } = req.body;
+        const files = req.files || {};
+        const promptFile = files.promptFile ? files.promptFile[0] : null;
+        const lessonFile = files.lessonFile ? files.lessonFile[0] : null;
 
-    const { title, type, moduleId } = req.body;
-    const file = req.file;
+        if (!title || !type || !moduleId) {
+            return res.status(400).json({ message: 'Missing required fields: title, type, or module.' });
+        }
 
-    if (!file) {
-      return res.status(400).json({ message: "Vui lòng chọn một file để tải lên." });
+        const module = await Module.findById(moduleId).populate('course');
+        if (!module || !module.course || module.course.teacher.toString() !== req.user.id) {
+            return res.status(403).json({ message: 'Permission denied.' });
+        }
+
+        const lastLesson = await Lesson.findOne({ module: moduleId }).sort({ order: -1 });
+        const newOrder = (lastLesson?.order || 0) + 1;
+
+        const newLessonData = {
+            title, type, module: moduleId, order: newOrder,
+        };
+
+        if (promptFile) {
+            newLessonData.promptType = promptFile.mimetype.startsWith('image/') ? 'image' : 'pdf';
+            newLessonData.prompt = promptFile.path;
+        } else if (promptText) {
+            newLessonData.promptType = 'text';
+            newLessonData.prompt = promptText;
+        }
+
+        if (lessonFile) {
+            newLessonData.fileUrl = lessonFile.path;
+            newLessonData.fileType = lessonFile.mimetype;
+        }
+
+        const newLesson = new Lesson(newLessonData);
+        await newLesson.save();
+        res.status(201).json(newLesson);
+
+    } catch (err) {
+        console.error("CREATE LESSON ERROR:", err);
+        res.status(500).json({ message: "Server error while creating lesson." });
     }
-
-    const lastLesson = await Lesson.findOne({ module: moduleId }).sort({ order: -1 });
-    const newOrder = (lastLesson?.order || 0) + 1;
-
-    const fileUrl = file.secure_url || file.path; // ✅ đảm bảo luôn có URL
-
-    const newLessonData = {
-      title,
-      type,
-      module: moduleId,
-      order: newOrder,
-      fileUrl,
-      fileType: file.mimetype,
-    };
-
-    console.log("Dữ liệu chuẩn bị lưu vào DB:", newLessonData);
-
-    const newLesson = new Lesson(newLessonData);
-    await newLesson.save();
-
-    console.log("Lưu lesson vào DB thành công.");
-    res.status(201).json(newLesson);
-  } catch (err) {
-    console.error("--- LỖI 500 KHI TẠO LESSON ---", err);
-    res.status(500).json({ message: "Lỗi máy chủ khi tạo bài học" });
-  }
 };
-
 
 /**
  * @desc    Giáo viên xóa một bài học
