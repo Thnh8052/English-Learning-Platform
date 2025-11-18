@@ -9,9 +9,8 @@ const Searchbar = () => {
     const handleSearch = (e) => {
         e.preventDefault();
         if (query.trim()) {
-            // Điều hướng đến trang /courses với query tìm kiếm
             navigate(`/courses?search=${encodeURIComponent(query)}`);
-            setQuery(''); // Xóa nội dung sau khi tìm kiếm
+            setQuery('');
         }
     };
 

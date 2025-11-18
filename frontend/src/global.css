@@ -6,7 +6,7 @@
 /* 2. CSS Custom Properties (Design Tokens)
    ========================================================================== */
 :root {
-  /* 🎨 Colors */
+  /*Colors */
   /* Base Palette */
   --color-white: #ffffff;
   --color-black: #111827;
@@ -50,13 +50,13 @@
   --color-info-hover: #2563eb;
   --color-info-light: #dbeafe;
 
-  /* ✒️ Typography */
+  /*Typography */
   --font-body: 'Inter', sans-serif;
   --font-code: 'Fira Code', monospace;
   --font-size-base: 16px;
   --line-height-base: 1.6;
 
-  /* 📏 Spacing (8px grid system) */
+  /*Spacing (8px grid system) */
   --spacing-1: 0.5rem;  /* 8px */
   --spacing-2: 1rem;    /* 16px */
   --spacing-3: 1.5rem;  /* 24px */
@@ -64,21 +64,21 @@
   --spacing-5: 3rem;    /* 48px */
   --spacing-6: 4rem;    /* 64px */
 
-  /* 🔲 Border Radius */
+  /*Border Radius */
   --border-radius-sm: 4px;
   --border-radius-md: 8px;
   --border-radius-lg: 12px;
   --border-radius-xl: 16px;
   --border-radius-full: 9999px;
 
-  /* 🌟 Shadows */
+  /*Shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
 
-  /* ⏱️ Transitions */
+  /*Transitions */
   --transition-base: all 0.2s ease-in-out;
 }
 
@@ -366,7 +366,7 @@ pre {
 
 /* 9. Specific Fixes (Webkit Autocomplete)
    ========================================================================== */
-input:-webkit-autofill,
+/* input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
@@ -375,13 +375,13 @@ input:-webkit-autofill:active {
   -webkit-text-fill-color: var(--color-black) !important;
   caret-color: var(--color-black) !important;
   transition: background-color 5000s ease-in-out 0s !important;
-}
+} */
 
-input:-webkit-autofill::first-line {
+/* input:-webkit-autofill::first-line {
   font-family: inherit !important;
   font-size: 16px !important;
   color: var(--color-black) !important;
-}
+} */
 
 /* 10. Prose / Rich Content Styling
    ========================================================================== */
@@ -416,6 +416,53 @@ input:-webkit-autofill::first-line {
   margin-left: 0;
   font-style: italic;
   color: var(--color-gray-600);
+}
+
+/* =========================================================
+   FORM INPUT COLOR FIX — GLOBAL — SAFE & ISOLATED
+   ========================================================= */
+
+/* Màu chữ input */
+.form-input,
+.form-select {
+  color: var(--color-gray-800) !important;
+  -webkit-text-fill-color: var(--color-gray-800) !important; /* Chrome fix */
+  caret-color: var(--color-gray-800) !important;
+}
+
+/* Placeholder (Firefox, Edge, Safari) */
+.form-input::placeholder,
+.form-select::placeholder {
+  color: var(--color-gray-400) !important;
+  opacity: 1 !important;
+}
+
+/* Placeholder (Chrome/WebKit) */
+.form-input::-webkit-input-placeholder,
+.form-select::-webkit-input-placeholder {
+  color: var(--color-gray-400) !important;
+  -webkit-text-fill-color: var(--color-gray-400) !important;
+}
+
+/* Placeholder (MS / legacy Edge) */
+.form-input:-ms-input-placeholder,
+.form-select:-ms-input-placeholder {
+  color: var(--color-gray-400) !important;
+}
+
+/* Autofill fix — giữ nền trắng + màu text bình thường */
+.form-input:-webkit-autofill,
+.form-select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px var(--color-white) inset !important;
+  box-shadow: 0 0 0px 1000px var(--color-white) inset !important;
+  -webkit-text-fill-color: var(--color-gray-800) !important;
+  caret-color: var(--color-gray-800) !important;
+}
+
+/* Màu dòng đầu của autofill */
+.form-input:-webkit-autofill::first-line,
+.form-select:-webkit-autofill::first-line {
+  color: var(--color-gray-800) !important;
 }
 
 /* @media (prefers-color-scheme: dark) {
