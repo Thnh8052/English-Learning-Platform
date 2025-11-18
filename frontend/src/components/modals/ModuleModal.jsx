@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import styles from './LessonModal.module.css';
 
-const AddModuleModal = ({ courseId, isOpen, onClose, onSave, mode = 'add', initialData = null }) => {
+const ModuleModal = ({ courseId, isOpen, onClose, onSave, mode = 'add', initialData = null }) => {
     const [title, setTitle] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
@@ -73,4 +73,4 @@ const AddModuleModal = ({ courseId, isOpen, onClose, onSave, mode = 'add', initi
     );
 };
 
-export default AddModuleModal;
+export default ModuleModal;
