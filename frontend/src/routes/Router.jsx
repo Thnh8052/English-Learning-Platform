@@ -3,6 +3,9 @@ import Layout from "../components/layout/Layout.jsx";
 import HomePage from "../pages/homepage/Home.jsx";
 import Login from "../pages/auth/Login.jsx";
 import Register from "../pages/auth/Register.jsx";
+import ForgotPasswordPage from "../pages/auth/ForgotPassword.jsx";
+import ResetPasswordPage from "../pages/auth/ResetPassword.jsx";
+
 import Courses from "../pages/courses/CourseList.jsx";
 import Discussion from "../pages/discussion/Discussion.jsx";
 import NotFound from "../pages/notFound/NotFound.jsx";
@@ -14,8 +17,7 @@ import CreateCoursePage from "../pages/teacher/createCourse.jsx";
 import AdminReviewPage from '../pages/admin/adminReviewPage.jsx';
 import EditCoursePage from "../pages/teacher/editCoursePage.jsx";
 import LessonView from '../pages/lessons/LessonView.jsx';
-
-
+// import QuizBuilder from '../pages/teacher/quizBuilder.jsx';
 
 
 const router = createBrowserRouter([
@@ -28,6 +30,8 @@ const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
+      { path: "forgot-password", element: <ForgotPasswordPage /> },
+      { path: "reset-password/:token", element: <ResetPasswordPage /> },
       { path: "courses", element: <Courses /> },
       { path: "discussion", element: <Discussion /> },
       { path: "courses/:courseId", element: <CourseDetailPage /> },
@@ -44,6 +48,7 @@ const router = createBrowserRouter([
       { path: "teacher/create-course", element: <CreateCoursePage /> },
       { path: "admin/review/:courseId", element: <AdminReviewPage /> },
       { path: "teacher/edit-course/:courseId", element: <EditCoursePage /> },
+      // { path: "teacher/lesson/:lessonId/quiz", element: <QuizBuilder /> },
         ],   
       },   
     ],
