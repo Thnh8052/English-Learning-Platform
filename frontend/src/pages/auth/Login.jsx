@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation,Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import api from "../../services/api"; // 🧩 thêm dòng này
 import styles from "./login.module.css";
 
 const Login = () => {
@@ -72,6 +71,12 @@ if (res.success) {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+        </div>
+
+        <div className={styles.forgotPasswordContainer}>
+          <Link to="/forgot-password" className={styles.link}>
+            Forgot password?
+          </Link>
         </div>
 
         <button type="submit" className={styles.button} disabled={loading}>
