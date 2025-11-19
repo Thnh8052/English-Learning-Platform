@@ -7,6 +7,8 @@ import testRoutes from "./src/routes/test.routes.js";
 import courseRoutes from "./src/routes/courses.routes.js";
 import lessonRoutes from "./src/routes/lesson.routes.js";
 import moduleRoutes from './src/routes/modules.routes.js';
+import aiRoutes from './src/routes/ai.routes.js';
+
 
 import submissionRoutes from './src/routes/submissions.routes.js';
 
@@ -41,6 +43,9 @@ app.use('/api/admin', adminRoutes);
 
 // Thêm module routes
 app.use('/api/modules', moduleRoutes);
+
+// Thêm AI routes
+app.use('/api/ai', aiRoutes);
 
 
 // rate limit (ví dụ cho auth)
