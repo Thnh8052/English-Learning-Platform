@@ -3,40 +3,27 @@ const Schema = mongoose.Schema;
 
 const lessonSchema = new Schema({
     title: { type: String, required: true },
-
-    // Mở rộng 'type' để phân biệt các loại bài học
     type: { 
         type: String, 
-        enum: ['video', 'reading','listening_audio','speaking_prompt', 'quiz', 'assignment'], 
-        default: 'reading' 
+        enum: ['video', 'reading', 'listening_audio', 'speaking_prompt', 'quiz', 'assignment'], 
+        required: true 
     },
-
-    duration: { 
-        type: Number, 
-        default: 0 // Đơn vị là giây
-    },
-
+    
+    // --- CÁC TRƯỜNG CŨ GIỮ NGUYÊN (fileUrl, prompt...) ---
     prompt: { type: String },
-
-    isPreviewable: { type: Boolean, default: false }, // Cho phép xem trước không?
-
-    module: {
-      type: Schema.Types.ObjectId,
-      ref: 'Module',
-      required: true,
-      index: true
-    },
-
-    order: {
-        type: Number,
-        required: true
-    },
-
-    // Trường mới cho file upload
+    promptType: { type: String, enum: ['text', 'image', 'pdf'], default: 'text' },
+    module: { type: Schema.Types.ObjectId, ref: 'Module', required: true },
+    order: { type: Number, required: true },
     fileUrl: { type: String },
+    fileType: { type: String },
 
-    fileType: { type: String } // 'video/mp4', 'application/pdf', ...
+    // --- THÊM MỚI: Mảng chứa câu hỏi cho Quiz ---
+    questions: [{
+        questionText: { type: String, required: true },
+        options: [{ type: String, required: true }], // Mảng các đáp án (VD: ["A", "B", "C", "D"])
+        correctAnswerIndex: { type: Number, required: true } // Index của đáp án đúng (0, 1, 2, hoặc 3)
+    }]
+
 }, { timestamps: true });
 
-const Lesson = mongoose.model("Lesson", lessonSchema);
-export default Lesson;
+export default mongoose.model("Lesson", lessonSchema);

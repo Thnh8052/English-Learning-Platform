@@ -4,6 +4,7 @@ import { lessonStorage } from '../config/cloudinary.js';
 import { getLessonsByCourse,createLesson,updateLesson,deleteLesson,getLessonById   } from "../controllers/lesson.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
+import { addQuizQuestion, deleteQuizQuestion } from '../controllers/quiz.controller.js';
 
 
 const router = express.Router();
@@ -27,6 +28,10 @@ router.post(
 );
 router.put('/:id', updateLesson);
 router.delete('/:id', deleteLesson);
+
+// Quiz question routes
+router.post('/:lessonId/questions', protect, authorizeRoles('teacher'), addQuizQuestion);
+router.delete('/:lessonId/questions/:questionId', protect, authorizeRoles('teacher'), deleteQuizQuestion);
 
 
 export default router;

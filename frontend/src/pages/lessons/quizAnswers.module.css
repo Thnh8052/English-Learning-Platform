@@ -1,0 +1,117 @@
+.playerContainer {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: var(--color-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    border: 1px solid var(--color-gray-200);
+}
+
+/* Progress Bar */
+.progressBar {
+    height: 6px;
+    background-color: var(--color-gray-200);
+    width: 100%;
+}
+.progressFill {
+    height: 100%;
+    background-color: var(--color-student-primary);
+    transition: width 0.3s ease;
+}
+
+/* Question Area */
+.questionCard {
+    padding: var(--spacing-4);
+}
+.questionCount {
+    font-size: 0.85rem;
+    color: var(--color-gray-500);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.questionText {
+    font-size: 1.5rem;
+    color: var(--color-gray-900);
+    margin-top: 0.5rem;
+    margin-bottom: 2rem;
+    line-height: 1.4;
+}
+
+/* Options */
+.optionsList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.optionItem {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border: 2px solid var(--color-gray-200);
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.optionItem:hover {
+    border-color: var(--color-student-primary-light);
+    background-color: var(--color-gray-50);
+}
+.optionItem.selected {
+    border-color: var(--color-student-primary);
+    background-color: var(--color-student-primary-light);
+}
+.optionLabel {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: var(--color-gray-200);
+    color: var(--color-gray-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    margin-right: 1rem;
+    font-size: 0.9rem;
+}
+.selected .optionLabel {
+    background-color: var(--color-student-primary);
+    color: white;
+}
+
+/* Footer */
+.footer {
+    padding: var(--spacing-3) var(--spacing-4);
+    border-top: 1px solid var(--color-gray-200);
+    display: flex;
+    justify-content: space-between;
+    background-color: var(--color-gray-50);
+}
+
+/* Result Screen */
+.resultContainer {
+    max-width: 600px;
+    margin: 2rem auto;
+    text-align: center;
+}
+.scoreCard {
+    background: white;
+    padding: 3rem;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+.scoreCircle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: var(--color-success-light);
+    color: var(--color-success);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 1.5rem auto;
+    border: 5px solid var(--color-success);
+}

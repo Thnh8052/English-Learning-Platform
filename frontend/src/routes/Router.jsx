@@ -17,7 +17,7 @@ import CreateCoursePage from "../pages/teacher/createCourse.jsx";
 import AdminReviewPage from '../pages/admin/adminReviewPage.jsx';
 import EditCoursePage from "../pages/teacher/editCoursePage.jsx";
 import LessonView from '../pages/lessons/LessonView.jsx';
-// import QuizBuilder from '../pages/teacher/quizBuilder.jsx';
+import QuizBuilder from "../pages/teacher/quizBuilder.jsx";
 
 
 const router = createBrowserRouter([
@@ -48,7 +48,7 @@ const router = createBrowserRouter([
       { path: "teacher/create-course", element: <CreateCoursePage /> },
       { path: "admin/review/:courseId", element: <AdminReviewPage /> },
       { path: "teacher/edit-course/:courseId", element: <EditCoursePage /> },
-      // { path: "teacher/lesson/:lessonId/quiz", element: <QuizBuilder /> },
+      { path: "teacher/quiz-builder/:lessonId", element: <QuizBuilder /> },
         ],   
       },   
     ],

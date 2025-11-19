@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import styles from './lessonView.module.css';
 import ExamLayout from '../../components/exam/ExamLayout.jsx';
+import QuizAnswers from './quizAnswers.jsx';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
@@ -163,6 +164,8 @@ const LessonView = () => {
         return <WritingComponent lesson={lesson} onSubmit={handleSubmitAnswer} />;
       case 'speaking_prompt':
         return <SpeakingComponent lesson={lesson} onSubmit={handleSubmitAnswer} />;
+      case 'quiz':
+        return <QuizAnswers lesson={lesson} />;
       default:
         return <p>Content type "{lesson.type}" is not supported yet.</p>;
     }

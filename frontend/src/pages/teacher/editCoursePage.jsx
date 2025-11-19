@@ -3,8 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../services/api';
 import styles from './editCoursePage.module.css';
 
-import AddLessonModal from '../../components/modals/LessonModal.jsx';
-import AddModuleModal from '../../components/modals/ModuleModal.jsx';
+// Import đúng 2 file modal bạn vừa sửa
+import LessonModal from '../../components/modals/LessonModal.jsx';
+import ModuleModal from '../../components/modals/ModuleModal.jsx';
 
 const EditCoursePage = () => {
     const { courseId } = useParams();
@@ -14,7 +15,7 @@ const EditCoursePage = () => {
     const [course, setCourse] = useState(null);
     const [modules, setModules] = useState([]);
 
-    // ----------------- COURSE FORM -----------------
+    // ----------------- FORM STATE -----------------
     const [formData, setFormData] = useState({
         name: '',
         summary: '',
@@ -23,6 +24,7 @@ const EditCoursePage = () => {
         level: '',
     });
 
+    // ----------------- UI STATES -----------------
     const [loading, setLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
@@ -30,25 +32,26 @@ const EditCoursePage = () => {
     // ----------------- MODAL STATES -----------------
     const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
     const [isModuleModalOpen, setIsModuleModalOpen] = useState(false);
-
-    const [modalMode, setModalMode] = useState('add');
-    const [moduleModalMode, setModuleModalMode] = useState('add');
-
-    const [selectedModuleId, setSelectedModuleId] = useState(null);
+    
+    // State cho Module (Add/Edit)
+    const [moduleModalMode, setModuleModalMode] = useState('add'); 
     const [selectedModule, setSelectedModule] = useState(null);
+    
+    // State cho Lesson (Chỉ Add)
+    const [selectedModuleId, setSelectedModuleId] = useState(null);
 
     // ----------------- FETCH DATA -----------------
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const [courseRes, modulesRes] = await Promise.all([
+                const [courseRes, contentRes] = await Promise.all([
                     api.get(`/courses/${courseId}`),
                     api.get(`/lessons/course/${courseId}`),
                 ]);
 
                 setCourse(courseRes.data);
-                setModules(modulesRes.data);
+                setModules(contentRes.data);
 
                 setFormData({
                     name: courseRes.data.name || '',
@@ -67,7 +70,7 @@ const EditCoursePage = () => {
         fetchData();
     }, [courseId]);
 
-    // ----------------- HANDLERS -----------------
+    // ----------------- COURSE INFO HANDLERS -----------------
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
@@ -79,6 +82,7 @@ const EditCoursePage = () => {
             await api.put(`/courses/${courseId}`, formData);
             alert('Course updated successfully!');
         } catch (err) {
+            console.error(err);
             alert('Failed to save course changes.');
         } finally {
             setIsSubmitting(false);
@@ -86,73 +90,92 @@ const EditCoursePage = () => {
     };
 
     const handleResubmit = async () => {
-        if (!window.confirm('Resubmit this course for review?')) return;
+        if (!window.confirm('Resubmit this course for admin review?')) return;
         setIsSubmitting(true);
         try {
             await api.post(`/courses/${courseId}/submit-for-review`);
+            alert('Course resubmitted successfully!');
             navigate('/dashboard');
         } catch (err) {
-            alert('Failed to resubmit.');
+            console.error(err);
+            alert('Failed to resubmit course.');
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    // ---------------- MODULE MODAL ----------------
-    const openAddModule = () => {
+    // ----------------- MODULE HANDLERS -----------------
+    const handleOpenAddModuleModal = () => {
         setModuleModalMode('add');
         setSelectedModule(null);
         setIsModuleModalOpen(true);
     };
 
-    const openEditModule = (module) => {
+    const handleOpenEditModuleModal = (module) => {
         setModuleModalMode('edit');
         setSelectedModule(module);
         setIsModuleModalOpen(true);
     };
 
-    const handleSaveModule = async (courseId, title, moduleId = null) => {
+    const handleCloseModuleModal = () => {
+        setIsModuleModalOpen(false);
+        setSelectedModule(null);
+        setModuleModalMode('add');
+    };
+
+    // Hàm này khớp với cách gọi onSave(courseId, title, moduleId) của ModuleModal
+    const handleSaveModule = async (idFromModal, title, moduleId = null) => {
         try {
             let res;
             if (moduleModalMode === 'add') {
+                // Add: idFromModal là courseId, moduleId là undefined/null
                 res = await api.post('/modules', { courseId, title });
                 setModules((prev) => [...prev, res.data]);
             } else {
+                // Edit: moduleId có giá trị
                 res = await api.put(`/modules/${moduleId}`, { title });
+                
+                // Cập nhật UI, giữ nguyên danh sách lessons cũ
                 setModules((prev) =>
-                    prev.map((m) => (m._id === res.data._id ? res.data : m))
+                    prev.map((m) => (m._id === moduleId ? { ...m, title: res.data.title } : m))
                 );
             }
-            alert('Module saved.');
-        } catch (err) {
-            alert(err.response?.data?.message || 'Failed to save module.');
+            handleCloseModuleModal();
+        } catch (error) {
+            console.error('Failed to save module:', error);
+            // Ném lỗi để modal hiển thị
+            throw new Error(error.response?.data?.message || 'Failed to save module.');
         }
     };
 
     const handleDeleteModule = async (moduleId) => {
-        if (!window.confirm("Delete this module?")) return;
-
+        if (!window.confirm("Are you sure you want to delete this module and all its lessons?")) return;
         try {
             await api.delete(`/modules/${moduleId}`);
             setModules((prev) => prev.filter((m) => m._id !== moduleId));
-        } catch (err) {
-            alert('Failed to delete module.');
+            alert("Module deleted successfully!");
+        } catch (error) {
+            console.error("Failed to delete module:", error);
+            alert(error.response?.data?.message || "Failed to delete module.");
         }
     };
 
-    // ---------------- LESSON MODAL ----------------
-    const openAddLesson = (moduleId) => {
+    // ----------------- LESSON HANDLERS -----------------
+    const handleOpenAddLessonModal = (moduleId) => {
         setSelectedModuleId(moduleId);
-        setModalMode('add');
         setIsLessonModalOpen(true);
     };
 
-    const handleSaveLesson = async (formData) => {
+    const handleCloseLessonModal = () => {
+        setIsLessonModalOpen(false);
+        setSelectedModuleId(null);
+    };
+
+    const handleAddLesson = async (formData) => {
         try {
             const res = await api.post('/lessons', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-
             const newLesson = res.data;
 
             setModules((prev) =>
@@ -162,14 +185,15 @@ const EditCoursePage = () => {
                         : m
                 )
             );
+            // Không cần đóng modal ở đây, modal sẽ tự đóng sau khi await xong
         } catch (err) {
-            throw new Error(err.response?.data?.message || 'Add lesson failed.');
+            console.error('Failed to add lesson:', err);
+            throw new Error(err.response?.data?.message || 'Error adding lesson.');
         }
     };
 
     const handleDeleteLesson = async (moduleId, lessonId) => {
-        if (!window.confirm("Delete this lesson?")) return;
-
+        if (!window.confirm('Delete this lesson?')) return;
         try {
             await api.delete(`/lessons/${lessonId}`);
             setModules((prev) =>
@@ -179,131 +203,180 @@ const EditCoursePage = () => {
                         : m
                 )
             );
+            alert('Lesson deleted.');
         } catch (err) {
+            console.error(err);
             alert('Failed to delete lesson.');
         }
     };
 
-    // ---------------- UI ----------------
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p className={styles.errorText}>{error}</p>;
+    // ----------------- RENDER -----------------
+    if (loading) return <div className={styles.pageContainer}><p>Loading...</p></div>;
+    if (error) return <div className={styles.pageContainer}><p className={styles.errorText}>{error}</p></div>;
     if (!course) return null;
 
     return (
         <div className={styles.pageContainer}>
-            {/* SIDEBAR */}
             <aside className={styles.sidebar}>
                 <h3>Editing Course</h3>
                 <h2>{course.name}</h2>
+                <p>
+                    Status:{' '}
+                    <span className={`${styles.statusBadge} ${styles[`status_${course.status}`]}`}>
+                        {course.status.replace('_', ' ')}
+                    </span>
+                </p>
 
-                <button onClick={handleSaveChanges}
-                        className="btn btn-primary-teacher"
-                        disabled={isSubmitting}>
+                <button onClick={handleSaveChanges} className="btn btn-primary-teacher" disabled={isSubmitting}>
                     {isSubmitting ? 'Saving...' : 'Save Changes'}
                 </button>
 
-                <button onClick={handleResubmit}
-                        className="btn btn-secondary"
-                        style={{ marginTop: '12px' }}>
-                    Resubmit
+                <button onClick={handleResubmit} className="btn btn-secondary" style={{ width: '100%', marginTop: '1rem' }}>
+                    Resubmit for Review
                 </button>
             </aside>
 
-            {/* MAIN CONTENT */}
             <main className={styles.mainContent}>
-                {/* COURSE INFO */}
+                {course.status === 'requires_changes' && (
+                    <div className={styles.adminFeedback}>
+                        <h4>Admin Feedback</h4>
+                        <p>{course.adminFeedback || "No specific feedback was provided."}</p>
+                    </div>
+                )}
+
+                {/* Form thông tin khóa học */}
                 <div className={styles.section}>
                     <h3>Course Information</h3>
-
                     <form className={styles.form}>
                         <div className="form-group">
-                            <label>Name</label>
-                            <input name="name"
-                                   value={formData.name}
-                                   onChange={handleChange}
-                                   className="form-input" />
+                            <label className="form-label">Name</label>
+                            <input type="text" name="name" value={formData.name} onChange={handleChange} className="form-input" />
                         </div>
-
                         <div className="form-group">
-                            <label>Summary</label>
-                            <textarea name="summary"
-                                      value={formData.summary}
-                                      onChange={handleChange}
-                                      className="form-input" />
+                            <label className="form-label">Summary</label>
+                            <textarea name="summary" value={formData.summary} onChange={handleChange} className="form-input" rows="2"></textarea>
                         </div>
-
                         <div className="form-group">
-                            <label>Description</label>
-                            <textarea name="description"
-                                      value={formData.description}
-                                      onChange={handleChange}
-                                      className="form-input" />
+                            <label className="form-label">Description</label>
+                            <textarea name="description" value={formData.description} onChange={handleChange} className="form-input" rows="5"></textarea>
+                        </div>
+                        <div className={styles.grid}>
+                            <div className="form-group">
+                                <label className="form-label">Category</label>
+                                <select name="category" value={formData.category} onChange={handleChange} className="form-select">
+                                    <option value="Speaking">Speaking</option>
+                                    <option value="Writing">Writing</option>
+                                    <option value="Listening">Listening</option>
+                                    <option value="Reading">Reading</option>
+                                    <option value="Grammar">Grammar</option>
+                                    <option value="Vocabulary">Vocabulary</option>
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Level</label>
+                                <select name="level" value={formData.level} onChange={handleChange} className="form-select">
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="Intermediate">Intermediate</option>
+                                    <option value="Advanced">Advanced</option>
+                                </select>
+                            </div>
                         </div>
                     </form>
                 </div>
 
-                {/* MODULES */}
+                {/* Nội dung khóa học */}
                 <div className={styles.section}>
                     <div className={styles.header}>
                         <h3>Course Content</h3>
-                        <button onClick={openAddModule}
-                                className="btn btn-primary-teacher">
+                        <button onClick={handleOpenAddModuleModal} className="btn btn-primary-teacher">
                             + Add Module
                         </button>
                     </div>
 
-                    {modules.map((module) => (
-                        <div key={module._id} className={styles.module}>
-                            <div className={styles.moduleHeader}>
-                                <strong>{module.title}</strong>
-                                <div>
-                                    <button className="btn btn-outline btn-sm"
-                                            onClick={() => openEditModule(module)}>
-                                        Edit
-                                    </button>
+                    <div className={styles.moduleList}>
+                        {modules.length > 0 ? (
+                            modules.map((module) => (
+                                <div key={module._id} className={styles.module}>
+                                    <div className={styles.moduleHeader}>
+                                        <strong>{module.title}</strong>
+                                        <div className={styles.moduleActions}>
+                                            <button className="btn btn-outline btn-sm" onClick={() => handleOpenEditModuleModal(module)}>
+                                                Edit
+                                            </button>
+                                            <button className="btn btn-danger-outline btn-sm" onClick={() => handleDeleteModule(module._id)}>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
 
-                                    <button className="btn btn-danger-outline btn-sm"
-                                            onClick={() => handleDeleteModule(module._id)}>
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
+                                    <div className={styles.lessonList}>
+                                        {module.lessons?.map((lesson) => (
+                                            <div key={lesson._id} className={styles.lesson}>
+                                                <span>
+                                                    {lesson.type === 'quiz' && (
+                                                        <span className="badge badge-warning" style={{ marginRight: '8px' }}>
+                                                            QUIZ
+                                                        </span>
+                                                    )}
+                                                    {lesson.title}
+                                                </span>
 
-                            {/* LESSONS */}
-                            <div className={styles.lessonList}>
-                                {module.lessons?.map((lesson) => (
-                                    <div key={lesson._id} className={styles.lesson}>
-                                        <span>{lesson.title}</span>
-                                        <button className="btn btn-danger-outline btn-sm"
-                                                onClick={() =>
-                                                    handleDeleteLesson(module._id, lesson._id)
-                                                }>
-                                            Delete
+                                                <div>
+                                                    {lesson.type === 'quiz' && (
+                                                        <button
+                                                            onClick={() => navigate(`/teacher/quiz-builder/${lesson._id}`)}
+                                                            className="btn btn-primary-teacher btn-sm"
+                                                            style={{ marginRight: '8px' }}
+                                                        >
+                                                            Manage Questions
+                                                        </button>
+                                                    )}
+
+                                                    <button
+                                                        onClick={() => handleOpenEditLessonModal(lesson)}
+                                                        className="btn btn-outline btn-sm"
+                                                        style={{ marginRight: '8px' }}
+                                                    >
+                                                        Edit Info
+                                                    </button>
+
+                                                    <button
+                                                        onClick={() => handleDeleteLesson(module._id, lesson._id)}
+                                                        className="btn btn-danger-outline btn-sm"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+
+                                        <button onClick={() => handleOpenAddLessonModal(module._id)} className={styles.addLessonBtn}>
+                                            + Add Lesson
                                         </button>
                                     </div>
-                                ))}
-
-                                <button className={styles.addLessonBtn}
-                                        onClick={() => openAddLesson(module._id)}>
-                                    + Add Lesson
-                                </button>
-                            </div>
-                        </div>
-                    ))}
+                                </div>
+                            ))
+                        ) : (
+                            <p>This course has no content yet. Start by adding a module.</p>
+                        )}
+                    </div>
                 </div>
             </main>
 
             {/* MODALS */}
-            <AddLessonModal
+            
+            {/* Lesson Modal dùng onSave={handleAddLesson} */}
+            <LessonModal
                 isOpen={isLessonModalOpen}
-                onClose={() => setIsLessonModalOpen(false)}
-                onSave={handleSaveLesson}
+                onClose={handleCloseLessonModal}
                 moduleId={selectedModuleId}
+                onSave={handleAddLesson} 
             />
 
-            <AddModuleModal
+            {/* Module Modal dùng onSave={handleSaveModule} */}
+            <ModuleModal
                 isOpen={isModuleModalOpen}
-                onClose={() => setIsModuleModalOpen(false)}
+                onClose={handleCloseModuleModal}
                 courseId={courseId}
                 mode={moduleModalMode}
                 initialData={selectedModule}
