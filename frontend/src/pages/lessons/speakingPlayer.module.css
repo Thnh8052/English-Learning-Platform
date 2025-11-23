@@ -1,0 +1,96 @@
+/* Container chính - Đồng nhất với Quiz */
+.playerContainer {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: var(--color-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    border: 1px solid var(--color-gray-200);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header Section */
+.header {
+    padding: var(--spacing-4);
+    padding-bottom: 0;
+}
+
+.header h3 {
+    margin-bottom: 1rem;
+    color: var(--color-gray-800);
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+/* Progress Bar - Giữ nguyên */
+.progressBar {
+    height: 6px;
+    background-color: var(--color-gray-200);
+    width: 100%;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progressFill {
+    height: 100%;
+    background-color: var(--color-student-primary);
+    transition: width 0.3s ease;
+}
+
+.questionCount {
+    font-size: 0.85rem;
+    color: var(--color-gray-500);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: right; /* Đẩy số trang sang phải cho gọn */
+}
+
+/* Question Area */
+.questionCard {
+    padding: 0 var(--spacing-4) var(--spacing-4);
+    flex: 1; /* Để phần này chiếm khoảng trống còn lại nếu cần */
+}
+
+.questionText {
+    font-size: 1.5rem;
+    color: var(--color-gray-900);
+    margin-top: 0.5rem;
+    margin-bottom: 2rem;
+    line-height: 1.4;
+    font-weight: 600;
+}
+
+/* Recording Area - Phần mới dành riêng cho Speaking */
+/* Thay thế cho style inline marginTop: 2rem */
+.recordingArea {
+    margin-top: 2rem;
+    padding: 2rem;
+    background-color: var(--color-gray-50);
+    border: 2px dashed var(--color-gray-300); /* Viền nét đứt tạo cảm giác khu vực input */
+    border-radius: var(--border-radius-md);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+/* Hiệu ứng khi đang focus vào vùng ghi âm (nếu cần mở rộng sau này) */
+.recordingArea:hover {
+    border-color: var(--color-student-primary-light);
+    background-color: #f9fafb;
+}
+
+/* Navigation / Footer - Đồng nhất với class .footer cũ */
+.navigation {
+    padding: var(--spacing-3) var(--spacing-4);
+    border-top: 1px solid var(--color-gray-200);
+    display: flex;
+    justify-content: space-between;
+    background-color: var(--color-gray-50);
+    align-items: center;
+}
