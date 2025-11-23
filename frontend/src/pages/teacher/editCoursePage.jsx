@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../services/api';
 import styles from './editCoursePage.module.css';
 
-// Import đúng 2 file modal bạn vừa sửa
+// Import đúng 2 file modal
 import LessonModal from '../../components/modals/LessonModal.jsx';
 import ModuleModal from '../../components/modals/ModuleModal.jsx';
 
@@ -123,19 +123,14 @@ const EditCoursePage = () => {
         setModuleModalMode('add');
     };
 
-    // Hàm này khớp với cách gọi onSave(courseId, title, moduleId) của ModuleModal
     const handleSaveModule = async (idFromModal, title, moduleId = null) => {
         try {
             let res;
             if (moduleModalMode === 'add') {
-                // Add: idFromModal là courseId, moduleId là undefined/null
                 res = await api.post('/modules', { courseId, title });
                 setModules((prev) => [...prev, res.data]);
             } else {
-                // Edit: moduleId có giá trị
                 res = await api.put(`/modules/${moduleId}`, { title });
-                
-                // Cập nhật UI, giữ nguyên danh sách lessons cũ
                 setModules((prev) =>
                     prev.map((m) => (m._id === moduleId ? { ...m, title: res.data.title } : m))
                 );
@@ -143,7 +138,6 @@ const EditCoursePage = () => {
             handleCloseModuleModal();
         } catch (error) {
             console.error('Failed to save module:', error);
-            // Ném lỗi để modal hiển thị
             throw new Error(error.response?.data?.message || 'Failed to save module.');
         }
     };
@@ -185,11 +179,15 @@ const EditCoursePage = () => {
                         : m
                 )
             );
-            // Không cần đóng modal ở đây, modal sẽ tự đóng sau khi await xong
         } catch (err) {
             console.error('Failed to add lesson:', err);
             throw new Error(err.response?.data?.message || 'Error adding lesson.');
         }
+    };
+
+    const handleOpenEditLessonModal = (lesson) => {
+        // Placeholder for edit logic (future implementation)
+        alert("Edit lesson info feature coming soon for: " + lesson.title);
     };
 
     const handleDeleteLesson = async (moduleId, lessonId) => {
@@ -231,7 +229,8 @@ const EditCoursePage = () => {
                     {isSubmitting ? 'Saving...' : 'Save Changes'}
                 </button>
 
-                <button onClick={handleResubmit} className="btn btn-secondary" style={{ width: '100%', marginTop: '1rem' }}>
+                {/* Đã thay style inline bằng class sidebarBtn */}
+                <button onClick={handleResubmit} className={`btn btn-secondary ${styles.sidebarBtn}`}>
                     Resubmit for Review
                 </button>
             </aside>
@@ -314,19 +313,27 @@ const EditCoursePage = () => {
                                             <div key={lesson._id} className={styles.lesson}>
                                                 <span>
                                                     {lesson.type === 'quiz' && (
-                                                        <span className="badge badge-warning" style={{ marginRight: '8px' }}>
+                                                        <span className={`badge badge-warning ${styles.lessonBadge}`}>
                                                             QUIZ
                                                         </span>
                                                     )}
                                                     {lesson.title}
                                                 </span>
-
-                                                <div>
+                                                
+                                                <div className={styles.lessonActions}>
+                                                    {lesson.type === 'speaking_prompt' && (
+                                                        <button 
+                                                            onClick={() => navigate(`/teacher/lesson/${lesson._id}/speaking`)} 
+                                                            className="btn btn-primary-teacher btn-sm"
+                                                        >
+                                                            Manage Questions
+                                                        </button>
+                                                    )}
+                                                    
                                                     {lesson.type === 'quiz' && (
                                                         <button
                                                             onClick={() => navigate(`/teacher/quiz-builder/${lesson._id}`)}
                                                             className="btn btn-primary-teacher btn-sm"
-                                                            style={{ marginRight: '8px' }}
                                                         >
                                                             Manage Questions
                                                         </button>
@@ -335,7 +342,6 @@ const EditCoursePage = () => {
                                                     <button
                                                         onClick={() => handleOpenEditLessonModal(lesson)}
                                                         className="btn btn-outline btn-sm"
-                                                        style={{ marginRight: '8px' }}
                                                     >
                                                         Edit Info
                                                     </button>
@@ -364,8 +370,6 @@ const EditCoursePage = () => {
             </main>
 
             {/* MODALS */}
-            
-            {/* Lesson Modal dùng onSave={handleAddLesson} */}
             <LessonModal
                 isOpen={isLessonModalOpen}
                 onClose={handleCloseLessonModal}
@@ -373,7 +377,6 @@ const EditCoursePage = () => {
                 onSave={handleAddLesson} 
             />
 
-            {/* Module Modal dùng onSave={handleSaveModule} */}
             <ModuleModal
                 isOpen={isModuleModalOpen}
                 onClose={handleCloseModuleModal}

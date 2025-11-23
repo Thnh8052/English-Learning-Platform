@@ -18,6 +18,7 @@ import AdminReviewPage from '../pages/admin/adminReviewPage.jsx';
 import EditCoursePage from "../pages/teacher/editCoursePage.jsx";
 import LessonView from '../pages/lessons/LessonView.jsx';
 import QuizBuilder from "../pages/teacher/quizBuilder.jsx";
+import SpeakingBuilder from "../pages/teacher/speakingBuilder.jsx";
 
 
 const router = createBrowserRouter([
@@ -49,6 +50,8 @@ const router = createBrowserRouter([
       { path: "admin/review/:courseId", element: <AdminReviewPage /> },
       { path: "teacher/edit-course/:courseId", element: <EditCoursePage /> },
       { path: "teacher/quiz-builder/:lessonId", element: <QuizBuilder /> },
+      { path: "teacher/lesson/:lessonId/speaking", element: <SpeakingBuilder /> },
+
         ],   
       },   
     ],

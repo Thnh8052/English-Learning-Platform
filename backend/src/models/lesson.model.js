@@ -3,13 +3,15 @@ const Schema = mongoose.Schema;
 
 const lessonSchema = new Schema({
     title: { type: String, required: true },
+    
+    // Cập nhật enum type để bao gồm 'speaking_prompt'
     type: { 
         type: String, 
         enum: ['video', 'reading', 'listening_audio', 'speaking_prompt', 'quiz', 'assignment'], 
         required: true 
     },
     
-    // --- CÁC TRƯỜNG CŨ GIỮ NGUYÊN (fileUrl, prompt...) ---
+    // --- CÁC TRƯỜNG CŨ GIỮ NGUYÊN ---
     prompt: { type: String },
     promptType: { type: String, enum: ['text', 'image', 'pdf'], default: 'text' },
     module: { type: Schema.Types.ObjectId, ref: 'Module', required: true },
@@ -17,11 +19,23 @@ const lessonSchema = new Schema({
     fileUrl: { type: String },
     fileType: { type: String },
 
-    // --- THÊM MỚI: Mảng chứa câu hỏi cho Quiz ---
+    // --- CẬP NHẬT TRƯỜNG QUESTIONS (LINH HOẠT HƠN) ---
     questions: [{
-        questionText: { type: String, required: true },
-        options: [{ type: String, required: true }], // Mảng các đáp án (VD: ["A", "B", "C", "D"])
-        correctAnswerIndex: { type: Number, required: true } // Index của đáp án đúng (0, 1, 2, hoặc 3)
+        // 1. Chung cho cả Quiz và Speaking
+        questionText: { type: String, required: true }, 
+
+        // 2. Dành riêng cho QUIZ (Trắc nghiệm)
+        // Lưu ý: Không để required: true ở đây nữa, vì bài Speaking sẽ không có options
+        options: [{ type: String }], 
+        correctAnswerIndex: { type: Number },
+
+        // 3. Dành riêng cho SPEAKING
+        part: { 
+            type: String, 
+            enum: ['part1', 'part2', 'part3'], 
+            default: 'part1' 
+        },
+        sampleAnswer: { type: String } // Bài mẫu (nếu giáo viên muốn cung cấp)
     }]
 
 }, { timestamps: true });
