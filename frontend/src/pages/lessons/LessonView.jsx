@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import styles from './lessonView.module.css';
 import ExamLayout from '../../components/exam/ExamLayout.jsx';
+import SpeakingPlayer from './SpeakingPlayer.jsx';
 import QuizAnswers from './quizAnswers.jsx';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -34,32 +35,32 @@ const WritingComponent = ({ lesson, onSubmit }) => {
   );
 };
 
-/* ==========================
-   SPEAKING LESSON COMPONENT
-========================== */
-const SpeakingComponent = ({ lesson, onSubmit }) => {
-  const handleRecord = () => alert('Recording feature coming soon!');
+// /* ==========================
+//    SPEAKING LESSON COMPONENT
+// ========================== */
+// const SpeakingComponent = ({ lesson, onSubmit }) => {
+//   const handleRecord = () => alert('Recording feature coming soon!');
 
-  return (
-    <ExamLayout
-      instructionComponent={
-        <div
-          className="prose-content"
-          dangerouslySetInnerHTML={{ __html: lesson.prompt || 'No prompt provided.' }}
-        />
-      }
-      answerComponent={
-        <div>
-          <p>Click the button below to start recording your answer (coming soon).</p>
-          <button onClick={handleRecord} className="btn btn-primary-student">
-            Start Recording
-          </button>
-        </div>
-      }
-      onSubmit={() => onSubmit({ lessonId: lesson._id, content: 'audio_placeholder' })}
-    />
-  );
-};
+//   return (
+//     <ExamLayout
+//       instructionComponent={
+//         <div
+//           className="prose-content"
+//           dangerouslySetInnerHTML={{ __html: lesson.prompt || 'No prompt provided.' }}
+//         />
+//       }
+//       answerComponent={
+//         <div>
+//           <p>Click the button below to start recording your answer (coming soon).</p>
+//           <button onClick={handleRecord} className="btn btn-primary-student">
+//             Start Recording
+//           </button>
+//         </div>
+//       }
+//       onSubmit={() => onSubmit({ lessonId: lesson._id, content: 'audio_placeholder' })}
+//     />
+//   );
+// };
 
 /* ==========================
    VIDEO PLAYER COMPONENT
@@ -162,8 +163,8 @@ const LessonView = () => {
         return <PdfReader url={lesson.fileUrl} />;
       case 'assignment':
         return <WritingComponent lesson={lesson} onSubmit={handleSubmitAnswer} />;
-      case 'speaking_prompt':
-        return <SpeakingComponent lesson={lesson} onSubmit={handleSubmitAnswer} />;
+      case 'speaking_prompt': // Hoặc 'speaking' tùy enum bạn chọn
+        return <SpeakingPlayer lesson={lesson} />;
       case 'quiz':
         return <QuizAnswers lesson={lesson} />;
       default:
