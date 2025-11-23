@@ -33,7 +33,7 @@ const CourseContentAccordion = ({ modules }) => {
                                 <svg className={`${styles.accordionIcon} ${isOpen ? styles.open : ''}`} width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fillRule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>
                                 {module.title}
                             </span>
-                            <span className={styles.moduleMeta}>{module.lessons.length} lectures • {totalDuration}</span>
+                            <span className={styles.moduleMeta}>{module.lessons.length} lectures </span>
                         </div>
                         {isOpen && (
                             <div className={styles.accordionContent}>
@@ -44,7 +44,6 @@ const CourseContentAccordion = ({ modules }) => {
                                         className={styles.lessonItem}
                                     >
                                         <span className={styles.lessonTitle}><LessonIcon type={lesson.type} /> {lesson.title}</span>
-                                        <span className={styles.lessonDuration}>{formatDuration(lesson.duration)}</span>
                                     </Link>
                                 ))}
                             </div>
