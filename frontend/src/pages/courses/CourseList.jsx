@@ -116,13 +116,19 @@ const CourseListPage = () => {
                                                     )}
                                                   </div>
                                             <p className={styles.teacherName}>Taught by: {course.teacher?.name || '...'}</p>
-
                                             {user && user.role === 'student' && (isEnrolled ? (
-                                                <div className={`${styles.btn} ${styles.btnUnenroll}`}>You have already enrolled in this course</div>
+                                                <div className={`${styles.btn} ${styles.btnUnenroll}`}>
+                                                    <span>✓ Enrolled</span>
+                                                </div>
                                             ) : (
                                                 <div className={`${styles.btn} ${styles.btnEnroll}`}>View Details</div>
                                             ))}
-                                            {user && isMyTeachingCourse && <span className={styles.tag}>You are teaching this course</span>}
+
+                                            {user && isMyTeachingCourse && (
+                                                <div className={styles.tag}>
+                                                    <span>Your  Course</span>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                     {<CourseTooltip course={course} />}

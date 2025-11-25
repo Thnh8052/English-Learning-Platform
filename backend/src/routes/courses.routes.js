@@ -16,7 +16,10 @@ import {
   submitForReview,
   retractCourse,
   deleteCourse,
+  getCourseDashboard,
 } from "../controllers/courses.controller.js";
+import { getSubmissionsByCourse } from '../controllers/submissions.controller.js';
+
 
 const router = express.Router();
 
@@ -24,17 +27,19 @@ const router = express.Router();
 // --- CÁC ROUTE CÓ ĐƯỜNG DẪN CỐ ĐỊNH PHẢI ĐẶT LÊN TRÊN ---
 
 // GET /api/courses -> Lấy tất cả khóa học
-router.get('/', getAllCourses); 
+router.get('/', getAllCourses);
+// GET /api/courses/:id/content -> Lấy nội dung khóa học
+router.get('/:id/content', getCourseContent);
 
-// GET /api/courses/my-courses -> Lấy các khóa học đã đăng ký của sinh viên
-router.get('/my-courses', protect, authorizeRoles('student'), getMyEnrolledCourses);
+// --- STUDENT ---
+router.get('/my-courses', protect, getMyEnrolledCourses);
+router.post('/:id/enroll', protect, enrollInCourse);
 
-// GET /api/courses/my-teaching-courses -> Lấy các khóa học của giáo viên
+// --- TEACHER ---
+router.post('/', protect, authorizeRoles('teacher'), createCourse);
 router.get('/my-teaching-courses', protect, authorizeRoles('teacher'), getMyTeachingCourses);
 
 
-// --- CÁC ROUTE CÓ ĐƯỜNG DẪN ĐỘNG (VỚI :id) ĐẶT Ở DƯỚI ---
-router.get('/:id/content', getCourseContent);//Lấy nội dung khóa học
 
 // GET /api/courses/:id -> Lấy chi tiết một khóa học
 router.get('/:id', getCourseById); // Lấy khóa học theo ID
@@ -47,9 +52,14 @@ router.put('/:id', protect, authorizeRoles('teacher'), updateCourse);
 
 // POST /api/courses/:id/submit-for-review -> Giáo viên gửi khóa học để xem xét
 router.post('/:id/submit-for-review', protect, authorizeRoles('teacher'), submitForReview);
+
+// Lấy danh sách bài nộp của khóa học
+router.get('/:courseId/submissions', protect, authorizeRoles('teacher'), getSubmissionsByCourse);
+
 // POST /api/courses/:id/retract -> Giáo viên rút lại khóa học từ xem xét
 router.post('/:id/retract', protect, authorizeRoles('teacher'), retractCourse);
 router.delete('/:id', protect, authorizeRoles('teacher'), deleteCourse);
+router.get('/:id/dashboard', protect, authorizeRoles('teacher'), getCourseDashboard);
 
 // --- CÁC ROUTE KHÁC ---
 

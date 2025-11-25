@@ -6,11 +6,11 @@ import authRoutes from "./src/routes/auth.routes.js";
 import testRoutes from "./src/routes/test.routes.js";
 import courseRoutes from "./src/routes/courses.routes.js";
 import lessonRoutes from "./src/routes/lesson.routes.js";
+import submissionRoutes from './src/routes/submissions.routes.js';
+
+
 import moduleRoutes from './src/routes/modules.routes.js';
 import aiRoutes from './src/routes/ai.routes.js';
-
-
-import submissionRoutes from './src/routes/submissions.routes.js';
 
 
 import adminRoutes from './src/routes/admin.routes.js';
@@ -34,6 +34,7 @@ app.use('/uploads', express.static('uploads'));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
+app.use('/api/submissions', submissionRoutes);
 app.use('/api/test', testRoutes); // Thêm route để test phân quyền
 app.use('/api/lessons', lessonRoutes);
 

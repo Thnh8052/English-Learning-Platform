@@ -1,23 +1,45 @@
 import express from 'express';
-import { createSubmission,submitQuiz,submitSpeaking } from '../controllers/submissions.controller.js';
-import { protect } from '../middleware/auth.middleware.js';
-import { authorizeRoles } from '../middleware/auth.middleware.js';
+import { 
+    createSubmission, 
+    submitQuiz, 
+    submitSpeaking, 
+    getSubmissionById,
+    gradeSubmission,
+    getMySubmissionHistory
+} from '../controllers/submissions.controller.js';
+
+import { protect, authorizeRoles } from '../middleware/auth.middleware.js';
 import { lessonStorage } from '../config/cloudinary.js';
 import multer from 'multer';
 
 const upload = multer({ storage: lessonStorage });
 
-
 const router = express.Router();
 
+// --- MIDDLEWARE CHUNG ---
 // Tất cả các route trong file này đều yêu cầu đăng nhập
 router.use(protect);
 
-// Chỉ học viên mới có thể nộp bài
+// --- STUDENT ROUTES ---
+// 1. Nộp bài tập thường (Text/File link)
 router.post('/', authorizeRoles('student'), createSubmission);
-    // Logic xử lý nộp bài Quiz và chấm điểm tự động
+
+// 2. Nộp bài Quiz (Chấm điểm tự động)
 router.post('/quiz', authorizeRoles('student'), submitQuiz);
-// Logic xử lý nộp bài Speaking với upload file
-router.post('/speaking', protect, authorizeRoles('student'), upload.any(), submitSpeaking);
+
+// 3. Nộp bài Speaking (Upload audio lên Cloudinary)
+router.post('/speaking', authorizeRoles('student'), upload.any(), submitSpeaking);
+
+// 4. Xem lịch sử làm bài Quiz của bản thân
+router.get('/my-quiz-history', authorizeRoles('student'), getMySubmissionHistory);
+
+
+// --- TEACHER ROUTES ---
+// 5. Lấy chi tiết một bài nộp để chấm điểm
+// (Cho phép cả admin và teacher truy cập)
+router.get('/:id', authorizeRoles('teacher', 'admin'), getSubmissionById);
+
+// 6. Gửi kết quả chấm điểm (Score & Feedback)
+router.post('/:id/grade', authorizeRoles('teacher', 'admin'), gradeSubmission);
 
 export default router;
