@@ -12,7 +12,6 @@ const ExamLayout = ({ instructionComponent, answerComponent, onSubmit }) => {
         try {
             await onSubmit();
         } catch (error) {
-            // Lỗi đã được xử lý và alert ở component cha (LessonView)
         } finally {
             setIsSubmitting(false);
         }

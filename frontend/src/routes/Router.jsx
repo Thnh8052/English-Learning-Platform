@@ -10,7 +10,11 @@ import Courses from "../pages/courses/CourseList.jsx";
 import Discussion from "../pages/discussion/Discussion.jsx";
 import NotFound from "../pages/notFound/NotFound.jsx";
 import Dashboard from "../pages/dashboard/Dashboard.jsx";
+import CourseDashboard from "../pages/teacher/courseDashboard.jsx";
+import GradingList from "../pages/dashboard/Views/Teacher/GradingList.jsx";
+import GradingDetail from "../pages/dashboard/Views/Teacher/GradingDetail.jsx";
 import Profile from "../pages/profile/Profile.jsx";
+
 import ProtectedRoute from "../components/ProtectedRoutes.jsx";
 import CourseDetailPage from "../pages/courses/CourseDetailPage.jsx";
 import CreateCoursePage from "../pages/teacher/createCourse.jsx";
@@ -19,7 +23,6 @@ import EditCoursePage from "../pages/teacher/editCoursePage.jsx";
 import LessonView from '../pages/lessons/LessonView.jsx';
 import QuizBuilder from "../pages/teacher/quizBuilder.jsx";
 import SpeakingBuilder from "../pages/teacher/speakingBuilder.jsx";
-
 
 const router = createBrowserRouter([
   {
@@ -38,20 +41,27 @@ const router = createBrowserRouter([
       { path: "courses/:courseId", element: <CourseDetailPage /> },
       { path: "lessons/:lessonId", element: <LessonView /> },
 
-
       {
         element: <ProtectedRoute />,
         children: [
-      { path: "dashboard", element: <Dashboard /> },
-      { path: "teacher", element: <Dashboard /> },
-      { path: "admin", element: <Dashboard /> },
-      { path: "profile", element: <Profile /> },
-      { path: "teacher/create-course", element: <CreateCoursePage /> },
-      { path: "admin/review/:courseId", element: <AdminReviewPage /> },
-      { path: "teacher/edit-course/:courseId", element: <EditCoursePage /> },
-      { path: "teacher/quiz-builder/:lessonId", element: <QuizBuilder /> },
-      { path: "teacher/lesson/:lessonId/speaking", element: <SpeakingBuilder /> },
+          { path: "dashboard", element: <Dashboard /> },
+          { path: "teacher", element: <Dashboard /> },
+          { path: "admin", element: <Dashboard /> },
+          { path: "profile", element: <Profile /> },
+          
+          // --- Student Routes ---
+          
+          // --- Teacher Routes ---
+          { path: "teacher/create-course", element: <CreateCoursePage /> },
+          { path: "teacher/courses/:courseId/dashboard", element: <CourseDashboard /> },
+          { path: "teacher/courses/:courseId/grading", element: <GradingList /> },
+          { path: "teacher/grading/:submissionId", element: <GradingDetail /> },
+          { path: "teacher/edit-course/:courseId", element: <EditCoursePage /> },
+          { path: "teacher/quiz-builder/:lessonId", element: <QuizBuilder /> },
+          { path: "teacher/lesson/:lessonId/speaking", element: <SpeakingBuilder /> },
 
+          // --- Admin Routes ---
+          { path: "admin/review/:courseId", element: <AdminReviewPage /> },
         ],   
       },   
     ],

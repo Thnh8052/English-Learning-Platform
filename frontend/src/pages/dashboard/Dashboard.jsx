@@ -1,17 +1,56 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from "../../contexts/AuthContext";
+import { Link } from 'react-router-dom';
+import api from '../../services/api';
 import StudentView from "./Views/Student/StudentView";
 import TeacherView from "./Views/Teacher/TeacherView";
 import AdminView from "./Views/Admin/AdminView";
 import styles from "./dashboard.module.css";
 
-// --- COMPONENT SIDEBAR TRÁI (NÂNG CẤP VỚI LOGIC THU GỌN) ---
+//COMPONENT SIDEBAR TRÁI
 const NavigationSidebar = () => {
-  // State để quản lý trạng thái mở/đóng của "My courses"
+  const { user } = useAuth();
   const [isCoursesExpanded, setIsCoursesExpanded] = useState(true);
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(false);
 
+  // Toggle menu
   const toggleCourses = () => {
     setIsCoursesExpanded(prevState => !prevState);
+  };
+
+  // Fetch dữ liệu khóa học dựa trên Role
+  useEffect(() => {
+    const fetchSidebarCourses = async () => {
+      if (!user) return;
+      setLoading(true);
+      try {
+        let res;
+        if (user.role === 'student') {
+          res = await api.get('/courses/my-courses');
+        } else if (user.role === 'teacher') {
+          res = await api.get('/courses/my-teaching-courses');
+        }
+        
+        if (res && res.data) {
+          setCourses(res.data);
+        }
+      } catch (error) {
+        console.error("Failed to load sidebar courses", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSidebarCourses();
+  }, [user]);
+
+  // Xác định đường dẫn dựa trên Role
+  const getCourseLink = (courseId) => {
+    if (user.role === 'teacher') {
+      return `/teacher/courses/${courseId}/dashboard`; // Giáo viên -> Trang quản lý
+    }
+    return `/courses/${courseId}`; // Học viên -> Trang chi tiết khóa học
   };
 
   return (
@@ -19,20 +58,34 @@ const NavigationSidebar = () => {
       <h3>Navigation</h3>
       <nav>
         <ul className={styles.navList}>
-          <li><a href="#" className={styles.navLinkActive}>Dashboard</a></li>
-          <li><a href="#" className={styles.navLink}>Site home</a></li>
-          <li>
-            <div className={styles.navLink} onClick={toggleCourses}>
-              <span>My courses</span>
-              <svg className={`${styles.navIcon} ${isCoursesExpanded ? styles.expanded : ''}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
-            </div>
-            <ul className={`${styles.courseSublist} ${isCoursesExpanded ? styles.expanded : ''}`}>
-              <li><a href="#">› Kỹ năng mềm</a></li>
-              <li><a href="#">› Tâm lý học ứng dụng</a></li>
-              <li><a href="#">› Quản trị học đại cương</a></li>
-              <li><a href="#">› Cơ sở dữ liệu</a></li>
-            </ul>
-          </li>
+          <li><Link to="/dashboard" className={styles.navLinkActive}>Dashboard</Link></li>
+          <li><Link to="/" className={styles.navLink}>Site home</Link></li>
+          
+          {/* Mục My Courses */}
+          {(user.role === 'student' || user.role === 'teacher') && (
+            <li>
+              <div className={styles.navLink} onClick={toggleCourses}>
+                <span>My courses</span>
+                <svg className={`${styles.navIcon} ${isCoursesExpanded ? styles.expanded : ''}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+              </div>
+              
+              <ul className={`${styles.courseSublist} ${isCoursesExpanded ? styles.expanded : ''}`}>
+                {loading ? (
+                  <li className={styles.loadingItem}>Loading...</li>
+                ) : courses.length > 0 ? (
+                  courses.map(course => (
+                    <li key={course._id}>
+                      <Link to={getCourseLink(course._id)} title={course.name}>
+                        › {course.name}
+                      </Link>
+                    </li>
+                  ))
+                ) : (
+                  <li className={styles.emptyItem}>No courses found</li>
+                )}
+              </ul>
+            </li>
+          )}
         </ul>
       </nav>
     </div>
@@ -40,7 +93,7 @@ const NavigationSidebar = () => {
 };
 
 
-// --- COMPONENT SIDEBAR PHẢI ---
+// --- COMPONENT SIDEBAR PHẢI (Giữ nguyên logic cũ) ---
 const CalendarSidebar = ({ user }) => (
   <>
     <div className={styles.block}>
@@ -64,7 +117,7 @@ const CalendarSidebar = ({ user }) => (
     <div className={styles.block}>
       <h3>Upcoming events</h3>
       <div className={styles.eventItem}>
-        <a href="#">Bài tập lý thuyết chương 2 is due</a>
+        <a href="#">Homework Chapter 2 due</a>
         <p>Sunday, 26 October, 11:59 PM</p>
       </div>
       {user.role === 'teacher' && (

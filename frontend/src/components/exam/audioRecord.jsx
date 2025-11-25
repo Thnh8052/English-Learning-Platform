@@ -10,19 +10,18 @@ const AudioRecorder = ({ onRecordingComplete, existingAudioBlob }) => {
     const audioChunksRef = useRef([]);
     const timerRef = useRef(null);
 
-    // Nếu component mount lại mà đã có audio trước đó (dùng cho tính năng Resume/Back)
+    //Nếu component mount lại mà đã có audio trước đó (dùng cho tính năng Resume/Back)
     useEffect(() => {
         if (existingAudioBlob) {
             const url = URL.createObjectURL(existingAudioBlob);
             setAudioUrl(url);
         }
-        // Cleanup URL khi unmount để tránh leak memory
         return () => {
             if (audioUrl) URL.revokeObjectURL(audioUrl);
         };
     }, [existingAudioBlob]); // Thêm dependency existingAudioBlob
 
-    // Đồng hồ đếm giờ
+    //Đồng hồ đếm giờ
     useEffect(() => {
         if (isRecording) {
             timerRef.current = setInterval(() => {
@@ -51,17 +50,17 @@ const AudioRecorder = ({ onRecordingComplete, existingAudioBlob }) => {
                 setAudioUrl(url);
                 audioChunksRef.current = []; // Reset chunks
                 
-                // Gửi blob ra ngoài cho component cha
+                //Gửi blob ra ngoài cho component cha
                 onRecordingComplete(audioBlob);
                 
-                // Tắt mic (đèn đỏ trên tab)
+                //Tắt mic (đèn đỏ trên tab)
                 stream.getTracks().forEach(track => track.stop());
             };
 
             mediaRecorderRef.current.start();
             setIsRecording(true);
             setRecordingTime(0);
-            setAudioUrl(null); // Xóa audio cũ nếu có
+            setAudioUrl(null); //Xóa audio cũ nếu có
         } catch (error) {
             console.error("Error accessing microphone:", error);
             alert("Microphone access denied or not found.");
@@ -78,11 +77,11 @@ const AudioRecorder = ({ onRecordingComplete, existingAudioBlob }) => {
     const handleRecordAgain = () => {
         if (confirm("This will delete your current recording. Are you sure?")) {
             setAudioUrl(null);
-            onRecordingComplete(null); // Xóa blob ở cha
+            onRecordingComplete(null); //Xóa blob ở cha
         }
     };
 
-    // Format giây thành mm:ss
+    //Format giây thành mm:ss
     const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
@@ -92,14 +91,14 @@ const AudioRecorder = ({ onRecordingComplete, existingAudioBlob }) => {
     return (
         <div className={styles.recorderContainer}>
             
-            {/* 1. Trạng thái chưa ghi âm & chưa có file */}
+            {/*Trạng thái chưa ghi âm & chưa có file */}
             {!isRecording && !audioUrl && (
                 <button onClick={startRecording} className="btn btn-primary-student">
                     🎙️ Start Recording
                 </button>
             )}
 
-            {/* 2. Đang ghi âm */}
+            {/* Đang ghi âm */}
             {isRecording && (
                 <div className={styles.recordingStatus}>
                     <div className={styles.indicator}>
@@ -111,7 +110,7 @@ const AudioRecorder = ({ onRecordingComplete, existingAudioBlob }) => {
                 </div>
             )}
 
-            {/* 3. Đã ghi âm xong (Playback & Retry) */}
+            {/*Đã ghi âm xong (Playback & Retry) */}
             {audioUrl && (
                 <div className={styles.playbackContainer}>
                     <audio src={audioUrl} controls className={styles.audioPlayer} />
