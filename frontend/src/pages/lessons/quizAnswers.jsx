@@ -6,9 +6,9 @@ import styles from './quizAnswers.module.css';
 const QuizAnswers = ({ lesson }) => {
     const navigate = useNavigate();
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [userAnswers, setUserAnswers] = useState({}); // Lưu dạng { indexCâu: indexĐápÁn }
+    const [userAnswers, setUserAnswers] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [result, setResult] = useState(null); // Lưu kết quả trả về từ server
+    const [result, setResult] = useState(null);
 
     const questions = lesson.questions || [];
     const currentQuestion = questions[currentQuestionIndex];
@@ -48,7 +48,16 @@ const QuizAnswers = ({ lesson }) => {
                 lessonId: lesson._id,
                 userAnswers: userAnswers
             });
-            setResult(res.data); // Lưu kết quả để hiển thị màn hình điểm số
+            
+            // --- SỬA LỖI Ở ĐÂY ---
+            const submissionData = res.data.submission || res.data;
+            setResult(submissionData);
+
+            alert("Nộp bài thành công!");
+            
+            // Reload trang để LessonView nhận diện trạng thái 'completed' và hiển thị màn hình kết quả chung
+            window.location.reload(); 
+
         } catch (error) {
             console.error("Submit quiz failed:", error);
             alert("Có lỗi xảy ra khi nộp bài.");
@@ -58,35 +67,37 @@ const QuizAnswers = ({ lesson }) => {
     };
 
     // --- MÀN HÌNH KẾT QUẢ ---
+    // Hiển thị trong lúc chờ reload hoặc nếu reload thất bại
     if (result) {
+        const percentage = result.score?.percentage ?? 0;
+        const correct = result.score?.correct ?? 0;
+        const total = result.score?.total ?? 0;
+
         return (
             <div className={styles.resultContainer}>
                 <div className={styles.scoreCard}>
                     <h2>🎉 Quiz Completed!</h2>
                     <div className={styles.scoreCircle}>
-                        <span>{result.score.percentage}%</span>
+                        <span>{percentage}%</span>
                     </div>
-                    <p>You got <strong>{result.score.correct}</strong> out of <strong>{result.score.total}</strong> questions correct.</p>
+                    <p>Bạn trả lời đúng <strong>{correct}</strong> trên tổng số <strong>{total}</strong> câu.</p>
                     
                     <button 
                         className="btn btn-primary-student" 
-                        onClick={() => navigate(`/courses/${lesson.module.course}`)} // Quay về trang khóa học
+                        onClick={() => window.location.reload()}
                     >
-                        Back to Course
+                        Xem chi tiết kết quả
                     </button>
-                    
-                    {/* (Nâng cao) Có thể hiển thị chi tiết đúng sai từng câu ở đây */}
                 </div>
             </div>
         );
     }
 
     // --- MÀN HÌNH LÀM BÀI ---
-    if (questions.length === 0) return <p>This quiz has no questions yet.</p>;
+    if (questions.length === 0) return <p>Bài trắc nghiệm chưa có câu hỏi.</p>;
 
     return (
         <div className={styles.playerContainer}>
-            {/* Progress Bar */}
             <div className={styles.progressBar}>
                 <div 
                     className={styles.progressFill} 
@@ -95,7 +106,7 @@ const QuizAnswers = ({ lesson }) => {
             </div>
 
             <div className={styles.questionCard}>
-                <span className={styles.questionCount}>Question {currentQuestionIndex + 1} / {questions.length}</span>
+                <span className={styles.questionCount}>Câu hỏi {currentQuestionIndex + 1} / {questions.length}</span>
                 <h3 className={styles.questionText}>{currentQuestion.questionText}</h3>
 
                 <div className={styles.optionsList}>
@@ -118,7 +129,7 @@ const QuizAnswers = ({ lesson }) => {
                     onClick={handlePrev} 
                     disabled={currentQuestionIndex === 0}
                 >
-                    Previous
+                    Quay lại
                 </button>
 
                 {isLastQuestion ? (
@@ -127,14 +138,14 @@ const QuizAnswers = ({ lesson }) => {
                         onClick={handleSubmit}
                         disabled={isSubmitting}
                     >
-                        {isSubmitting ? 'Submitting...' : 'Submit Quiz'}
+                        {isSubmitting ? 'Đang nộp...' : 'Nộp bài'}
                     </button>
                 ) : (
                     <button 
                         className="btn btn-primary-student" 
                         onClick={handleNext}
                     >
-                        Next
+                        Tiếp theo
                     </button>
                 )}
             </div>

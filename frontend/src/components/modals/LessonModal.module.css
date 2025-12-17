@@ -1,107 +1,113 @@
-/* ----- Inputs (text, email, number, v.v.) ----- */
-.form input,
-.grid input {
-  color: #000 !important;
-  background-color: #fff !important;
-  border: 1px solid var(--color-gray-300);
-  caret-color: #000 !important;
-  appearance: auto !important;
-  -webkit-appearance: textfield !important;
-  padding: 0.5rem 0.75rem;
-  border-radius: 6px;
+/* ----- Form Container ----- */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
 }
 
-/* ----- Textareas ----- */
+.radioGroup {
+  display: flex;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-2);
+  align-items: center;
+}
+
+.radioGroup label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+/* ----- Inputs, Textareas, Selects ----- */
+.form input[type="text"],
+.form input[type="file"],
 .form textarea,
-.grid textarea {
-  color: #000 !important;
-  background-color: #fff !important;
-  border: 1px solid var(--color-gray-300);
-  padding: 0.5rem 0.75rem;
-  border-radius: 6px;
+.form select {
+  width: 100%;
+  color: var(--input-text);
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--border-radius-md);
+  font-family: inherit;
+  font-size: 1rem;
+  transition: var(--transition-base);
+  
+  /* Reset appearance */
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* Fix riêng cho textarea */
+.form textarea {
+  min-height: 100px;
   resize: vertical;
-  overflow: auto;
-  caret-color: #000 !important;
 }
 
-/* ----- Selects ----- */
-.form select,
-.grid select {
-  color: #000 !important;
-  background-color: #fff !important;
-  border: 1px solid var(--color-gray-300);
-  padding: 0.45rem 0.75rem;
-  border-radius: 6px;
-  appearance: menulist !important;
-  -webkit-appearance: menulist-button !important;
-  caret-color: #000 !important;
+/* Fix riêng cho select (mũi tên) */
+.form select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
 }
 
-/* ----- Options inside selects ----- */
-.form select option,
-.grid select option {
-  color: #000 !important;
-  background-color: #fff !important;
+/* Dark mode override cho icon select */
+@media (prefers-color-scheme: dark) {
+  .form select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  }
 }
 
-/* ----- Placeholder text ----- */
+/* ----- Placeholder ----- */
 .form input::placeholder,
-.form textarea::placeholder,
-.grid input::placeholder,
-.grid textarea::placeholder {
-  color: #6b7280;
-}
-
-/* ----- Autofill (Chrome) ----- */
-.form input:-webkit-autofill,
-.form textarea:-webkit-autofill,
-.grid input:-webkit-autofill,
-.grid textarea:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0px 1000px #fff inset !important;
-  box-shadow: 0 0 0px 1000px #fff inset !important;
-  -webkit-text-fill-color: #000 !important;
-  caret-color: #000 !important;
+.form textarea::placeholder {
+  color: var(--input-placeholder);
 }
 
 /* ----- Focus state ----- */
 .form input:focus,
 .form textarea:focus,
-.form select:focus,
-.grid input:focus,
-.grid textarea:focus,
-.grid select:focus {
+.form select:focus {
   outline: none;
   border-color: var(--color-info);
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
 }
 
-/* ----- Edge/IE select arrow fix ----- */
-.form select::-ms-expand,
-.grid select::-ms-expand {
-  color: #000;
-  background: #fff;
+/* ----- Autofill Fix (Cho Chrome không bị trắng nền) ----- */
+.form input:-webkit-autofill,
+.form textarea:-webkit-autofill,
+.form select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px var(--input-bg) inset !important;
+  box-shadow: 0 0 0px 1000px var(--input-bg) inset !important;
+  -webkit-text-fill-color: var(--input-text) !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
-/* ----- Ensure form controls use light color-scheme (helps Chrome/Edge dark native) ----- */
-.form input,
-.form textarea,
-.form select,
-.grid input,
-.grid textarea,
-.grid select {
-  color-scheme: light !important;
-}
-
-/* Keep existing classes untouched */
+/* ----- Modal Specifics ----- */
 .errorText {
   color: var(--color-error);
+  font-size: 0.9rem;
+  margin-bottom: var(--spacing-2);
+  padding: var(--spacing-2);
+  background-color: var(--color-error-light);
+  border-radius: var(--border-radius-sm);
 }
 
 .modalActions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  margin-top: 1.5rem;
-  padding-top: 1rem;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-4);
+  padding-top: var(--spacing-3);
   border-top: 1px solid var(--color-gray-200);
+}
+
+@media (prefers-color-scheme: dark) {
+  .modalActions {
+    border-top-color: var(--color-gray-700);
+  }
 }

@@ -43,7 +43,7 @@ userSchema.methods.getResetPasswordToken = function () {
         .createHash('sha256')
         .update(resetToken)
         .digest('hex');
-    
+    //thời gian hết hạn token reset mật khẩu
     this.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 phút
 
     return resetToken;

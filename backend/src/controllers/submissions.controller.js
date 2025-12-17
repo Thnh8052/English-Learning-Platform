@@ -13,6 +13,13 @@ const getLessonWithCourse = async (lessonId) => {
         populate: { path: 'course', select: '_id teacher' }
     });
 };
+const getNextAttempt = async (studentId, lessonId) => {
+    const count = await Submission.countDocuments({ student: studentId, lesson: lessonId });
+    if (count >= 5) {
+        throw new Error('Bạn đã hết lượt làm bài (Tối đa 5 lần).');
+    }
+    return count + 1;
+};
 
 // --- STUDENT CONTROLLERS ---
 
@@ -41,17 +48,21 @@ export const createSubmission = async (req, res) => {
             return res.status(403).json({ message: 'Bạn chưa ghi danh vào khóa học này.' });
         }
 
+        /*
         const existingSubmission = await Submission.findOne({ student: studentId, lesson: lessonId });
         if (existingSubmission) {
             return res.status(400).json({ message: 'Bạn đã nộp bài cho bài học này rồi.' });
-        }
+        } */
+
+        const attempt = await getNextAttempt(studentId, lessonId);
 
         const submission = new Submission({
             student: studentId,
             lesson: lessonId,
             course: courseId,
             content: content,
-            status: 'submitted'
+            status: 'submitted',
+            attempt: attempt
         });
 
         await submission.save();
@@ -73,54 +84,73 @@ export const submitQuiz = async (req, res) => {
         const { lessonId, userAnswers } = req.body;
         const studentId = req.user.id;
 
-        const lesson = await getLessonWithCourse(lessonId);
-        if (!lesson || lesson.type !== 'quiz') {
-            return res.status(404).json({ message: 'Bài quiz không tồn tại.' });
-        }
+        const lesson = await Lesson.findById(lessonId).populate({ path: 'module', select: 'course'});
+        if (!lesson) return res.status(404).json({ message: 'Bài học không tồn tại.' });
 
         let correctCount = 0;
-        const totalQuestions = lesson.questions.length;
-
+        
+        // Tạo mảng answers theo cấu trúc mới của Model
         const processedAnswers = lesson.questions.map((q, index) => {
             const selected = userAnswers[index];
-            const isCorrect = selected === q.correctAnswerIndex;
+            // So sánh đáp án (lưu ý: kiểm tra null/undefined nếu user không chọn)
+            const isCorrect = (selected !== undefined && selected === q.correctAnswerIndex);
+            
             if (isCorrect) correctCount++;
+            
             return {
                 questionIndex: index,
+                questionText: q.questionText,
                 selectedOptionIndex: selected,
-                isCorrect
+                isCorrect: isCorrect
             };
         });
 
-        const scorePercentage = Math.round((correctCount / totalQuestions) * 100);
+        const totalQuestions = lesson.questions.length;
+        const scorePercentage = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
 
-        const submission = await Submission.findOneAndUpdate(
-            { student: studentId, lesson: lessonId },
-            {
-                student: studentId,
-                lesson: lessonId,
-                course: lesson.module.course._id,
-                content: 'Quiz Attempt',
-                answers: processedAnswers,
-                score: {
+        // const submission = await Submission.findOneAndUpdate(
+        //     { student: studentId, lesson: lessonId },
+        //     {
+        //         student: studentId,
+        //         lesson: lessonId,
+        //         course: lesson.module.course,
+        //         content: `Quiz Result: ${scorePercentage}%`,
+                
+        //         // QUAN TRỌNG: Lưu mảng answers này vào DB
+        //         answers: processedAnswers, 
+                
+        //         score: {
+        //             correct: correctCount,
+        //             total: totalQuestions,
+        //             percentage: scorePercentage
+        //         },
+        //         status: 'completed'
+        //     },
+        //     { upsert: true, new: true, setDefaultsOnInsert: true }
+        // );
+        const attempt = await getNextAttempt(studentId, lessonId);
+
+        const submission = new Submission({
+            student: studentId,
+            lesson: lessonId,
+            course: lesson.module.course,
+            content: `Quiz Attempt ${attempt}`,
+            answers: processedAnswers,
+            score: {
                     correct: correctCount,
                     total: totalQuestions,
                     percentage: scorePercentage
-                },
-                status: 'completed'
             },
-            { upsert: true, new: true, setDefaultsOnInsert: true }
-        );
-
-        res.status(201).json({
-            message: 'Quiz submitted successfully',
-            score: submission.score,
-            results: processedAnswers
+            status: 'completed',
+            attempt: attempt
         });
 
+        await submission.save();
+        res.status(201).json({ message: 'Quiz submitted', submission });
+
     } catch (err) {
-        console.error("Quiz submission error:", err);
-        res.status(500).json({ message: 'Lỗi khi nộp bài quiz' });
+        console.error("Quiz Error:", err);
+        res.status(500).json({ message: 'Lỗi nộp bài' });
     }
 };
 
@@ -157,18 +187,29 @@ export const submitSpeaking = async (req, res) => {
             };
         });
 
-        const submission = await Submission.findOneAndUpdate(
-            { student: studentId, lesson: lessonId },
-            {
-                student: studentId,
-                lesson: lessonId,
-                course: lesson.module.course._id,
-                content: 'Speaking Submission',
-                answers: answers,
-                status: 'submitted'
-            },
-            { upsert: true, new: true, setDefaultsOnInsert: true }
-        );
+        // const submission = await Submission.findOneAndUpdate(
+        //     { student: studentId, lesson: lessonId },
+        //     {
+        //         student: studentId,
+        //         lesson: lessonId,
+        //         course: lesson.module.course._id,
+        //         content: 'Speaking Submission',
+        //         answers: answers,
+        //         status: 'submitted'
+        //     },
+        //     { upsert: true, new: true, setDefaultsOnInsert: true }
+        // );
+        const attempt = await getNextAttempt(studentId, lessonId);
+        const submission = new Submission({
+            student: studentId,
+            lesson: lessonId,
+            course: lesson.module.course._id,
+            content: `Speaking Attempt ${attempt}`,
+            answers: answers,
+            status: 'submitted',
+            attempt: attempt
+        });
+        await submission.save();
 
         res.status(201).json({ message: 'Speaking submission received', submission });
 
@@ -206,6 +247,27 @@ export const getMySubmissionHistory = async (req, res) => {
     }
 };
 
+/**
+ * @desc    Lấy lịch sử làm bài của học viên cho một lesson cụ thể
+ * @route   GET /api/submissions/my-submission/:lessonId
+ */
+export const getSubmissionHistoryByLesson = async (req, res) => {
+    try {
+        const { lessonId } = req.params;
+        const studentId = req.user.id;
+
+        // Lấy tất cả bài nộp, sắp xếp mới nhất lên đầu
+        const submissions = await Submission.find({ student: studentId, lesson: lessonId })
+            .select('createdAt status score attempt')
+            .sort({ attempt: -1 });
+
+        res.json(submissions);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Lỗi server' });
+    }
+};
+
 
 // --- TEACHER CONTROLLERS ---
 
@@ -235,21 +297,32 @@ export const getSubmissionsByCourse = async (req, res) => {
 };
 
 /**
- * @desc    Lấy chi tiết một bài nộp để chấm
+ * @desc    Lấy chi tiết một bài nộp (Dùng cho cả Giáo viên chấm bài & Học sinh xem lại)
  * @route   GET /api/submissions/:id
  */
 export const getSubmissionById = async (req, res) => {
     try {
         const submission = await Submission.findById(req.params.id)
             .populate('student', 'name email avatar')
-            .populate('lesson', 'title content type questions') 
-            .populate('course', 'name');
+            .populate('course', 'name')
+            // Vì questions nằm trực tiếp trong lesson, ta chỉ cần select nó ra
+            .populate({
+                path: 'lesson',
+                select: 'title type content questions module', 
+                populate: { path: 'module', select: 'title' }
+            });
 
         if (!submission) {
             return res.status(404).json({ message: 'Không tìm thấy bài nộp' });
         }
+
+        if (req.user.role === 'student' && submission.student._id.toString() !== req.user.id) {
+            return res.status(403).json({ message: 'Không có quyền xem bài này.' });
+        }
+        
         res.json(submission);
     } catch (err) {
+        console.error(err);
         res.status(500).json({ message: 'Lỗi server' });
     }
 };
@@ -282,5 +355,25 @@ export const gradeSubmission = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Lỗi server khi lưu điểm' });
+    }
+};
+/**
+ * @desc    Lấy bài nộp của user hiện tại cho một lesson cụ thể
+ * @route   GET /api/submissions/my-submission/:lessonId
+ * @access  Private (Student)
+ */
+export const getMySubmissionByLesson = async (req, res) => {
+    try {
+        const { lessonId } = req.params;
+        const studentId = req.user.id;
+
+        const submission = await Submission.findOne({ 
+            student: studentId, 
+            lesson: lessonId 
+        }).sort({ createdAt: -1 }); // Quan trọng
+
+        res.status(200).json(submission || null); 
+    } catch (err) {
+        res.status(500).json({ message: 'Lỗi server' });
     }
 };

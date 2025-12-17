@@ -1,68 +1,101 @@
+/* ===========================
+   LAYOUT
+=========================== */
 .container {
     display: grid;
-    grid-template-columns: 250px 1fr;
+    grid-template-columns: 260px 1fr;
     min-height: calc(100vh - 70px);
-    background-color: var(--color-gray-50);
+    background-color: var(--bg-body);
+    color: var(--text-primary);
 }
 
-/* --- SIDEBAR --- */
+/* ===========================
+   SIDEBAR
+=========================== */
 .sidebar {
-    background-color: var(--color-white);
+    background-color: var(--bg-card);
     border-right: 1px solid var(--color-gray-200);
     padding: var(--spacing-4);
     display: flex;
     flex-direction: column;
+    position: sticky;
+    top: 70px;
+    height: calc(100vh - 70px);
+    transition: var(--transition-base);
+}
+
+@media (prefers-color-scheme: dark) {
+    .sidebar { border-right-color: var(--color-gray-700); }
 }
 
 .courseTitle {
     font-size: 1.1rem;
     font-weight: 700;
-    color: var(--color-gray-800);
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--color-gray-100);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-4);
+    padding-bottom: var(--spacing-2);
+    border-bottom: 1px solid var(--color-gray-200);
+    word-break: break-word;
 }
 
+@media (prefers-color-scheme: dark) {
+    .courseTitle { border-bottom-color: var(--color-gray-700); }
+}
+
+/* Navigation Menu */
 .navMenu {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 6px;
 }
 
 .navItem {
     display: flex;
     align-items: center;
-    padding: 0.75rem 1rem;
+    padding: 10px 12px;
     border-radius: var(--border-radius-md);
-    color: var(--color-gray-600);
+    color: var(--text-secondary);
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: var(--transition-base);
     text-decoration: none;
-    border: none;
-    background: none;
-    text-align: left;
-    width: 100%;
+    border: 1px solid transparent;
 }
 
 .navItem:hover {
     background-color: var(--color-gray-100);
-    color: var(--color-gray-900);
+    color: var(--text-primary);
 }
 
 .navItem.active {
-    background-color: var(--color-student-primary-light); /* Dùng màu nhạt */
-    color: var(--color-student-primary);
+    background-color: var(--color-teacher-primary-light);
+    color: var(--color-teacher-primary);
     font-weight: 600;
+    border-color: rgba(124, 58, 237, 0.1);
 }
 
 .navIcon {
     margin-right: 12px;
-    width: 20px;
-    height: 20px;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
 }
 
-/* --- MAIN CONTENT --- */
+/* Dark mode overrides for Nav */
+@media (prefers-color-scheme: dark) {
+    .navItem:hover { background-color: var(--color-gray-800); }
+    .navItem.active { 
+        background-color: rgba(124, 58, 237, 0.2); 
+        color: #a78bfa; /* Lighter purple for dark mode */
+        border-color: rgba(124, 58, 237, 0.3);
+    }
+}
+
+/* ===========================
+   MAIN CONTENT
+=========================== */
 .mainContent {
     padding: var(--spacing-5);
     overflow-y: auto;
@@ -76,12 +109,16 @@
 }
 
 .pageTitle {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--color-gray-900);
+    font-size: 1.75rem;
+    color: var(--text-primary);
+    margin: 0;
+    font-weight: 800;
 }
 
-/* --- STATS CARDS --- */
+/* ===========================
+   STATS GRID
+=========================== */
+/* Đổi tên từ statGrid thành statsGrid để khớp JSX */
 .statsGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -90,18 +127,40 @@
 }
 
 .statCard {
-    background: white;
+    background-color: var(--bg-card);
     padding: var(--spacing-4);
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--color-gray-200);
     box-shadow: var(--shadow-sm);
     display: flex;
     flex-direction: column;
+    transition: var(--transition-base);
+}
+
+.statCard:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-teacher-primary-light);
+}
+
+/* Warning state for Pending Grading */
+.statCard.warning {
+    border-color: var(--color-warning);
+    background-color: #fffbeb; /* Amber 50 */
+}
+
+@media (prefers-color-scheme: dark) {
+    .statCard { border-color: var(--color-gray-700); }
+    .statCard.warning {
+        background-color: rgba(245, 158, 11, 0.1); /* Amber transparent */
+        border-color: var(--color-warning-hover);
+    }
 }
 
 .statLabel {
-    color: var(--color-gray-500);
-    font-size: 0.875rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -110,65 +169,80 @@
 .statValue {
     font-size: 2rem;
     font-weight: 800;
-    color: var(--color-gray-900);
-    margin: 8px 0;
+    color: var(--text-primary);
+    line-height: 1.2;
 }
 
+/* Thêm class này vì JSX có dùng */
 .statTrend {
+    margin-top: 8px;
     font-size: 0.85rem;
-    color: var(--color-success);
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
 }
 
-/* Warning Color cho thẻ Pending */
-.statCard.warning .statValue {
-    color: var(--color-warning-hover);
-}
-.statCard.warning {
-    border-left: 4px solid var(--color-warning-hover);
-}
-
-/* --- SECTIONS (Recent Activity) --- */
+/* ===========================
+   SECTIONS & LISTS
+=========================== */
+/* Đổi tên từ gridTwo thành sectionGrid để khớp JSX */
 .sectionGrid {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
     gap: var(--spacing-4);
 }
 
 .section {
-    background: white;
-    border-radius: var(--border-radius-lg);
+    background-color: var(--bg-card);
     border: 1px solid var(--color-gray-200);
-    box-shadow: var(--shadow-sm);
+    border-radius: var(--border-radius-lg);
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    box-shadow: var(--shadow-sm);
+}
+
+@media (prefers-color-scheme: dark) {
+    .section { border-color: var(--color-gray-700); }
 }
 
 .sectionHeader {
-    padding: var(--spacing-4);
-    border-bottom: 1px solid var(--color-gray-100);
+    padding: var(--spacing-3) var(--spacing-4);
+    border-bottom: 1px solid var(--color-gray-200);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background-color: var(--color-gray-50);
+}
+
+@media (prefers-color-scheme: dark) {
+    .sectionHeader { 
+        border-bottom-color: var(--color-gray-700);
+        background-color: var(--color-gray-800);
+    }
 }
 
 .sectionTitle {
+    margin: 0;
     font-size: 1.1rem;
     font-weight: 700;
-    margin: 0;
+    color: var(--text-primary);
 }
 
+/* Đổi tên từ viewAll thành viewAllLink để khớp JSX */
 .viewAllLink {
-    font-size: 0.9rem;
-    color: var(--color-student-primary);
+    font-size: 0.85rem;
+    color: var(--color-teacher-primary);
     text-decoration: none;
     font-weight: 600;
+    transition: var(--transition-base);
+}
+.viewAllLink:hover {
+    color: var(--color-teacher-primary-hover);
+    text-decoration: underline;
 }
 
-/* List Items */
 .list {
     display: flex;
     flex-direction: column;
@@ -176,11 +250,12 @@
 
 .listItem {
     padding: var(--spacing-3) var(--spacing-4);
-    border-bottom: 1px solid var(--color-gray-50);
+    border-bottom: 1px solid var(--color-gray-100);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    transition: background 0.2s;
+    transition: background-color 0.2s;
+    background-color: var(--bg-card);
 }
 
 .listItem:last-child {
@@ -191,6 +266,12 @@
     background-color: var(--color-gray-50);
 }
 
+@media (prefers-color-scheme: dark) {
+    .listItem { border-bottom-color: var(--color-gray-700); }
+    .listItem:hover { background-color: var(--color-gray-800); }
+}
+
+/* Info Group */
 .itemInfo {
     display: flex;
     align-items: center;
@@ -201,47 +282,56 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background-color: var(--color-student-primary-light);
-    color: var(--color-student-primary);
+    background-color: var(--color-teacher-primary-light);
+    color: var(--color-teacher-primary);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    flex-shrink: 0;
 }
 
 .itemText h5 {
     margin: 0 0 4px 0;
     font-size: 0.95rem;
-    color: var(--color-gray-800);
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
 .itemText p {
     margin: 0;
     font-size: 0.85rem;
-    color: var(--color-gray-500);
+    color: var(--text-secondary);
 }
 
+/* Buttons in List (Missing in original CSS) */
 .actionBtn {
     padding: 6px 12px;
+    border-radius: var(--border-radius-md);
     font-size: 0.85rem;
-    border-radius: 4px;
-    cursor: pointer;
     font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: var(--transition-base);
 }
 
 .btnGrade {
-    background-color: var(--color-warning-light);
-    color: var(--color-warning-hover);
-    border: 1px solid transparent;
+    background-color: var(--color-teacher-primary);
+    color: var(--color-white);
+    box-shadow: var(--shadow-sm);
 }
+
 .btnGrade:hover {
-    border-color: var(--color-warning-hover);
+    background-color: var(--color-teacher-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
 }
 
 .emptyState {
-    padding: 2rem;
+    padding: var(--spacing-6);
     text-align: center;
-    color: var(--color-gray-500);
+    color: var(--text-secondary);
     font-style: italic;
+    background-color: var(--bg-card);
 }

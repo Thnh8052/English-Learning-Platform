@@ -14,10 +14,14 @@ import CourseDashboard from "../pages/teacher/courseDashboard.jsx";
 import GradingList from "../pages/dashboard/Views/Teacher/GradingList.jsx";
 import GradingDetail from "../pages/dashboard/Views/Teacher/GradingDetail.jsx";
 import Profile from "../pages/profile/Profile.jsx";
+import StudentSubmissionHistory from "../pages/student/StudentSubmissionHistory.jsx";
+import StudentSubmissionDetail from "../pages/student/StudentSubmissionDetail.jsx";
 
 import ProtectedRoute from "../components/ProtectedRoutes.jsx";
 import CourseDetailPage from "../pages/courses/CourseDetailPage.jsx";
 import CreateCoursePage from "../pages/teacher/createCourse.jsx";
+import StudentList from "../pages/teacher/StudentList.jsx";
+import StudentDetail from "../pages/teacher/StudentDetail.jsx";
 import AdminReviewPage from '../pages/admin/adminReviewPage.jsx';
 import EditCoursePage from "../pages/teacher/editCoursePage.jsx";
 import LessonView from '../pages/lessons/LessonView.jsx';
@@ -50,10 +54,14 @@ const router = createBrowserRouter([
           { path: "profile", element: <Profile /> },
           
           // --- Student Routes ---
+          { path: "student/history", element: <StudentSubmissionHistory /> }, 
+          { path: "student/submissions/:id", element: <StudentSubmissionDetail /> },
           
           // --- Teacher Routes ---
           { path: "teacher/create-course", element: <CreateCoursePage /> },
           { path: "teacher/courses/:courseId/dashboard", element: <CourseDashboard /> },
+          { path: "teacher/courses/:courseId/students", element: <StudentList /> },
+          { path: "teacher/courses/:courseId/students/:studentId", element: <StudentDetail /> },
           { path: "teacher/courses/:courseId/grading", element: <GradingList /> },
           { path: "teacher/grading/:submissionId", element: <GradingDetail /> },
           { path: "teacher/edit-course/:courseId", element: <EditCoursePage /> },

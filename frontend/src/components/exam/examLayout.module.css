@@ -1,11 +1,27 @@
 .examContainer {
     display: flex;
     flex-direction: column;
+    width: 100%;
+    /* Thêm khoảng cách nếu cần */
+    gap: var(--spacing-4); 
 }
 
 .panel {
     display: none;
-    animation: fadeIn 0.3s ease-in-out;
+    /* Sử dụng background card từ global để hỗ trợ dark mode */
+    background-color: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--spacing-4);
+    border: 1px solid var(--color-gray-200);
+    animation: fadeIn 0.3s var(--transition-base);
+}
+
+/* Fix border cho Dark Mode */
+@media (prefers-color-scheme: dark) {
+    .panel {
+        border-color: var(--color-gray-700);
+    }
 }
 
 .panel.visible {
@@ -13,24 +29,40 @@
 }
 
 .panelTitle {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
+    font-size: 1.25rem; /* h3 size */
+    font-weight: 700;
+    margin-bottom: var(--spacing-3);
     border-bottom: 1px solid var(--color-gray-200);
-    padding-bottom: 0.75rem;
+    padding-bottom: var(--spacing-2);
+    color: var(--text-primary);
+}
+
+@media (prefers-color-scheme: dark) {
+    .panelTitle {
+        border-bottom-color: var(--color-gray-700);
+    }
 }
 
 .panelContent {
     min-height: 350px;
+    color: var(--text-primary);
+    line-height: 1.6;
 }
 
 .navigation {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
+    align-items: center;
+    gap: var(--spacing-2);
+    margin-top: var(--spacing-4);
+    padding-top: var(--spacing-4);
     border-top: 1px solid var(--color-gray-200);
+}
+
+@media (prefers-color-scheme: dark) {
+    .navigation {
+        border-top-color: var(--color-gray-700);
+    }
 }
 
 @keyframes fadeIn {

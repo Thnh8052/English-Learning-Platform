@@ -5,60 +5,84 @@
     margin-bottom: var(--spacing-3);
 }
 
-.header h3 { margin-bottom: 0; }
+.header h3 { 
+    margin-bottom: 0; 
+    color: var(--text-primary);
+    font-size: 1.5rem;
+}
 
+/* --- TABS --- */
 .tabContainer {
     display: flex;
-    gap: 8px;
+    gap: var(--spacing-2);
     border-bottom: 2px solid var(--color-gray-200);
-    margin-bottom: var(--spacing-3);
+    margin-bottom: var(--spacing-4);
+}
+@media (prefers-color-scheme: dark) {
+    .tabContainer { border-bottom-color: var(--color-gray-700); }
 }
 
 .tabButton {
-    padding: 12px 16px;
+    padding: 10px 16px;
     border: none;
     background-color: transparent;
     cursor: pointer;
     font-weight: 600;
-    color: var(--color-gray-500);
+    font-size: 0.95rem;
+    color: var(--text-secondary);
     border-bottom: 2px solid transparent;
     margin-bottom: -2px;
-    transition: all 0.2s ease-in-out;
+    transition: var(--transition-base);
 }
-.tabButton:hover { color: var(--color-teacher-primary); }
+
+.tabButton:hover {
+    color: var(--text-primary);
+}
+
 .tabButton.active {
     color: var(--color-teacher-primary);
     border-bottom-color: var(--color-teacher-primary);
 }
 
+/* --- GRID --- */
 .courseGrid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: var(--spacing-3);
+    gap: var(--spacing-4);
 }
 
 .emptyState {
     grid-column: 1 / -1;
     text-align: center;
-    padding: 2rem;
-    color: var(--color-gray-500);
-    background: var(--color-gray-50);
-    border-radius: var(--border-radius-md);
-    border: 1px dashed var(--color-gray-300);
+    padding: var(--spacing-6);
+    color: var(--text-secondary);
+    background: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    border: 2px dashed var(--color-gray-300);
+}
+@media (prefers-color-scheme: dark) {
+    .emptyState { 
+        border-color: var(--color-gray-700);
+        background-color: var(--color-gray-800);
+    }
 }
 
-/* --- COURSE CARD STYLES --- */
+/* --- COURSE CARD --- */
 .courseCard {
     width: 100%;
     display: flex;
     flex-direction: column;
-    background-color: var(--color-white);
+    background-color: var(--bg-card);
     border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--color-gray-200);
     overflow: hidden;
-    transition: all 0.25s ease-in-out;
+    transition: var(--transition-base);
 }
+@media (prefers-color-scheme: dark) {
+    .courseCard { border-color: var(--color-gray-700); }
+}
+
 .courseCard:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-md);
@@ -66,106 +90,119 @@
 
 .cardImage {
     position: relative;
-    height: 120px;
+    height: 140px;
     background-color: var(--color-gray-200);
     border-bottom: 1px solid var(--color-gray-100);
 }
+@media (prefers-color-scheme: dark) {
+    .cardImage { border-bottom-color: var(--color-gray-700); }
+}
 
+/* Badges */
 .badge {
     position: absolute;
     top: 10px;
     left: 10px;
     padding: 4px 10px;
     font-size: 0.75rem;
-    font-weight: 600;
-    border-radius: 999px;
-    color: white;
+    font-weight: 700;
+    border-radius: var(--border-radius-full);
+    color: var(--color-white);
     box-shadow: var(--shadow-sm);
     z-index: 2;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 .badge.draft { background-color: var(--color-gray-500); }
-.badge.pending { background-color: var(--color-warning-hover); }
-.badge.published { background-color: var(--color-success-hover); }
-.badge.requiresChanges { background-color: var(--color-error-hover); }
+.badge.pending { background-color: var(--color-warning); }
+.badge.published { background-color: var(--color-success); }
+.badge.requiresChanges { background-color: var(--color-error); }
 
-/* --- NEW: OVERLAY STATS --- */
+/* Overlay Stats */
 .publishedOverlay {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(2px);
+    background: rgba(17, 24, 39, 0.85); /* Dark gray transparent */
+    backdrop-filter: blur(4px);
     padding: 6px 12px;
     display: flex;
     justify-content: flex-start;
     gap: 16px;
-    color: white;
+    color: var(--color-white);
     z-index: 1;
 }
 
 .statItem {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     font-size: 0.8rem;
     font-weight: 600;
 }
-.statItem svg { width: 14px; height: 14px; opacity: 0.9; }
+.statItem svg { width: 16px; height: 16px; opacity: 0.9; }
 
-/* --- CARD CONTENT & ACTIONS --- */
+/* Card Content */
 .cardContent {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
     padding: var(--spacing-3);
-    gap: 8px;
+    gap: var(--spacing-2);
 }
 
 .cardContent h4 {
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 700;
-    color: var(--color-gray-900);
+    color: var(--text-primary);
     margin: 0;
-    line-height: 1.3;
-    /* Giới hạn 2 dòng */
+    line-height: 1.4;
+    
+    /* Cắt dòng title */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    min-height: 2.6em; 
+    min-height: 3rem;
 }
 
 .cardDescription {
-    color: var(--color-gray-600);
+    color: var(--text-secondary);
     font-size: 0.9rem;
     line-height: 1.5;
     flex-grow: 1;
     margin-bottom: var(--spacing-2);
 }
 
-/* --- NEW: GRADING ALERT --- */
+/* Grading Alert */
 .gradingAlert {
     font-size: 0.85rem;
-    color: var(--color-warning-hover);
-    background-color: var(--color-warning-light);
-    padding: 8px 10px;
-    border-radius: 4px;
+    color: #92400e; /* Amber 800 */
+    background-color: #fef3c7; /* Amber 100 */
+    padding: 8px 12px;
+    border-radius: var(--border-radius-md);
     display: flex;
     align-items: center;
     gap: 8px;
     font-weight: 600;
     margin-bottom: var(--spacing-2);
-    flex-grow: 1; /* Để thay thế vị trí của description */
+    border: 1px solid #fcd34d;
+}
+@media (prefers-color-scheme: dark) {
+    .gradingAlert {
+        background-color: rgba(245, 158, 11, 0.15);
+        color: #fbbf24; /* Amber 400 */
+        border-color: rgba(245, 158, 11, 0.3);
+    }
 }
 
 .pulseDot {
     width: 8px;
     height: 8px;
-    background-color: var(--color-warning-hover);
+    background-color: var(--color-warning);
     border-radius: 50%;
     display: inline-block;
-    box-shadow: 0 0 0 rgba(245, 158, 11, 0.4);
     animation: pulse-orange 2s infinite;
 }
 
@@ -175,42 +212,51 @@
     100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
 }
 
-/* --- BUTTONS --- */
+/* Buttons */
 .cardActions {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 8px;
-    border-top: 1px solid var(--color-gray-200);
-    padding-top: var(--spacing-2);
+    border-top: 1px solid var(--color-gray-100);
+    padding-top: var(--spacing-3);
     margin-top: auto;
+}
+@media (prefers-color-scheme: dark) {
+    .cardActions { border-top-color: var(--color-gray-700); }
 }
 
 .btn {
-    padding: 0.5rem 0.75rem;
+    padding: 8px 12px;
     font-size: 0.85rem;
     font-weight: 600;
     border-radius: var(--border-radius-md);
     cursor: pointer;
-    transition: all 0.2s;
-    border: none;
-    text-decoration: none;
+    transition: var(--transition-base);
+    border: 1px solid transparent;
     text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btnSecondaryOutline {
-    border: 1px solid var(--color-gray-300);
+    border-color: var(--color-gray-300);
     background-color: transparent;
-    color: var(--color-gray-600);
+    color: var(--text-secondary);
 }
 .btnSecondaryOutline:hover {
     background-color: var(--color-gray-100);
-    color: var(--color-gray-900);
+    color: var(--text-primary);
+}
+@media (prefers-color-scheme: dark) {
+    .btnSecondaryOutline { border-color: var(--color-gray-600); }
+    .btnSecondaryOutline:hover { background-color: var(--color-gray-700); }
 }
 
 .btnWarningOutline {
-    border: 1px solid var(--color-warning);
-    background-color: #fff;
+    border-color: var(--color-warning);
+    background-color: transparent;
     color: var(--color-warning-hover);
 }
 .btnWarningOutline:hover {

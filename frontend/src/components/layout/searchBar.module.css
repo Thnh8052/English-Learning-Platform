@@ -1,23 +1,37 @@
-/* SearchBar */
 .searchBar {
   flex: 1;
   display: flex;
   justify-content: center;
+  margin: 0 var(--spacing-4);
 }
 
 .searchBar input {
-  width: 60%;
-  max-width: 400px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-surface);
-  color: var(--color-text-base);
-  transition: 0.2s;
+  width: 100%;
+  max-width: 500px;
+  padding: 0.6rem 1rem;
+  border-radius: var(--border-radius-full); /* Search bar thường bo tròn nhiều hơn */
+  border: 1px solid var(--color-gray-300);
+  background: var(--color-gray-50); /* Nền hơi xám nhẹ để phân biệt với header trắng */
+  color: var(--text-primary);
+  transition: var(--transition-base);
+  font-size: 0.95rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .searchBar input {
+    background: var(--color-gray-800);
+    border-color: var(--color-gray-600);
+  }
 }
 
 .searchBar input:focus {
-  border-color: var(--color-primary);
+  border-color: var(--color-student-primary);
+  background: var(--bg-card);
   outline: none;
-  background: var(--color-bg-hover);
+  box-shadow: 0 0 0 3px var(--color-student-primary-light);
+}
+
+/* Placeholder color */
+.searchBar input::placeholder {
+  color: var(--text-secondary);
 }

@@ -142,3 +142,42 @@ export const deleteSpeakingQuestion = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+/**
+ * @desc    Xóa NHIỀU câu hỏi cùng lúc
+ * @route   DELETE /api/lessons/:lessonId/questions/bulk
+ * @body    { questionIds: string[] }
+ */
+export const deleteMultipleQuizQuestions = async (req, res) => {
+    try {
+        const { lessonId } = req.params;
+        const { questionIds } = req.body; // Mảng chứa các _id câu hỏi cần xóa
+
+        if (!questionIds || !Array.isArray(questionIds) || questionIds.length === 0) {
+            return res.status(400).json({ message: "Danh sách câu hỏi cần xóa không hợp lệ." });
+        }
+
+        const lesson = await Lesson.findById(lessonId).populate({
+            path: 'module',
+            populate: { path: 'course' }
+        });
+
+        if (!lesson) return res.status(404).json({ message: "Lesson not found" });
+                if (lesson.module.course.teacher.toString() !== req.user.id) {
+            return res.status(403).json({ message: "Unauthorized" });
+        }
+
+        const initialLength = lesson.questions.length;
+        lesson.questions = lesson.questions.filter(q => !questionIds.includes(q._id.toString()));
+
+        if (lesson.questions.length === initialLength) {
+             return res.status(400).json({ message: "Không tìm thấy câu hỏi nào để xóa trong danh sách gửi lên." });
+        }
+        
+        await lesson.save();
+        res.status(200).json({ message: `Đã xóa thành công ${initialLength - lesson.questions.length} câu hỏi.` });
+
+    } catch (error) {
+        console.error("Bulk Delete Error:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};

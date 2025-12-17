@@ -1,10 +1,14 @@
 .recorderContainer {
-    padding: 2rem;
+    padding: var(--spacing-4);
+    /* Dùng dashed border với màu gray-300 */
     border: 2px dashed var(--color-gray-300);
-    border-radius: var(--border-radius-md);
+    border-radius: var(--border-radius-lg);
     text-align: center;
-    background-color: var(--color-white);
-    transition: all 0.3s ease;
+    
+    /* Semantic background */
+    background-color: var(--bg-card); 
+    
+    transition: var(--transition-base);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -12,64 +16,66 @@
     min-height: 150px;
 }
 
-/* Hiệu ứng khi hover vào vùng recorder */
-.recorderContainer:hover {
-    border-color: var(--color-student-primary-light);
-    background-color: #fafafa;
+/* Dark mode override cho border */
+@media (prefers-color-scheme: dark) {
+    .recorderContainer {
+        border-color: var(--color-gray-600);
+    }
 }
 
-/* Trạng thái đang ghi âm */
+/* Hiệu ứng khi hover */
+.recorderContainer:hover {
+    border-color: var(--color-student-primary);
+    background-color: var(--color-gray-50);
+}
+
+@media (prefers-color-scheme: dark) {
+    .recorderContainer:hover {
+        background-color: var(--color-gray-800);
+    }
+}
+
 .recordingStatus {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    gap: var(--spacing-3);
     width: 100%;
 }
 
 .indicator {
     color: var(--color-error);
-    font-weight: 700;
-    font-size: 1.1rem;
+    font-weight: 600;
+    font-size: 1.125rem;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--spacing-2);
     animation: pulse 1.5s infinite ease-in-out;
 }
 
-/* Container chứa audio player và nút */
 .playbackContainer {
     width: 100%;
-    max-width: 400px; /* Giới hạn chiều rộng cho đẹp */
+    max-width: 400px;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: var(--spacing-3);
 }
 
 .audioPlayer {
     width: 100%;
     outline: none;
-    border-radius: 30px; /* Bo tròn audio player trình duyệt */
+    border-radius: var(--border-radius-full);
+    box-shadow: var(--shadow-sm);
 }
 
 .actions {
     display: flex;
-    gap: 1rem;
+    gap: var(--spacing-2);
     justify-content: center;
 }
 
-/* Animation nhấp nháy cho đèn đỏ */
 @keyframes pulse {
-    0% {
-        opacity: 1;
-        transform: scale(1);
-    }
-    50% {
-        opacity: 0.6;
-        transform: scale(1.05);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.02); }
+    100% { opacity: 1; transform: scale(1); }
 }

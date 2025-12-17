@@ -1,18 +1,18 @@
-
 .homeContainer {
   font-family: var(--font-body);
-  color: var(--color-text-base);
-  background-color: var(--color-bg-surface);
+  color: var(--text-primary);
+  background-color: var(--bg-body);
   overflow-x: hidden;
+  min-height: 100vh;
 }
 
-/* HERO */
+/* --- HERO SECTION --- */
 .hero {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 60px 8%;
-  background-color: var(--color-bg-base);
+  padding: var(--spacing-6) 8%;
+  background-color: var(--bg-body);
 }
 
 .heroContent {
@@ -22,106 +22,207 @@
 
 .heroImage {
   width: 40%;
-  max-width: 400px;
-  border-radius: 16px;
+  max-width: 450px;
+  border-radius: var(--border-radius-xl);
+  /* Thêm shadow nhẹ cho ảnh hero */
+  box-shadow: var(--shadow-lg); 
 }
 
 .title {
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin-bottom: var(--spacing-3);
+  letter-spacing: -1px;
 }
 
 .title span {
-  color: var(--color-primary);
+  color: var(--color-student-primary);
+  position: relative;
+  display: inline-block;
 }
 
 .subtitle {
-  font-size: 1.1rem;
-  margin: 20px 0;
-  color: var(--color-text-muted);
+  font-size: 1.15rem;
+  margin-bottom: var(--spacing-4);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 90%;
 }
 
 .ctaButton {
-  background-color: var(--color-primary);
-  color: white;
-  padding: 12px 26px;
-  font-size: 1rem;
+  background-color: var(--color-student-primary);
+  color: var(--color-white);
+  padding: 14px 32px;
+  font-size: 1.05rem;
+  font-weight: 600;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--border-radius-md);
   cursor: pointer;
-  transition: 0.3s;
+  transition: var(--transition-base);
+  box-shadow: var(--shadow-md);
 }
 
 .ctaButton:hover {
-  background-color: var(--color-primary-hover);
+  background-color: var(--color-student-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
 
-/* FEATURES */
+/* --- FEATURES SECTION --- */
 .features {
-  padding: 60px 8%;
+  padding: var(--spacing-6) 8%;
   text-align: center;
-  background-color: var(--color-bg-base);
+  background-color: var(--bg-body);
 }
 
 .sectionTitle {
-  font-size: 2rem;
-  margin-bottom: 40px;
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-5);
+  color: var(--text-primary);
 }
 
 .featureGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--spacing-4);
 }
 
 .featureCard {
-  background: var(--color-bg-surface);
-  border-radius: 12px;
-  padding: 25px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-  transition: 0.3s;
+  background: var(--bg-card);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-4);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-base);
+  color: var(--text-primary);
+  border: 1px solid var(--color-gray-200);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+@media (prefers-color-scheme: dark) {
+    .featureCard { border-color: var(--color-gray-700); }
+}
+
+.featureCard h3 {
+    margin-bottom: var(--spacing-2);
+    color: var(--text-primary);
+    font-size: 1.25rem;
+}
+
+.featureCard p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
 }
 
 .featureCard:hover {
   transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-student-primary-light);
 }
 
-/* COURSES */
+/* --- COURSES PREVIEW --- */
 .courses {
-  padding: 60px 8%;
-  background-color: var(--color-bg-surface);
+  padding: var(--spacing-6) 8%;
+  background-color: var(--bg-body);
   text-align: center;
 }
 
 .courseGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 25px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-4);
 }
 
 .courseCard {
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  padding: 20px;
-  transition: 0.3s;
-  background: var(--color-bg-base);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-3);
+  transition: var(--transition-base);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+@media (prefers-color-scheme: dark) {
+    .courseCard { border-color: var(--color-gray-700); }
 }
 
 .courseCard:hover {
   transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
 }
 
 .courseImage {
   width: 100%;
-  border-radius: 8px;
-  margin-bottom: 15px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-3);
+  background-color: var(--color-gray-200);
+}
+
+.courseCard h3 {
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing-2) 0;
+    font-size: 1.15rem;
+    text-align: left;
+}
+
+.courseCard p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    text-align: left;
+    margin-bottom: var(--spacing-3);
+    flex-grow: 1;
 }
 
 .learnMore {
-  background: none;
-  border: none;
-  color: #2563eb;
-  font-weight: 500;
+  background: transparent;
+  border: 1px solid var(--color-student-primary);
+  color: var(--color-student-primary);
+  font-weight: 600;
   cursor: pointer;
-  margin-top: 10px;
+  margin-top: auto;
+  padding: 10px;
+  border-radius: var(--border-radius-md);
+  transition: var(--transition-base);
+  width: 100%;
+}
+
+.learnMore:hover {
+    background-color: var(--color-student-primary);
+    color: var(--color-white);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column-reverse;
+    text-align: center;
+    padding: var(--spacing-4) 5%;
+  }
+
+  .heroImage {
+    width: 80%;
+    margin-bottom: var(--spacing-4);
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+  
+  .subtitle {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .features, .courses {
+    padding: var(--spacing-5) 5%;
+  }
 }

@@ -6,53 +6,66 @@
 
 .pageTitle {
     font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-2);
 }
 
 .pageSubtitle {
-    color: var(--color-gray-500);
-    margin-bottom: var(--spacing-4);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-5);
+    font-size: 1.1rem;
 }
 
 .form {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-3);
+    gap: var(--spacing-4);
+    background-color: var(--bg-card);
+    padding: var(--spacing-5);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--color-gray-200);
+    box-shadow: var(--shadow-sm);
+}
+@media (prefers-color-scheme: dark) {
+    .form { border-color: var(--color-gray-700); }
 }
 
+/* Các class input/select/textarea này nên được thay thế bằng class global
+   nhưng nếu muốn giữ style module, hãy dùng biến global */
 .form input,
 .form select,
 .form textarea {
-    color: #000 !important;
-    background-color: #fff !important;
-    border: 1px solid var(--color-gray-300);
-    padding: var(--spacing-2);
-    border-radius: var(--radius-md, 4px);
-}
-
-.form select option {
-    color: #000 !important;
-    background-color: #fff !important;
-}
-
-.form input::placeholder,
-.form textarea::placeholder {
-    color: #6b7280;
+    width: 100%;
+    color: var(--input-text);
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    padding: 0.75rem;
+    border-radius: var(--border-radius-md);
+    font-family: inherit;
+    font-size: 1rem;
+    transition: var(--transition-base);
 }
 
 .form input:focus,
 .form select:focus,
 .form textarea:focus {
     outline: none;
-    border-color: var(--color-primary, #3b82f6);
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    border-color: var(--color-teacher-primary);
+    box-shadow: 0 0 0 3px var(--color-teacher-primary-light);
 }
 
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-3);
+.form textarea {
+    resize: vertical;
+    min-height: 120px;
 }
 
-.errorText {
-    color: var(--color-error);
+.form select option {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+}
+
+.form input::placeholder,
+.form textarea::placeholder {
+    color: var(--input-placeholder);
 }

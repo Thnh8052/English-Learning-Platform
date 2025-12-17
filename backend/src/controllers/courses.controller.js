@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import Course from '../models/course.model.js';
 import Enrollment from '../models/enrollment.model.js';
 import Module from '../models/module.model.js';
-import User from '../models/user.model.js';
+import Submission from '../models/submission.model.js';
 
 
 // PUBLIC CONTROLLERS (Bất kỳ ai cũng có thể truy cập)
@@ -435,5 +435,57 @@ export const getCourseDashboard = async (req, res) => {
     } catch (err) {
         console.error("Dashboard Error:", err);
         res.status(500).json({ message: "Server Error" });
+    }
+};
+
+/**
+ * @desc    Lấy danh sách học viên đã đăng ký khóa học
+ * @route   GET /api/courses/:courseId/students
+ */
+export const getEnrolledStudents = async (req, res) => {
+    try {
+        const { courseId } = req.params;
+        
+        // Tìm enrollment và populate thông tin student
+        const enrollments = await Enrollment.find({ course: courseId })
+            .populate('student', 'name email avatar')
+            .sort({ createdAt: -1 });
+
+        // Format lại dữ liệu trả về cho gọn
+        const students = enrollments.map(enroll => ({
+            _id: enroll.student._id,
+            name: enroll.student.name,
+            email: enroll.student.email,
+            avatar: enroll.student.avatar,
+            enrolledAt: enroll.createdAt,
+            progress: enroll.progress || 0 // Giả sử model Enrollment có trường progress
+        }));
+
+        res.json(students);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Lỗi server' });
+    }
+};
+
+/**
+ * @desc    Lấy tất cả bài nộp của 1 học viên trong 1 khóa học cụ thể
+ * @route   GET /api/courses/:courseId/students/:studentId/submissions
+ */
+export const getStudentSubmissionsInCourse = async (req, res) => {
+    try {
+        const { courseId, studentId } = req.params;
+
+        const submissions = await Submission.find({ 
+            course: courseId, 
+            student: studentId 
+        })
+        .populate('lesson', 'title type') // Lấy tên bài học và loại
+        .sort({ createdAt: -1 });
+
+        res.json(submissions);
+    } catch (err) {
+        console.error("Error getting student submissions:", err);
+        res.status(500).json({ message: 'Lỗi server khi lấy danh sách bài nộp.' });
     }
 };

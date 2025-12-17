@@ -8,7 +8,7 @@ import {
   getAllCourses,
   getCourseById,
   createCourse,
-  updateCourse,        // <-- Import luôn hàm update để dùng sau
+  updateCourse,
   enrollInCourse,
   getMyEnrolledCourses,
   getMyTeachingCourses,
@@ -17,6 +17,8 @@ import {
   retractCourse,
   deleteCourse,
   getCourseDashboard,
+  getEnrolledStudents,
+  getStudentSubmissionsInCourse 
 } from "../controllers/courses.controller.js";
 import { getSubmissionsByCourse } from '../controllers/submissions.controller.js';
 
@@ -38,8 +40,8 @@ router.post('/:id/enroll', protect, enrollInCourse);
 // --- TEACHER ---
 router.post('/', protect, authorizeRoles('teacher'), createCourse);
 router.get('/my-teaching-courses', protect, authorizeRoles('teacher'), getMyTeachingCourses);
-
-
+router.get('/:courseId/students', protect, authorizeRoles('teacher', 'admin'), getEnrolledStudents);
+router.get('/:courseId/students/:studentId/submissions', protect, authorizeRoles('teacher', 'admin'), getStudentSubmissionsInCourse);
 
 // GET /api/courses/:id -> Lấy chi tiết một khóa học
 router.get('/:id', getCourseById); // Lấy khóa học theo ID

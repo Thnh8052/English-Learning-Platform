@@ -1,57 +1,80 @@
-/* --- LAYOUT CHUNG --- */
+/* --- LAYOUT --- */
 .container {
-    padding: 2rem;
-    max-width: 1200px;
+    padding: var(--spacing-4);
+    max-width: 1280px;
     margin: 0 auto;
 }
 
 .header {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    gap: var(--spacing-3);
+    margin-bottom: var(--spacing-4);
+}
+
+.header h2 {
+    color: var(--text-primary);
+    margin: 0;
+    font-size: 1.5rem;
 }
 
 .backBtn {
     background: none;
     border: none;
-    color: var(--color-gray-600);
+    color: var(--text-secondary);
     font-weight: 600;
     cursor: pointer;
     font-size: 0.9rem;
+    transition: color 0.2s;
+    padding: 0;
 }
-.backBtn:hover { text-decoration: underline; color: var(--color-student-primary); }
+.backBtn:hover { 
+    color: var(--color-student-primary); 
+    text-decoration: underline;
+}
 
 /* --- TABS --- */
 .tabs {
     display: flex;
-    gap: 1rem;
-    border-bottom: 2px solid var(--color-gray-200);
-    margin-bottom: 1.5rem;
+    gap: var(--spacing-4);
+    border-bottom: 1px solid var(--color-gray-200);
+    margin-bottom: var(--spacing-4);
+}
+@media (prefers-color-scheme: dark) {
+    .tabs { border-bottom-color: var(--color-gray-700); }
 }
 
 .tab {
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 0.5rem;
     border: none;
     background: none;
     font-weight: 600;
-    color: var(--color-gray-500);
+    font-size: 0.95rem;
+    color: var(--text-secondary);
     cursor: pointer;
     border-bottom: 2px solid transparent;
-    margin-bottom: -2px;
+    margin-bottom: -1px;
+    transition: var(--transition-base);
+}
+.tab:hover {
+    color: var(--text-primary);
 }
 
 .activeTab {
-    color: var(--color-student-primary);
-    border-bottom-color: var(--color-student-primary);
+    color: var(--color-teacher-primary) !important;
+    border-bottom-color: var(--color-teacher-primary);
 }
 
 /* --- TABLE --- */
 .tableContainer {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    background: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
     overflow: hidden;
+    border: 1px solid var(--color-gray-200);
+}
+@media (prefers-color-scheme: dark) {
+    .tableContainer { border-color: var(--color-gray-700); }
 }
 
 .table {
@@ -60,17 +83,25 @@
 }
 
 .table th, .table td {
-    padding: 1rem;
+    padding: 1rem 1.5rem;
     text-align: left;
     border-bottom: 1px solid var(--color-gray-100);
+    color: var(--text-primary);
+}
+@media (prefers-color-scheme: dark) {
+    .table th, .table td { border-bottom-color: var(--color-gray-700); }
 }
 
 .table th {
     background-color: var(--color-gray-50);
-    font-weight: 700;
-    color: var(--color-gray-700);
+    font-weight: 600;
+    color: var(--text-secondary);
     font-size: 0.85rem;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+@media (prefers-color-scheme: dark) {
+    .table th { background-color: var(--color-gray-800); }
 }
 
 .studentInfo {
@@ -89,67 +120,108 @@
     align-items: center;
     justify-content: center;
     font-weight: 700;
+    font-size: 0.9rem;
 }
 
-.studentName { font-weight: 600; color: var(--color-gray-900); }
-.studentEmail { font-size: 0.8rem; color: var(--color-gray-500); }
+.studentName { font-weight: 600; color: var(--text-primary); }
+.studentEmail { font-size: 0.85rem; color: var(--text-secondary); }
 
 .statusBadge {
+    display: inline-block;
     padding: 4px 8px;
-    border-radius: 4px;
+    border-radius: var(--border-radius-full);
     font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
 }
-.submitted { background-color: var(--color-warning-light); color: var(--color-warning-hover); }
-.completed { background-color: var(--color-success-light); color: var(--color-success); }
+.statusBadge.submitted { background-color: var(--color-warning-light); color: var(--color-warning-hover); }
+.statusBadge.completed { background-color: var(--color-success-light); color: var(--color-success-hover); }
 
 .scoreDisplay {
     font-weight: 700;
-    color: var(--color-gray-900);
+    color: var(--text-primary);
     font-size: 1.1rem;
+    font-family: var(--font-code);
 }
 
 /* --- DETAIL PAGE (SPLIT SCREEN) --- */
 .detailContainer {
     display: grid;
-    grid-template-columns: 1.5fr 1fr; /* Trái rộng hơn */
-    height: calc(100vh - 70px); /* Full chiều cao trừ navbar */
-    background-color: var(--color-gray-50);
+    grid-template-columns: 1.4fr 1fr;
+    height: calc(100vh - 80px); /* Trừ đi height của header chính nếu có */
+    background-color: var(--bg-body);
+    gap: 1px; /* Tạo đường kẻ giữa 2 panel */
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+}
+@media (prefers-color-scheme: dark) {
+    .detailContainer { border-color: var(--color-gray-700); }
 }
 
 .leftPanel, .rightPanel {
     overflow-y: auto;
-    padding: 2rem;
+    padding: var(--spacing-4);
+    background-color: var(--bg-card);
 }
 
 .leftPanel {
     border-right: 1px solid var(--color-gray-200);
-    background: white;
+}
+@media (prefers-color-scheme: dark) {
+    .leftPanel { border-right-color: var(--color-gray-700); }
 }
 
 .panelHeader {
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
+    margin-bottom: var(--spacing-4);
+    padding-bottom: var(--spacing-3);
     border-bottom: 1px solid var(--color-gray-100);
 }
+@media (prefers-color-scheme: dark) {
+    .panelHeader { border-bottom-color: var(--color-gray-700); }
+}
 
+.panelHeader h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.25rem;
+}
+
+/* Student Profile Card (trong detail) */
 .studentProfileCard {
     display: flex;
     gap: 1rem;
     align-items: center;
     background: var(--color-gray-50);
-    padding: 1.5rem;
-    border-radius: 8px;
-    margin-bottom: 2rem;
+    padding: var(--spacing-3);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--spacing-4);
+    border: 1px solid var(--color-gray-200);
+}
+@media (prefers-color-scheme: dark) {
+    .studentProfileCard { 
+        background-color: var(--color-gray-800); 
+        border-color: var(--color-gray-700);
+    }
+}
+
+.studentProfileCard h4 {
+    margin: 0 0 4px 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+.studentProfileCard p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
 }
 
 .avatarLarge {
-    width: 60px;
-    height: 60px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     background-color: var(--color-student-primary);
     color: white;
@@ -161,74 +233,146 @@
 }
 
 .date {
-    font-size: 0.85rem;
-    color: var(--color-gray-500);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
     display: block;
     margin-top: 4px;
 }
 
+/* Question & Content Blocks */
 .questionBlock {
-    margin-bottom: 2rem;
-    padding: 1rem;
+    margin-bottom: var(--spacing-3);
+    padding: var(--spacing-3);
     border: 1px solid var(--color-gray-200);
-    border-radius: 8px;
+    border-radius: var(--border-radius-md);
+    background-color: var(--bg-body);
+}
+@media (prefers-color-scheme: dark) {
+    .questionBlock { 
+        border-color: var(--color-gray-700); 
+        background-color: var(--color-gray-900);
+    }
+}
+
+.questionText {
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    font-weight: 500;
 }
 
 .audioPlayer {
     width: 100%;
-    margin-top: 0.5rem;
+    margin-top: 8px;
+    height: 40px;
+}
+
+.textContent, .writingContent {
+    color: var(--text-primary);
+    line-height: 1.7;
+    font-size: 1rem;
 }
 
 /* --- GRADING FORM --- */
 .gradingForm {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    background: var(--bg-card);
+    padding: var(--spacing-3);
+    border-radius: var(--border-radius-md);
 }
 
 .scoreGrid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    gap: var(--spacing-3);
+    margin-bottom: var(--spacing-4);
 }
 
 .scoreInputGroup label {
     display: block;
     font-size: 0.85rem;
     font-weight: 600;
-    margin-bottom: 4px;
-    color: var(--color-gray-700);
+    margin-bottom: 6px;
+    color: var(--text-secondary);
 }
 
 .scoreInputGroup input {
     width: 100%;
-    padding: 8px;
-    border: 1px solid var(--color-gray-300);
-    border-radius: 4px;
+    padding: 10px;
+    border: 1px solid var(--input-border);
+    border-radius: var(--border-radius-md);
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    font-family: var(--font-code);
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+}
+.scoreInputGroup input:focus {
+    outline: none;
+    border-color: var(--color-teacher-primary);
+    box-shadow: 0 0 0 3px var(--color-teacher-primary-light);
 }
 
 .totalScore {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
-    background-color: var(--color-student-primary-light);
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
-    color: var(--color-student-primary);
+    padding: var(--spacing-3);
+    background-color: var(--color-gray-50);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--spacing-4);
+    color: var(--text-primary);
+}
+@media (prefers-color-scheme: dark) {
+    .totalScore { 
+        background-color: var(--color-gray-800); 
+        border-color: var(--color-gray-700);
+    }
 }
 
 .totalScore strong {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
+    color: var(--color-teacher-primary);
+    font-weight: 800;
+}
+
+.feedbackSection label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
 .feedbackSection textarea {
     width: 100%;
     padding: 12px;
-    border: 1px solid var(--color-gray-300);
-    border-radius: 4px;
-    margin-top: 8px;
+    border: 1px solid var(--input-border);
+    border-radius: var(--border-radius-md);
+    margin-top: 4px;
     font-family: inherit;
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    min-height: 150px;
+    resize: vertical;
+}
+.feedbackSection textarea:focus {
+    outline: none;
+    border-color: var(--color-teacher-primary);
+    box-shadow: 0 0 0 3px var(--color-teacher-primary-light);
+}
+
+.actionButtons {
+    margin-top: var(--spacing-4);
+}
+
+.emptyState {
+    color: var(--text-secondary);
+    padding: var(--spacing-4);
+    text-align: center;
+    font-style: italic;
+    background-color: var(--color-gray-50);
+    border-radius: var(--border-radius-md);
+}
+@media (prefers-color-scheme: dark) {
+    .emptyState { background-color: var(--color-gray-800); }
 }

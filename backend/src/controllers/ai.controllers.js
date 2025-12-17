@@ -1,45 +1,30 @@
-import Lesson from '../models/lesson.model.js';
-import { generateQuizFromAI } from '../services/ai.services.js';
-import Module from '../models/module.model.js';
+import { generateQuiz } from '../services/ai.services.js';
+import { extractTextFromFile } from '../utils/fileParser.js';
 
-export const generateQuiz = async (req, res) => {
+export const generateFromText = async (req, res) => {
     try {
-        const { lessonId, prompt } = req.body;
+        const { text, numQuestions } = req.body;
+        if (!text) return res.status(400).json({ success: false, message: 'Thiếu nội dung văn bản' });
 
-        if (!lessonId || !prompt) {
-            return res.status(400).json({ message: "Missing lessonId or prompt." });
-        }
-
-        // 1. Tìm Lesson và kiểm tra quyền sở hữu
-        const lesson = await Lesson.findById(lessonId).populate({
-            path: 'module',
-            populate: { path: 'course' }
-        });
-
-        if (!lesson) return res.status(404).json({ message: "Lesson not found." });
-        
-        // Kiểm tra xem người gọi có phải là giáo viên của khóa học không
-        if (lesson.module.course.teacher.toString() !== req.user.id) {
-            return res.status(403).json({ message: "Unauthorized." });
-        }
-
-        // 2. Gọi AI Service
-        console.log(`[AI] Generating quiz for lesson ${lessonId}...`);
-        const generatedQuestions = await generateQuizFromAI(prompt, 5); // Mặc định tạo 5 câu
-
-        // 3. Lưu vào Database (Ghi đè hoặc thêm mới tùy logic, ở đây ta ghi đè để tạo bộ mới)
-        lesson.questions = generatedQuestions;
-        await lesson.save();
-
-        console.log(`[AI] Successfully generated ${generatedQuestions.length} questions.`);
-        
-        res.status(200).json({ 
-            message: "Quiz generated successfully", 
-            questions: lesson.questions 
-        });
-
+        const questions = await generateQuiz(text, numQuestions);
+        res.json({ success: true, data: questions });
     } catch (error) {
-        console.error("[AI Controller Error]:", error);
-        res.status(500).json({ message: error.message || "Server error during AI generation." });
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+export const generateFromFile = async (req, res) => {
+    try {
+        if (!req.file) return res.status(400).json({ success: false, message: 'Vui lòng upload file' });
+
+        const textContent = await extractTextFromFile(req.file);
+        if (!textContent.trim()) return res.status(400).json({ success: false, message: 'File rỗng hoặc không đọc được' });
+
+        const numQuestions = req.body.numQuestions || 5;
+        const questions = await generateQuiz(textContent, numQuestions);
+
+        res.json({ success: true, data: questions });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
     }
 };

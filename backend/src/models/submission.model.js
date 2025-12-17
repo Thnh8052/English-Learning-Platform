@@ -19,11 +19,15 @@ const submissionSchema = new Schema(
       required: true 
     },
     
-    // content có thể là bài viết (text) hoặc URL của file ghi âm
-    content: { 
-      type: String, 
-      required: true 
-    },
+    content: { type: String, required: true }, // Text tóm tắt hoặc URL chung
+
+    answers: [{
+        questionIndex: { type: Number }, // Index của câu hỏi trong mảng lesson.questions
+        questionText: { type: String },  // Lưu lại text câu hỏi (để hiển thị Speaking)
+        selectedOptionIndex: { type: Number }, // Dành cho Quiz
+        audioUrl: { type: String },      // Dành cho Speaking
+        isCorrect: { type: Boolean }     // Dành cho Quiz (đúng/sai)
+    }],
 
     status: {
       type: String,
@@ -31,14 +35,16 @@ const submissionSchema = new Schema(
       default: 'submitted'
     },
     
-    score: { type: Object }, // Ví dụ: { overall: 7.0, fluency: 7.5, ... }
+    score: { type: Object }, 
     feedback: { type: String },
-    gradedBy: { type: Schema.Types.ObjectId, ref: 'User' }
+    gradedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+
+    attempt: { type: Number, default: 1 }
+
   }, 
   { timestamps: true }
 );
 
-// Ngăn học viên nộp bài cho cùng một bài học nhiều lần
-submissionSchema.index({ student: 1, lesson: 1 }, { unique: true });
+submissionSchema.index({ student: 1, lesson: 1, attempt: 1 }, { unique: true });
 
 export default mongoose.model("Submission", submissionSchema);

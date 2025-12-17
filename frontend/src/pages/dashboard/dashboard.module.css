@@ -1,12 +1,10 @@
-/* ==========================================================================
-   1. BỐ CỤC DASHBOARD CHÍNH (3 CỘT)
-   ========================================================================== */
+/* --- LAYOUT --- */
 .dashboardLayout {
   display: grid;
-  grid-template-columns: 260px 1fr 300px;
+  grid-template-columns: 260px 1fr 320px;
   grid-template-areas: "nav main calendar";
-  gap: 24px;
-  padding: 24px 32px;
+  gap: var(--spacing-4);
+  padding: var(--spacing-4);
   max-width: 1600px;
   margin: 0 auto;
   align-items: start;
@@ -16,7 +14,6 @@
 .mainContent { grid-area: main; }
 .calendarSidebar { grid-area: calendar; }
 
-/* Responsive: Tablet & Mobile */
 @media (max-width: 1200px) {
   .dashboardLayout {
     grid-template-columns: 240px 1fr;
@@ -24,59 +21,63 @@
       "nav main"
       "calendar main";
   }
-  .calendarSidebar { display: none; }
+  .calendarSidebar { display: none; } /* Tạm ẩn calendar trên màn nhỏ */
 }
 
-/* ==========================================================================
-   2. TIÊU ĐỀ CHÍNH
-   ========================================================================== */
+/* --- MAIN TITLE --- */
 .mainTitle {
   font-size: 2rem;
   font-weight: 800;
-  margin-bottom: 8px;
-  color: var(--color-gray-900);  
+  margin-bottom: var(--spacing-1);
+  color: var(--text-primary);
   letter-spacing: -0.5px;
 }
 .mainSubtitle {
   font-size: 1.1rem;
-  color: var(--color-gray-600);
+  color: var(--text-secondary);
   margin-top: 0;
-  margin-bottom: 40px;
+  margin-bottom: var(--spacing-5);
 }
 
-/* ==========================================================================
-   3. SIDEBAR TRÁI (NAVIGATION)
-   ========================================================================== */
+/* --- SIDEBAR BLOCKS --- */
 .block {
-  background-color: var(--color-white);
+  background-color: var(--bg-card);
+  color: var(--text-primary);
   border-radius: var(--border-radius-lg);
-  padding: 20px;
+  padding: var(--spacing-4);
   border: 1px solid var(--color-gray-200);
   box-shadow: var(--shadow-sm);
-  margin-bottom: 24px;
+  margin-bottom: var(--spacing-4);
   position: sticky;
-  top: 24px;
+  top: var(--spacing-4);
+}
+@media (prefers-color-scheme: dark) {
+  .block { border-color: var(--color-gray-700); }
 }
 
 .block h3 {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 700;
   margin-top: 0;
-  margin-bottom: 16px;
-  color: var(--color-gray-500);
-  padding-bottom: 12px;
+  margin-bottom: var(--spacing-3);
+  color: var(--text-secondary);
+  padding-bottom: var(--spacing-2);
   border-bottom: 1px solid var(--color-gray-100);
 }
+@media (prefers-color-scheme: dark) {
+  .block h3 { border-bottom-color: var(--color-gray-700); }
+}
 
+/* --- NAVIGATION LIST --- */
 .navList {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .navLink, .navLinkActive {
@@ -84,19 +85,22 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  color: var(--color-gray-700);
+  color: var(--text-primary);
   font-weight: 500;
   text-decoration: none;
   padding: 10px 12px;
   border-radius: var(--border-radius-md);
-  transition: all 0.2s ease-in-out;
+  transition: var(--transition-base);
   cursor: pointer;
   user-select: none;
+  font-size: 0.95rem;
 }
 
 .navLink:hover {
   background-color: var(--color-gray-100);
-  color: var(--color-gray-900);
+}
+@media (prefers-color-scheme: dark) {
+  .navLink:hover { background-color: var(--color-gray-700); }
 }
 
 .navLinkActive {
@@ -106,49 +110,40 @@
 }
 
 .navIcon {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s ease;
   width: 16px;
   height: 16px;
-  color: var(--color-gray-400);
+  color: var(--text-secondary);
 }
-.navLink:hover .navIcon { color: var(--color-gray-600); }
+.navLink:hover .navIcon { color: var(--text-primary); }
 .navIcon.expanded { transform: rotate(90deg); }
 
-/* --- Sublist Courses (Tối ưu scroll & text) --- */
+/* --- Sublist --- */
 .courseSublist {
   list-style: none;
   padding-left: 0;
   margin: 0;
   overflow: hidden;
   max-height: 0;
-  transition: max-height 0.4s cubic-bezier(0, 1, 0, 1), margin-top 0.3s ease;
-  
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-gray-300) transparent;
+  transition: max-height 0.4s ease, margin-top 0.2s ease;
 }
-
-.courseSublist::-webkit-scrollbar { width: 4px; }
-.courseSublist::-webkit-scrollbar-thumb { background-color: var(--color-gray-300); border-radius: 4px; }
 
 .courseSublist.expanded {
-  max-height: 350px;
+  max-height: 400px;
   margin-top: 4px;
+  overflow-y: auto;
 }
 
-.courseSublist li {
-  margin-bottom: 2px;
-}
+.courseSublist li { margin-bottom: 2px; }
 
 .courseSublist a {
   font-size: 0.9rem;
-  color: var(--color-gray-600);
+  color: var(--text-secondary);
   text-decoration: none;
-  padding: 8px 12px 8px 24px;
+  padding: 8px 12px 8px 28px; /* Indent sâu hơn */
   display: block;
   border-radius: var(--border-radius-md);
-  transition: all 0.15s;
-  
+  transition: var(--transition-base);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -158,27 +153,28 @@
   color: var(--color-student-primary);
   background-color: var(--color-gray-50);
 }
+@media (prefers-color-scheme: dark) {
+  .courseSublist a:hover { background-color: var(--color-gray-800); }
+}
 
 .loadingItem, .emptyItem {
-  padding: 8px 12px 8px 24px;
+  padding: 8px 12px 8px 28px;
   font-size: 0.85rem;
-  color: var(--color-gray-400);
+  color: var(--text-secondary);
   font-style: italic;
 }
 
-/* ==========================================================================
-   4. SIDEBAR PHẢI (CALENDAR)
-   ========================================================================== */
+/* --- CALENDAR SIDEBAR --- */
 .calendarGrid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   text-align: center;
-  gap: 6px;
+  gap: 4px;
 }
 .dayHeader {
   font-weight: 700;
-  color: var(--color-gray-400);
-  font-size: 0.75rem !important;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
   padding-bottom: 8px;
 }
 .day {
@@ -187,49 +183,81 @@
   align-items: center;
   justify-content: center;
   font-size: 0.9rem;
-  color: var(--color-gray-700);
-  border-radius: 6px;
+  color: var(--text-primary);
+  border-radius: var(--border-radius-sm);
   cursor: default;
 }
-.day:hover:not(.today):not(.event-due) {
+.day:hover:not(.today):not(.eventDue) {
   background-color: var(--color-gray-100);
 }
-.day.today {
-  background-color: var(--color-gray-900);
-  color: var(--color-white);
-  font-weight: 600;
+@media (prefers-color-scheme: dark) {
+  .day:hover:not(.today):not(.eventDue) { background-color: var(--color-gray-700); }
 }
-.day.eventDue {
-  background-color: #fee2e2;
-  color: #b91c1c;
+
+/* Today */
+.day.today {
+  background-color: var(--color-student-primary);
+  color: var(--color-white);
   font-weight: 700;
 }
 
-.eventItem { margin-top: 20px; }
+/* Event Due */
+.day.eventDue {
+  background-color: var(--color-error-light);
+  color: var(--color-error);
+  font-weight: 700;
+  position: relative;
+}
+.day.eventDue::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  width: 4px;
+  height: 4px;
+  background-color: var(--color-error);
+  border-radius: 50%;
+}
+
+.eventItem { 
+  margin-top: var(--spacing-3); 
+  padding: 10px;
+  background-color: var(--color-gray-50);
+  border-radius: var(--border-radius-md);
+  border-left: 3px solid var(--color-student-primary);
+}
+@media (prefers-color-scheme: dark) {
+  .eventItem { background-color: var(--color-gray-800); }
+}
+
 .eventItem a {
-  color: var(--color-gray-900);
+  color: var(--text-primary);
   font-weight: 600;
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 4px;
 }
-.eventItem a:hover { text-decoration: underline; color: var(--color-student-primary); }
+.eventItem a:hover { 
+  color: var(--color-student-primary); 
+  text-decoration: underline; 
+}
 .eventItem p {
   font-size: 0.8rem;
-  color: var(--color-gray-500);
-  margin: 4px 0 0 0;
+  color: var(--text-secondary);
+  margin: 0;
 }
 
 .addEventButton {
   width: 100%;
-  margin-top: 20px;
-  background-color: var(--color-white);
+  margin-top: var(--spacing-3);
+  background-color: transparent;
   color: var(--color-teacher-primary);
   border: 1px dashed var(--color-teacher-primary);
   padding: 10px;
   border-radius: var(--border-radius-md);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: var(--transition-base);
 }
 .addEventButton:hover {
   background-color: var(--color-teacher-primary-light);

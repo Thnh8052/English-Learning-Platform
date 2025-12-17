@@ -1,0 +1,184 @@
+.container {
+    padding: var(--spacing-4);
+    max-width: 1200px;
+    margin: 0 auto;
+    /* Dùng biến nền body */
+    background-color: var(--bg-body);
+    min-height: 100vh;
+    color: var(--text-primary);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-4);
+}
+
+.titleGroup h2 { 
+    margin: 0; 
+    color: var(--text-primary); 
+}
+
+.subTitle { 
+    color: var(--text-secondary); 
+    font-size: 0.9rem; 
+}
+
+.backBtn {
+    background: var(--bg-card);
+    border: 1px solid var(--color-gray-300);
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: var(--transition-base);
+}
+.backBtn:hover {
+    background: var(--color-gray-100);
+    color: var(--text-primary);
+}
+
+/* --- TABLE STYLES --- */
+.tableCard {
+    background: var(--bg-card);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    border: 1px solid var(--color-gray-200);
+}
+
+.table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    color: var(--text-primary);
+}
+
+.table th { 
+    background: var(--color-gray-100); 
+    text-align: left; 
+    padding: 1rem; 
+    font-weight: 600; 
+    color: var(--text-secondary); 
+}
+
+.table td { 
+    padding: 1rem; 
+    border-bottom: 1px solid var(--color-gray-100); 
+    vertical-align: middle; 
+}
+
+.table tr:last-child td { 
+    border-bottom: none; 
+}
+
+/* Dark mode adjustment for table header inside global check needed, 
+   but variables handle most of it */
+
+.studentInfo { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+}
+
+.avatar { 
+    width: 40px; 
+    height: 40px; 
+    background: var(--color-info); /* Blue */
+    color: var(--color-white); 
+    border-radius: 50%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-weight: bold; 
+}
+
+.name { 
+    font-weight: 600; 
+    color: var(--text-primary); 
+    display: block; 
+}
+
+.email { 
+    font-size: 0.85rem; 
+    color: var(--text-secondary); 
+}
+
+.actionBtn {
+    padding: 6px 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--color-info);
+    text-decoration: none;
+    transition: var(--transition-base);
+    display: inline-block;
+}
+
+.actionBtn:hover { 
+    background: var(--color-info-light); 
+    border-color: var(--color-info);
+}
+
+/* --- DETAIL PAGE --- */
+.profileSummary {
+    background: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--spacing-4);
+    display: flex;
+    gap: 2rem;
+    border: 1px solid var(--color-gray-200);
+    box-shadow: var(--shadow-sm);
+}
+
+.statGrid {
+    display: flex;
+    gap: 2rem;
+    margin-left: auto;
+}
+
+.statItem { text-align: center; }
+
+.statVal { 
+    display: block; 
+    font-size: 1.5rem; 
+    font-weight: 700; 
+    color: var(--text-primary); 
+}
+
+.statLabel { 
+    font-size: 0.85rem; 
+    color: var(--text-secondary); 
+    text-transform: uppercase; 
+}
+
+/* Status Badges - Map to Global Semantic Colors */
+.badge { 
+    padding: 4px 8px; 
+    border-radius: var(--border-radius-sm); 
+    font-size: 0.75rem; 
+    font-weight: 700; 
+    text-transform: uppercase; 
+}
+
+/* Submitted -> Info (Blue) */
+.submitted { 
+    background: var(--color-info-light); 
+    color: var(--color-info); 
+}
+
+/* Completed -> Success (Green) */
+.completed { 
+    background: var(--color-success-light); 
+    color: var(--color-success); 
+}
+
+/* Grading -> Warning (Yellow/Amber) */
+.grading { 
+    background: var(--color-warning-light); 
+    color: var(--color-warning); 
+}
