@@ -1,97 +1,158 @@
-/* ==========================================================================
-   COURSE CAROUSEL CONTAINER
-   ========================================================================== */
+/* Carousel Container */
 .carouselContainer {
   position: relative;
-  /* Căn giữa carousel nếu nó không chiếm hết chiều rộng */
   max-width: fit-content;
   margin: 0 auto;
+  padding: 0 var(--spacing-2);
 }
 
-/* Các biến để dễ dàng thay đổi */
+/* Variables local cho carousel */
 :root {
   --card-width: 280px;
-  --gap: 24px; /* var(--spacing-3) */
+  --gap: 24px;
 }
 
 .scrollWrapper {
-  /* TÍNH TOÁN CHIỀU RỘNG ĐỂ HIỂN THỊ ĐÚNG 4 THẺ */
   width: calc((var(--card-width) * 4) + (var(--gap) * 3));
-  overflow: hidden; /* Ẩn thanh cuộn hoàn toàn */
+  overflow: hidden;
   scroll-behavior: smooth;
+  padding: 4px; /* Để shadow không bị cắt */
 }
 
 .courseList {
   display: flex;
   flex-wrap: nowrap;
   gap: var(--gap);
-  padding-bottom: 16px;
+  padding-bottom: 8px;
 }
 
-/* ==========================================================================
-   CAROUSEL NAVIGATION BUTTONS
-   ========================================================================== */
+/* Navigation Buttons */
 .navButton {
   position: absolute;
-  top: 40%;
+  top: 50%;
   transform: translateY(-50%);
   z-index: 10;
-  background-color: white;
-  border: 1px solid var(--color-gray-300);
+  background-color: var(--bg-card);
+  border: 1px solid var(--color-gray-200);
   border-radius: 50%;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: var(--shadow-md);
-  transition: all 0.2s ease;
-}
-.navButton:hover {
-  background-color: var(--color-gray-100);
-  transform: translateY(-50%) scale(1.05);
-}
-.navButton:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  transform: translateY(-50%) scale(0.95);
-}
-.navButton.left {
-  left: -22px;
-}
-.navButton.right {
-  right: -22px;
-}
-.navButton svg {
-  width: 24px;
-  height: 24px;
-  stroke: var(--color-gray-700);
+  transition: var(--transition-base);
+  color: var(--text-secondary);
 }
 
-/* ==========================================================================
-   COURSE CARD STYLES
-   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+  .navButton {
+    border-color: var(--color-gray-600);
+    color: var(--text-primary);
+  }
+}
+
+.navButton:hover:not(:disabled) {
+  background-color: var(--color-gray-50);
+  color: var(--color-student-primary);
+  transform: translateY(-50%) scale(1.1);
+  border-color: var(--color-student-primary);
+}
+@media (prefers-color-scheme: dark) {
+  .navButton:hover:not(:disabled) { background-color: var(--color-gray-700); }
+}
+
+.navButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.navButton.left { left: -20px; }
+.navButton.right { right: -20px; }
+
+.navButton svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Course Card Styles */
 .courseCard {
-  width: var(--card-width); /* Sử dụng biến CSS */
+  width: var(--card-width);
   flex-shrink: 0;
-  background-color: var(--color-white);
+  background-color: var(--bg-card);
   border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
   transition: var(--transition-base);
   border: 1px solid var(--color-gray-200);
   display: flex;
   flex-direction: column;
 }
+@media (prefers-color-scheme: dark) {
+  .courseCard { border-color: var(--color-gray-700); }
+}
 
-/* ... giữ nguyên các style .courseCard... khác của bạn ... */
-.courseCardImage { height: 120px; background-color: var(--color-gray-200); }
-.courseCardContent { padding: var(--spacing-2); flex-grow: 1; display: flex; flex-direction: column; }
-.courseCardContent h4 { font-size: 1rem; font-weight: 600; margin: 0 0 4px 0; }
-.courseCardContent a { color: var(--color-gray-900); text-decoration: none; }
-.courseCardContent a:hover { color: var(--color-student-primary); }
-.courseProgress { margin-top: auto; padding-top: var(--spacing-2); }
-.progressBar { height: 8px; background-color: var(--color-gray-200); border-radius: 999px; overflow: hidden; }
-.progressBarFill { height: 100%; background-color: var(--color-success); border-radius: 999px; }
-.progressLabel { font-size: 0.8rem; color: var(--color-gray-500); margin-top: 4px; }
+.courseCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.courseCardImage { 
+  height: 140px; 
+  background-color: var(--color-gray-200); 
+  border-bottom: 1px solid var(--color-gray-100);
+}
+@media (prefers-color-scheme: dark) {
+  .courseCardImage { border-bottom-color: var(--color-gray-700); }
+}
+
+.courseCardContent { 
+  padding: var(--spacing-3); 
+  flex-grow: 1; 
+  display: flex; 
+  flex-direction: column; 
+}
+
+.courseCardContent h4 { 
+  font-size: 1.05rem; 
+  font-weight: 700; 
+  margin: 0 0 8px 0; 
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.courseCardContent a { 
+  color: inherit; 
+  text-decoration: none; 
+}
+.courseCardContent a:hover { 
+  color: var(--color-student-primary); 
+}
+
+.courseProgress { 
+    margin-top: auto; 
+    padding-top: var(--spacing-2); 
+}
+.progressBar { 
+    height: 6px; 
+    background-color: var(--color-gray-200); 
+    border-radius: var(--border-radius-full); 
+    overflow: hidden; 
+}
+@media (prefers-color-scheme: dark) {
+    .progressBar { background-color: var(--color-gray-700); }
+}
+
+.progressBarFill { 
+    height: 100%; 
+    background-color: var(--color-success); 
+    border-radius: var(--border-radius-full); 
+}
+
+.progressLabel { 
+    font-size: 0.8rem; 
+    color: var(--text-secondary); 
+    margin-top: 6px; 
+    font-weight: 500;
+}

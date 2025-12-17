@@ -6,8 +6,6 @@ import sgMail from '@sendgrid/mail';
 import dotenv from 'dotenv';
 dotenv.config();
 
-
-
 // Cấu hình SendGrid
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 console.log('[DEBUG] SendGrid API Key being used:', process.env.SENDGRID_API_KEY ? 'Key exists' : 'Key is MISSING or undefined!');

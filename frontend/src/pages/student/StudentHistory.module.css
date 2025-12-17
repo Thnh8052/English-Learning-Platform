@@ -1,0 +1,445 @@
+.container {
+    padding: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.pageTitle {
+    font-size: 1.8rem;
+    color: #1e293b;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 0.5rem;
+}
+
+/* --- TABLE STYLES --- */
+.tableContainer {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow-x: auto;
+    border: 1px solid #e2e8f0;
+}
+
+.emptyState {
+    padding: 3rem;
+    text-align: center;
+    color: #64748b;
+    font-style: italic;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+.table th, .table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+}
+
+.table th {
+    background-color: #f8fafc;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+}
+
+.row:hover {
+    background-color: #f8fafc;
+}
+
+.cellTitle {
+    font-weight: 600;
+    color: #0f172a;
+    display: block;
+}
+
+.cellType {
+    color: #64748b;
+    font-size: 0.85rem;
+    text-transform: capitalize;
+}
+
+.cellScore {
+    font-weight: 700;
+    color: #475569;
+}
+
+/* --- BADGES --- */
+.statusBadge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-block;
+    text-transform: capitalize;
+}
+
+/* Status variants */
+.statusCompleted {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.statusSubmitted {
+    background-color: #e0f2fe;
+    color: #0369a1;
+}
+
+.statusPending {
+    background-color: #fef9c3;
+    color: #854d0e;
+}
+
+/* --- DETAIL PAGE --- */
+.detailHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.backBtn {
+    background: none;
+    border: 1px solid #cbd5e1;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #64748b;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.backBtn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+.headerInfo span {
+    color: #64748b;
+}
+
+.headerInfo strong {
+    color: #0f172a;
+    margin-left: 5px;
+}
+
+.sectionCard {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+    border: 1px solid #e2e8f0;
+}
+
+.resultCard {
+    border-top: 4px solid #22c55e;
+}
+
+.cardTitle {
+    font-size: 1.25rem;
+    color: #1e293b;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* Feedback Box */
+.feedbackBox {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.feedbackLabel {
+    color: #15803d;
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.feedbackText {
+    white-space: pre-line;
+    color: #14532d;
+    line-height: 1.6;
+}
+
+/* Score Grid */
+.scoreGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.scoreItem {
+    background: white;
+    padding: 1rem;
+    border-radius: 6px;
+    text-align: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    border: 1px solid #e2e8f0;
+}
+
+.scoreLabel {
+    display: block;
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.scoreValue {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #16a34a;
+}
+
+.scoreOverall .scoreValue {
+    font-size: 2.2rem;
+    color: #15803d;
+}
+
+/* Content / Answers */
+.answerItem {
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    background-color: #fff;
+}
+
+.answerHeader {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #334155;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Correct/Wrong Styles */
+.correct {
+    border-color: #86efac;
+    background-color: #f0fdf4;
+}
+
+.wrong {
+    border-color: #fca5a5;
+    background-color: #fef2f2;
+}
+
+.textSuccess { color: #16a34a; font-weight: 600; }
+.textDanger { color: #dc2626; font-weight: 600; }
+.textError { color: #dc2626; font-style: italic; }
+
+.audioPlayer {
+    width: 100%;
+    margin-top: 0.5rem;
+    height: 40px;
+}
+
+.fileLink {
+    color: #2563eb;
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+.textContent {
+    white-space: pre-wrap;
+    line-height: 1.6;
+    color: #334155;
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 6px;
+}
+.assessmentCard {
+    border-top: 4px solid #22c55e; /* Viền xanh lá trên cùng */
+    background-color: #f0fdf4; /* Nền xanh rất nhạt */
+}
+
+.pendingCard {
+    border-top: 4px solid #eab308;
+    background-color: #fefce8;
+}
+
+/* Feedback */
+.feedbackBox {
+    background-color: white;
+    border: 1px solid #bbf7d0;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.feedbackHeader {
+    color: #15803d;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+}
+
+.feedbackText {
+    white-space: pre-line;
+    color: #334155;
+    line-height: 1.6;
+}
+
+/* Overall Badge */
+.overallBadge {
+    background-color: #166534;
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
+.overallBadge strong {
+    font-size: 2rem;
+    margin-left: 10px;
+    color: #4ade80;
+}
+
+/* Criteria Grid (Bảng điểm thành phần) */
+.criteriaGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.criteriaItem {
+    background: white;
+    border: 1px solid #dcfce7;
+    padding: 1rem;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.criteriaLabel {
+    font-size: 0.8rem;
+    color: #64748b;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    height: 32px; /* Cố định chiều cao để căn dòng */
+    display: flex;
+    align-items: center;
+}
+
+.criteriaScore {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #15803d;
+}
+
+/* --- STUDENT WORK STYLES --- */
+
+/* Writing Paper Style */
+.writingPaper {
+    background: white;
+    padding: 2rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    min-height: 200px;
+    font-family: 'Georgia', serif; /* Font chữ kiểu văn bản */
+    line-height: 1.8;
+    color: #1e293b;
+}
+
+/* Audio List Style */
+.audioList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.audioItem {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.questionLabel {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #475569;
+}
+
+.quizReviewList {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.quizReviewItem {
+    padding: 1.5rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.quizReviewItem.correct { border-left: 5px solid #22c55e; }
+.quizReviewItem.wrong { border-left: 5px solid #ef4444; }
+
+.quizHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    font-size: 1.05rem;
+    color: #1e293b;
+}
+
+.tagSuccess { background: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+.tagError { background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+
+.quizOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.optionRow {
+    padding: 10px 14px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    display: flex;
+    gap: 10px;
+    font-size: 0.95rem;
+}
+
+.optionLetter { font-weight: 600; color: #64748b; }
+
+/* Các trạng thái đáp án */
+.optionNormal { background: #f8fafc; border-color: #e2e8f0; }
+
+/* User chọn ĐÚNG */
+.optionSelectedCorrect { background: #dcfce7; border-color: #86efac; color: #14532d; font-weight: 500; }
+
+/* User chọn SAI */
+.optionSelectedWrong { background: #fee2e2; border-color: #fca5a5; color: #7f1d1d; }
+
+/* Đáp án đúng (mà user bỏ qua) */
+.optionCorrectAnswer { background: #f0fdf4; border-color: #bbf7d0; color: #15803d; border: 1px dashed #16a34a; }

@@ -1,0 +1,17 @@
+.footer {
+    text-align: center;
+    padding: var(--spacing-4);
+    background-color: var(--color-gray-100);
+    color: var(--text-secondary);
+    border-top: 1px solid var(--color-gray-200);
+    margin-top: auto; /* Để đẩy footer xuống đáy nếu content ngắn */
+    font-size: 0.9rem;
+}
+
+@media (prefers-color-scheme: dark) {
+    .footer {
+        background-color: var(--color-gray-900);
+        border-top-color: var(--color-gray-800);
+        color: var(--color-gray-400);
+    }
+}

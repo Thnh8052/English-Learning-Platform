@@ -1,11 +1,18 @@
+/* Container chính */
 .playerContainer {
     max-width: 800px;
     margin: 0 auto;
-    background-color: var(--color-white);
+    background-color: var(--bg-card);
     border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-md);
     overflow: hidden;
     border: 1px solid var(--color-gray-200);
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+}
+@media (prefers-color-scheme: dark) {
+    .playerContainer { border-color: var(--color-gray-700); }
 }
 
 /* Progress Bar */
@@ -14,6 +21,10 @@
     background-color: var(--color-gray-200);
     width: 100%;
 }
+@media (prefers-color-scheme: dark) {
+    .progressBar { background-color: var(--color-gray-700); }
+}
+
 .progressFill {
     height: 100%;
     background-color: var(--color-student-primary);
@@ -22,49 +33,78 @@
 
 /* Question Area */
 .questionCard {
-    padding: var(--spacing-4);
-}
-.questionCount {
-    font-size: 0.85rem;
-    color: var(--color-gray-500);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-.questionText {
-    font-size: 1.5rem;
-    color: var(--color-gray-900);
-    margin-top: 0.5rem;
-    margin-bottom: 2rem;
-    line-height: 1.4;
+    padding: var(--spacing-5);
+    flex: 1;
 }
 
-/* Options */
+.questionCount {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: var(--spacing-2);
+}
+
+.questionText {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-4);
+    line-height: 1.5;
+    font-weight: 600;
+}
+
+/* Options List */
 .optionsList {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: var(--spacing-3);
 }
+
 .optionItem {
     display: flex;
     align-items: center;
-    padding: 1rem;
+    padding: 12px 16px;
     border: 2px solid var(--color-gray-200);
     border-radius: var(--border-radius-md);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: var(--transition-base);
+    background-color: var(--bg-card);
+    color: var(--text-primary);
 }
+@media (prefers-color-scheme: dark) {
+    .optionItem { border-color: var(--color-gray-700); }
+}
+
 .optionItem:hover {
     border-color: var(--color-student-primary-light);
     background-color: var(--color-gray-50);
 }
+@media (prefers-color-scheme: dark) {
+    .optionItem:hover { 
+        background-color: var(--color-gray-800);
+        border-color: var(--color-gray-600);
+    }
+}
+
+/* Selected State */
 .optionItem.selected {
     border-color: var(--color-student-primary);
     background-color: var(--color-student-primary-light);
+    color: var(--color-student-primary);
+    font-weight: 500;
 }
+@media (prefers-color-scheme: dark) {
+    .optionItem.selected {
+        background-color: rgba(79, 70, 229, 0.15); /* Màu nền trong suốt hơn */
+        color: var(--color-student-primary-light);
+    }
+}
+
 .optionLabel {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background-color: var(--color-gray-200);
     color: var(--color-gray-700);
@@ -74,44 +114,67 @@
     font-weight: 700;
     margin-right: 1rem;
     font-size: 0.9rem;
+    flex-shrink: 0;
 }
-.selected .optionLabel {
-    background-color: var(--color-student-primary);
-    color: white;
+@media (prefers-color-scheme: dark) {
+    .optionLabel {
+        background-color: var(--color-gray-700);
+        color: var(--color-gray-300);
+    }
 }
 
-/* Footer */
+.optionItem.selected .optionLabel {
+    background-color: var(--color-student-primary);
+    color: var(--color-white);
+}
+
+/* Footer Navigation */
 .footer {
-    padding: var(--spacing-3) var(--spacing-4);
+    padding: var(--spacing-3) var(--spacing-5);
     border-top: 1px solid var(--color-gray-200);
     display: flex;
     justify-content: space-between;
+    align-items: center;
     background-color: var(--color-gray-50);
+}
+@media (prefers-color-scheme: dark) {
+    .footer { 
+        border-top-color: var(--color-gray-700); 
+        background-color: var(--color-gray-800);
+    }
 }
 
 /* Result Screen */
 .resultContainer {
     max-width: 600px;
-    margin: 2rem auto;
+    margin: var(--spacing-6) auto;
     text-align: center;
+    padding: 0 var(--spacing-3);
 }
+
 .scoreCard {
-    background: white;
-    padding: 3rem;
+    background: var(--bg-card);
+    padding: var(--spacing-6);
     border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-lg);
+    border: 1px solid var(--color-gray-200);
+    color: var(--text-primary);
 }
+@media (prefers-color-scheme: dark) {
+    .scoreCard { border-color: var(--color-gray-700); }
+}
+
 .scoreCircle {
-    width: 120px;
-    height: 120px;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
     background-color: var(--color-success-light);
     color: var(--color-success);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.5rem;
+    font-size: 3rem;
     font-weight: 800;
-    margin: 1.5rem auto;
-    border: 5px solid var(--color-success);
+    margin: var(--spacing-4) auto;
+    border: 6px solid var(--color-success);
 }

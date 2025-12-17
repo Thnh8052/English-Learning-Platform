@@ -14,7 +14,6 @@ const CourseDashboard = () => {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                // Gọi API backend chúng ta vừa tạo
                 const res = await api.get(`/courses/${courseId}/dashboard`);
                 setData(res.data);
             } catch (err) {
@@ -57,7 +56,9 @@ const CourseDashboard = () => {
                             </span>
                         )}
                     </button>
-                    <button className={styles.navItem} onClick={() => alert("Comming Soon")}>
+                    <button 
+                        className={styles.navItem} 
+                        onClick={() => navigate(`/teacher/courses/${courseId}/students`)}>
                         <span className={styles.navIcon}>👥</span> Students
                     </button>
                     <button className={styles.navItem} onClick={() => navigate(`/teacher/edit-course/${courseId}`)}>
@@ -159,7 +160,7 @@ const CourseDashboard = () => {
                                 recentStudents.map(enroll => (
                                     <div key={enroll._id} className={styles.listItem}>
                                         <div className={styles.itemInfo}>
-                                            <div className={styles.avatarPlaceholder} style={{backgroundColor: '#e2e8f0', color: '#64748b'}}>
+                                            <div className={styles.avatarPlaceholder}>
                                                 {enroll.student?.name?.charAt(0) || 'U'}
                                             </div>
                                             <div className={styles.itemText}>

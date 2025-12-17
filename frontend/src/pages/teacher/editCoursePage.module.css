@@ -1,124 +1,193 @@
+/* ===========================
+   LAYOUT
+=========================== */
 .pageContainer {
     display: grid;
     grid-template-columns: 300px 1fr;
     min-height: calc(100vh - 70px);
+    background-color: var(--bg-body);
+    color: var(--text-primary);
 }
 
-/* --- Sidebar --- */
+/* ===========================
+   SIDEBAR
+=========================== */
 .sidebar {
-    background-color: var(--color-gray-50);
-    padding: var(--spacing-3);
+    background-color: var(--bg-card);
+    padding: var(--spacing-4);
     border-right: 1px solid var(--color-gray-200);
     display: flex;
     flex-direction: column;
+    position: sticky;
+    top: 70px;
+    height: calc(100vh - 70px);
+    overflow-y: auto;
+    transition: var(--transition-base);
 }
+
+@media (prefers-color-scheme: dark) {
+    .sidebar { border-right-color: var(--color-gray-700); }
+}
+
 .sidebar h2 {
     font-size: 1.5rem;
-    margin-bottom: 2rem;
-}
-.sidebar h3 {
-    font-size: 1rem;
-    color: var(--color-gray-500);
-    margin-bottom: 4px;
+    margin-bottom: var(--spacing-4);
+    color: var(--text-primary);
+    font-weight: 800;
 }
 
-/* Nút Sidebar full width */
+.sidebar h3 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-2);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
 .sidebarBtn {
     width: 100%;
-    margin-top: 1rem;
+    margin-top: var(--spacing-3);
+    justify-content: flex-start;
 }
 
-/* --- Status Badges --- */
+/* ===========================
+   STATUS BADGES
+=========================== */
 .statusBadge {
     text-transform: capitalize;
-    font-weight: bold;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: var(--border-radius-full);
+    font-size: 0.8rem;
+    display: inline-block;
+    margin-bottom: var(--spacing-3);
 }
-.status_draft,
-.status_requires_changes { color: var(--color-warning-hover); }
-.status_pending_review { color: var(--color-info-hover); }
-.status_published { color: var(--color-success-hover); }
 
-/* --- Main Content --- */
+/* Status variants */
+.status_draft { 
+    background-color: var(--color-gray-200); 
+    color: var(--color-gray-700); 
+}
+.status_published { 
+    background-color: var(--color-success-light); 
+    color: var(--color-success-hover); 
+}
+.status_pending_review {
+    background-color: var(--color-info-light);
+    color: var(--color-info-hover);
+}
+.status_requires_changes {
+    background-color: var(--color-error-light);
+    color: var(--color-error-hover);
+}
+
+/* Dark mode overrides for status */
+@media (prefers-color-scheme: dark) {
+    .status_draft { 
+        background-color: var(--color-gray-700); 
+        color: var(--color-gray-300); 
+    }
+}
+
+/* ===========================
+   MAIN CONTENT
+=========================== */
 .mainContent {
-    padding: var(--spacing-4);
-    max-width: 900px;
+    padding: var(--spacing-5);
+    overflow-y: auto;
 }
 
+/* Admin Feedback Box */
 .adminFeedback {
-    background-color: var(--color-warning-light);
-    border: 1px solid var(--color-warning);
-    border-radius: var(--border-radius-md);
+    background-color: var(--color-error-light);
+    border: 1px solid var(--color-error);
+    color: var(--color-error-hover);
     padding: var(--spacing-3);
+    border-radius: var(--border-radius-md);
     margin-bottom: var(--spacing-4);
 }
-.adminFeedback h4 {
-    margin-top: 0;
-    color: var(--color-warning-hover);
-}
+.adminFeedback h4 { margin-top: 0; margin-bottom: 0.5rem; }
 
-/* --- Sections & Forms --- */
+/* Sections (Added based on JSX usage) */
 .section {
-    margin-bottom: var(--spacing-5);
+    background-color: var(--bg-card);
+    padding: var(--spacing-4);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--spacing-4);
+    border: 1px solid var(--color-gray-200);
 }
-.section h3 {
-    border-bottom: 1px solid var(--color-gray-200);
-    padding-bottom: 8px;
-    margin-bottom: 1rem;
-}
-
-.form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+@media (prefers-color-scheme: dark) {
+    .section { border-color: var(--color-gray-700); }
 }
 
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--color-gray-200);
-    padding-bottom: 8px;
-    margin-bottom: 1rem;
-}
-.header h3 {
-    border: none;
-    margin: 0;
-    padding: 0;
+    margin-bottom: var(--spacing-4);
 }
 
-/* --- Modules --- */
-.moduleList {
+.header h3 {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* ===========================
+   FORMS & GRID (Added based on JSX)
+=========================== */
+.form {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-3);
 }
 
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-3);
+}
+
+/* ===========================
+   MODULE LIST
+=========================== */
+.moduleList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+}
+
 .module {
+    background-color: var(--bg-card);
     border: 1px solid var(--color-gray-200);
-    border-radius: var(--border-radius-md);
-    background-color: var(--color-white);
-    box-shadow: var(--shadow-sm);
+    border-radius: var(--border-radius-lg);
     overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+@media (prefers-color-scheme: dark) {
+    .module { border-color: var(--color-gray-700); }
 }
 
 .moduleHeader {
-    background-color: var(--color-gray-100);
-    padding: 12px 16px;
+    background-color: var(--color-gray-50);
+    padding: var(--spacing-2) var(--spacing-3);
+    border-bottom: 1px solid var(--color-gray-200);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--color-gray-200);
+}
+@media (prefers-color-scheme: dark) {
+    .moduleHeader { 
+        background-color: var(--color-gray-800);
+        border-bottom-color: var(--color-gray-700);
+    }
 }
 
 .moduleHeader strong {
-    font-size: 1.05rem;
-    color: var(--color-gray-800);
+    color: var(--text-primary);
+    font-size: 1.1rem;
 }
 
 .moduleActions {
@@ -126,135 +195,101 @@
     gap: 8px;
 }
 
-/* --- Lessons --- */
+/* ===========================
+   LESSON LIST
+=========================== */
 .lessonList {
     display: flex;
     flex-direction: column;
 }
 
 .lesson {
+    padding: var(--spacing-2) var(--spacing-3);
+    border-bottom: 1px solid var(--color-gray-100);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--color-gray-100);
-    transition: background-color 0.15s ease;
+    background-color: var(--bg-card);
+    transition: background-color 0.2s;
 }
+@media (prefers-color-scheme: dark) {
+    .lesson { border-bottom-color: var(--color-gray-700); }
+}
+
+.lesson:last-child {
+    border-bottom: none;
+}
+
 .lesson:hover {
     background-color: var(--color-gray-50);
+}
+@media (prefers-color-scheme: dark) {
+    .lesson:hover { background-color: var(--color-gray-800); }
 }
 
 .lesson span {
     font-weight: 500;
-    color: var(--color-gray-700);
     display: flex;
     align-items: center;
+    gap: 8px;
 }
 
-/* Class mới cho badge trong lesson */
-.lessonBadge {
-    margin-right: 8px;
-}
-
-/* Class container cho các nút action của lesson */
 .lessonActions {
     display: flex;
-    gap: 8px; /* Thay thế cho margin-right từng nút */
     align-items: center;
+    gap: 8px;
+}
+
+.lessonBadge {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: var(--border-radius-sm);
+    
+    background-color: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fcd34d;
+    
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-block;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+@media (prefers-color-scheme: dark) {
+    .lessonBadge { 
+        background-color: rgba(245, 158, 11, 0.15);
+        color: #fbbf24;
+        border-color: rgba(245, 158, 11, 0.4);
+    }
 }
 
 .addLessonBtn {
-    padding: 12px;
-    background-color: transparent;
+    padding: var(--spacing-2);
+    background-color: var(--bg-card);
     border: none;
     text-align: center;
     cursor: pointer;
     color: var(--color-teacher-primary);
     font-weight: 600;
     border-top: 1px dashed var(--color-gray-200);
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: var(--transition-base);
     width: 100%;
 }
-.addLessonBtn:hover {
-    background-color: var(--color-gray-50);
-    color: var(--color-teacher-primary-dark);
+@media (prefers-color-scheme: dark) {
+    .addLessonBtn { border-top-color: var(--color-gray-700); }
 }
 
-/* --- Buttons & Utilities --- */
+.addLessonBtn:hover {
+    background-color: var(--color-teacher-primary-light);
+    color: var(--color-teacher-primary-hover);
+}
+
+/* ===========================
+   UTILITY
+=========================== */
 .errorText {
     color: var(--color-error);
-}
-
-.noLessonText {
-    color: var(--color-gray-500);
-    font-size: 0.9rem;
-    font-style: italic;
     text-align: center;
-    padding: 12px 0;
-}
-
-/* =========================================
-   FIX HIỂN THỊ MÀU CHỮ TRONG FORM ELEMENTS
-   ========================================= */
-
-/* --- Input fields --- */
-.form input,
-.mainContent input,
-.sidebar input,
-.module input,
-.form-input {
-  color: #000 !important;
-  background-color: #fff !important;
-  border: 1px solid var(--color-gray-300);
-  appearance: auto !important;
-  caret-color: #000 !important;
-  color-scheme: light !important;
-}
-
-/* --- Textarea fields --- */
-.form textarea,
-.mainContent textarea,
-.sidebar textarea,
-.module textarea,
-.form-textarea {
-  color: #000 !important;
-  background-color: #fff !important;
-  border: 1px solid var(--color-gray-300);
-  resize: vertical;
-  caret-color: #000 !important;
-  color-scheme: light !important;
-}
-
-/* --- Autofill fix (Chrome) --- */
-.form input:-webkit-autofill,
-.form textarea:-webkit-autofill,
-.form select:-webkit-autofill,
-.mainContent input:-webkit-autofill,
-.mainContent textarea:-webkit-autofill,
-.mainContent select:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0px 1000px #fff inset !important;
-  box-shadow: 0 0 0px 1000px #fff inset !important;
-  -webkit-text-fill-color: #000 !important;
-  caret-color: #000 !important;
-}
-
-/* --- Focus style --- */
-.form input:focus,
-.form textarea:focus,
-.form select:focus,
-.mainContent input:focus,
-.mainContent textarea:focus,
-.mainContent select:focus {
-  outline: none;
-  border-color: var(--color-info);  
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
-}
-
-/* --- Fix mũi tên select cho Edge/IE --- */
-.form select::-ms-expand,
-.mainContent select::-ms-expand,
-.sidebar select::-ms-expand,
-.module select::-ms-expand {
-  color: #000;
-  background: #fff;
+    margin-top: 1rem;
 }

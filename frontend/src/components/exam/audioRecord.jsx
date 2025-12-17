@@ -104,9 +104,9 @@ const AudioRecorder = ({ onRecordingComplete, existingAudioBlob }) => {
                     <div className={styles.indicator}>
                         ● Recording {formatTime(recordingTime)}
                     </div>
-                    <button onClick={stopRecording} className="btn btn-danger">
-                        ⏹️ Stop
-                    </button>
+                <button onClick={stopRecording} className="btn btn-primary-admin">
+                    ⏹️ Stop
+                </button>
                 </div>
             )}
 

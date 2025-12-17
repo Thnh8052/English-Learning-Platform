@@ -41,20 +41,17 @@ const GradingList = () => {
             <div className={styles.tabs}>
                 <button 
                     className={`${styles.tab} ${filter === 'submitted' ? styles.activeTab : ''}`}
-                    onClick={() => setFilter('submitted')}
-                >
+                    onClick={() => setFilter('submitted')}>
                     Needs Grading
                 </button>
                 <button 
                     className={`${styles.tab} ${filter === 'completed' ? styles.activeTab : ''}`}
-                    onClick={() => setFilter('completed')}
-                >
+                    onClick={() => setFilter('completed')}>
                     Completed
                 </button>
                 <button 
                     className={`${styles.tab} ${filter === 'all' ? styles.activeTab : ''}`}
-                    onClick={() => setFilter('all')}
-                >
+                    onClick={() => setFilter('all')}>
                     All Submissions
                 </button>
             </div>

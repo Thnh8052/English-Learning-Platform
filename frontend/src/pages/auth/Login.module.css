@@ -3,19 +3,23 @@
   text-align: center;
   max-width: 400px;
   margin: 80px auto;
-  background-color: var(--color-bg-surface);
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  /* Dùng biến ngữ nghĩa cho background */
+  background-color: var(--bg-card); 
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  /* Đảm bảo màu chữ đúng theo theme */
+  color: var(--text-primary); 
 }
 
 .title {
   margin-bottom: 20px;
-  color: var(--color-text-base);
+  color: var(--text-primary);
 }
+
 .switchText {
   margin-top: 15px;
   font-size: 14px;
-  color: var(--color-text-muted);
+  color: var(--text-secondary);
 }
 
 .formGroup {
@@ -27,34 +31,47 @@
   display: block;
   font-weight: 600;
   margin-bottom: 6px;
-  color: #555;
+  color: var(--text-primary);
 }
 
+/* Đồng bộ Input với Global CSS */
 .input {
   width: 100%;
   padding: 10px;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
+  border: 1px solid var(--input-border);
+  border-radius: var(--border-radius-md);
   outline: none;
   font-size: 16px;
-  color: var(--color-text-base);
-  background-color: #fff;
+  color: var(--input-text);
+  background-color: var(--input-bg);
+  transition: var(--transition-base);
 }
 
 .input:focus {
-  border-color: var(--color-primary);
+  border-color: var(--color-student-primary); /* Mặc định dùng màu Student cho trang Login */
+  box-shadow: 0 0 0 3px var(--color-student-primary-light);
 }
 
 .button {
   width: 100%;
   padding: 12px;
-  background-color: var(--color-primary);
-  color: white;
+  /* Map màu button sang màu Student Primary */
+  background-color: var(--color-student-primary);
+  color: var(--color-white);
   font-weight: 600;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--border-radius-md);
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: var(--transition-base);
+}
+
+.button:hover {
+  background-color: var(--color-student-primary-hover);
+}
+
+.button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .forgotPasswordContainer {
@@ -63,13 +80,22 @@
   font-size: 14px;
 }
 
-.button:hover {
-  background-color: var(--color-primary-hover);
+.link {
+  color: var(--color-student-primary);
+  text-decoration: none;
+  transition: var(--transition-base);
 }
+
 .link:hover {
   text-decoration: underline;
+  color: var(--color-student-primary-hover);
 }
 
 /* Responsive Design */
 @media (max-width: 600px) {
+  .container {
+    width: 90%;
+    margin: 40px auto;
+    padding: 30px;
   }
+}

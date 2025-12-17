@@ -6,6 +6,7 @@ import api from '../../services/api';
 import styles from './courseDetail.module.css';
 import CourseContentAccordion from '../../components/course/CourseContentAccordion';
 
+// --- ICONS ---
 const CheckIcon = () => <svg className={styles.iconSuccess} width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.052-.143z" clipRule="evenodd" /></svg>;
 const VideoIcon = () => <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M10.804 8 5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z"/></svg>;
 const CertificateIcon = () => <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zM3 8.207V13.5A.5.5 0 0 0 3.5 14h9a.5.5 0 0 0 .5-.5V8.207l-5-5-4 4z"/></svg>;
@@ -25,26 +26,26 @@ const CourseSidebar = ({ course, isEnrolled, onEnroll }) => {
             return (
                 <div className={styles.teacherActions}>
                     <div className={styles.teacherBadge}>
-                        🎓 You are teaching this course
+                        🎓 Bạn là giáo viên khóa học này
                     </div>
                     <button 
                         className={`btn btn-primary-teacher ${styles.actionButton}`}
                         onClick={() => navigate(`/teacher/courses/${course._id}/dashboard`)}
                     >
-                        Manage Course
+                        Quản lý khóa học
                     </button>
                     <button 
                         className={`btn btn-outline ${styles.actionButton} ${styles.editButton}`}
                         onClick={() => navigate(`/teacher/edit-course/${course._id}`)}
                     >
-                        Edit Content
+                        Chỉnh sửa nội dung
                     </button>
                 </div>
             );
         }
 
         if (user.role === 'teacher') {
-             return <div className={`${styles.teacherBadge} ${styles.teacherPreviewBadge}`}>Teacher View Mode</div>;
+             return <div className={`${styles.teacherBadge} ${styles.teacherPreviewBadge}`}>Chế độ xem (Teacher)</div>;
         }
 
         if (isEnrolled) {
@@ -63,7 +64,7 @@ const CourseSidebar = ({ course, isEnrolled, onEnroll }) => {
 
     return (
         <div className={styles.sidebarCard}>
-            <div style={{backgroundColor: course.color}} className={styles.sidebarImage} />
+            <div style={{backgroundColor: course.color || '#ccc'}} className={styles.sidebarImage} />
             <div className={styles.sidebarContent}>
                 
                 {renderActionButtons()}
@@ -129,7 +130,7 @@ const CourseDetailPage = () => {
                     <StarIcon key={i} />
                  ))}
               </div>
-              <span className={styles.count}>({course.rating?.count || 0} ratings)</span>
+              <span className={styles.count}>({course.rating?.count || 0} đánh giá)</span>
             </div>
             <span>Dạy bởi <strong>{course.teacher?.name}</strong></span>
           </div>

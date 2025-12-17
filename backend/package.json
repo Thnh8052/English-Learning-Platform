@@ -22,11 +22,13 @@
     "helmet": "^8.1.0",
     "joi": "^18.0.1",
     "jsonwebtoken": "^9.0.2",
+    "mammoth": "^1.11.0",
     "mongoose": "^8.19.2",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
     "multer-storage-cloudinary": "^4.0.0",
     "openai": "^6.9.1",
+    "pdfjs-dist": "^5.4.449",
     "socket.io": "^4.8.1"
   },
   "keywords": [],

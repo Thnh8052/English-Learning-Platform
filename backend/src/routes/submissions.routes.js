@@ -5,7 +5,9 @@ import {
     submitSpeaking, 
     getSubmissionById,
     gradeSubmission,
-    getMySubmissionHistory
+    getMySubmissionHistory,
+    getMySubmissionByLesson,
+    getSubmissionHistoryByLesson
 } from '../controllers/submissions.controller.js';
 
 import { protect, authorizeRoles } from '../middleware/auth.middleware.js';
@@ -32,12 +34,15 @@ router.post('/speaking', authorizeRoles('student'), upload.any(), submitSpeaking
 
 // 4. Xem lịch sử làm bài Quiz của bản thân
 router.get('/my-quiz-history', authorizeRoles('student'), getMySubmissionHistory);
+router.get('/my-submission/:lessonId', protect, getMySubmissionByLesson);
+router.get('/history/:lessonId', protect, getSubmissionHistoryByLesson);
+
 
 
 // --- TEACHER ROUTES ---
 // 5. Lấy chi tiết một bài nộp để chấm điểm
 // (Cho phép cả admin và teacher truy cập)
-router.get('/:id', authorizeRoles('teacher', 'admin'), getSubmissionById);
+router.get('/:id', protect, getSubmissionById);
 
 // 6. Gửi kết quả chấm điểm (Score & Feedback)
 router.post('/:id/grade', authorizeRoles('teacher', 'admin'), gradeSubmission);

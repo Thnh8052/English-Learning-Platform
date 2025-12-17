@@ -3,6 +3,25 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../../../services/api';
 import styles from './Grading.module.css';
 
+// Cấu hình tiêu chí chấm điểm cho từng loại bài
+const GRADING_CRITERIA = {
+    speaking_prompt: [
+        { key: 'fluency', label: 'Fluency & Coherence' },
+        { key: 'vocabulary', label: 'Lexical Resource' },
+        { key: 'grammar', label: 'Grammar Range & Accuracy' },
+        { key: 'pronunciation', label: 'Pronunciation' }
+    ],
+    assignment: [ // Writing
+        { key: 'task_response', label: 'Task Response / Achievement' },
+        { key: 'coherence', label: 'Coherence & Cohesion' },
+        { key: 'vocabulary', label: 'Lexical Resource' },
+        { key: 'grammar', label: 'Grammar Range & Accuracy' }
+    ],
+    default: [
+        { key: 'score', label: 'Score (0-10)' }
+    ]
+};
+
 const GradingDetail = () => {
     const { submissionId } = useParams();
     const navigate = useNavigate();
@@ -10,29 +29,36 @@ const GradingDetail = () => {
     const [submission, setSubmission] = useState(null);
     const [loading, setLoading] = useState(true);
     
-    // State cho form chấm điểm
     const [feedback, setFeedback] = useState('');
-    // Giả sử chấm speaking theo 4 tiêu chí IELTS (0-9)
-    const [scores, setScores] = useState({
-        fluency: '',
-        vocabulary: '',
-        grammar: '',
-        pronunciation: ''
-    });
+    const [scores, setScores] = useState({});
+    const [criteriaList, setCriteriaList] = useState([]);
 
     useEffect(() => {
         const fetchDetail = async () => {
             try {
                 const res = await api.get(`/submissions/${submissionId}`);
-                setSubmission(res.data);
+                const sub = res.data;
+                setSubmission(sub);
                 
-                // Nếu đã chấm rồi thì fill dữ liệu cũ vào
-                if (res.data.status === 'completed') {
-                    setFeedback(res.data.feedback || '');
-                    if (res.data.score && typeof res.data.score === 'object') {
-                        setScores(res.data.score);
-                    }
+                // 1. Xác định tiêu chí chấm dựa trên loại bài học
+                const type = sub.lesson?.type || 'default';
+                const criteria = GRADING_CRITERIA[type] || GRADING_CRITERIA['default'];
+                setCriteriaList(criteria);
+
+                // 2. Fill dữ liệu cũ (nếu đã chấm) hoặc khởi tạo object rỗng
+                setFeedback(sub.feedback || '');
+                
+                if (sub.status === 'completed' && sub.score && typeof sub.score === 'object') {
+                    // Đã chấm: Lấy điểm cũ (loại bỏ field 'overall' để không bị trùng input)
+                    const { overall, ...detailScores } = sub.score;
+                    setScores(detailScores);
+                } else {
+                    // Chưa chấm: Khởi tạo state rỗng cho các input
+                    const initialScores = {};
+                    criteria.forEach(c => initialScores[c.key] = '');
+                    setScores(initialScores);
                 }
+
             } catch (error) {
                 console.error("Error fetching submission:", error);
                 alert("Failed to load submission.");
@@ -43,15 +69,38 @@ const GradingDetail = () => {
         fetchDetail();
     }, [submissionId]);
 
+    // --- HÀM XỬ LÝ URL AUDIO (MỚI THÊM) ---
+    const getAudioSrc = (path) => {
+        if (!path) return '';
+        if (path.startsWith('http')) return path;
+
+        // Fix lỗi đường dẫn Windows (\ -> /)
+        let cleanPath = path.replace(/\\/g, '/');
+        
+        if (cleanPath.startsWith('/')) cleanPath = cleanPath.substring(1);
+
+        // Loại bỏ '/api' khỏi baseURL để trỏ về root (nơi chứa thư mục uploads)
+        const baseUrl = api.defaults.baseURL.replace('/api', ''); 
+        return `${baseUrl}/${cleanPath}`;
+    };
+
     const handleScoreChange = (e) => {
         const { name, value } = e.target;
         setScores(prev => ({ ...prev, [name]: value }));
     };
 
+    // Tính điểm trung bình (Overall Band)
     const calculateOverall = () => {
-        const vals = Object.values(scores).map(v => parseFloat(v) || 0);
-        const sum = vals.reduce((a, b) => a + b, 0);
-        return vals.length ? (sum / vals.length).toFixed(1) : 0;
+        const vals = Object.values(scores).map(v => parseFloat(v));
+        const validVals = vals.filter(v => !isNaN(v));
+        
+        if (validVals.length === 0) return 0;
+
+        const sum = validVals.reduce((a, b) => a + b, 0);
+        
+        if (criteriaList.length === 1) return sum; 
+        
+        return (sum / validVals.length).toFixed(1);
     };
 
     const handleSubmitGrade = async () => {
@@ -64,32 +113,89 @@ const GradingDetail = () => {
                 feedback
             });
             
-            alert(`Grading saved! Overall Score: ${overall}`);
-            navigate(-1); // Quay lại trang danh sách
+            alert(`Grading saved successfully! Result: ${overall}`);
+            navigate(-1);
         } catch (error) {
             console.error("Error saving grade:", error);
             alert("Failed to save grade.");
         }
     };
 
-    if (loading) return <div className={styles.loading}>Loading submission details...</div>;
-    if (!submission) return <div className={styles.error}>Submission not found.</div>;
+    // --- RENDER HELPERS ---
+    const renderStudentContent = () => {
+        const type = submission.lesson?.type;
+        
+        // Case 1: Speaking (Có danh sách câu hỏi & Audio)
+        if (type === 'speaking_prompt') {
+            // Kiểm tra mảng answers trước
+            if (submission.answers && submission.answers.length > 0) {
+                 return submission.answers.map((ans, index) => (
+                    <div key={index} className={styles.questionBlock}>
+                        <p className={styles.questionText}><strong>Q{index + 1}:</strong> {ans.questionText}</p>                       
+                        {ans.audioUrl ? (
+                            <audio controls className={styles.audioPlayer} preload="metadata">
+                                <source src={getAudioSrc(ans.audioUrl)} />
+                                Trình duyệt không hỗ trợ file này.
+                            </audio>
+                        ) : <span style={{color:'red'}}>Audio missing</span>}
+                    </div>
+                 ));
+            }
+                        let questionData = [];
+            try {
+                questionData = typeof submission.questions === 'string' 
+                    ? JSON.parse(submission.questions) 
+                    : (submission.questions || []); 
+            } catch (e) {}
 
-    // Parse câu hỏi nếu nó là JSON string (do SpeakingBuilder lưu JSON)
-    let questionData = [];
-    try {
-        questionData = JSON.parse(submission.questions || "[]");
-    } catch (e) {
-        // Fallback nếu không phải JSON
-    }
+            if (questionData.length > 0) {
+                return questionData.map((q, index) => (
+                    <div key={index} className={styles.questionBlock}>
+                        <p className={styles.questionText}><strong>Q{index + 1}:</strong> {q.text}</p>
+                        <audio controls className={styles.audioPlayer}>
+                             <source src={getAudioSrc(submission.content)} />
+                        </audio>
+                    </div>
+                ))
+            }
+
+            return (
+                <div className={styles.singleContent}>
+                    <p>Audio Submission:</p>
+                    <audio controls src={getAudioSrc(submission.content)} className={styles.audioPlayer} />
+                </div>
+            );
+        }
+
+        // Case 2: Writing (Assignment) - Render HTML
+        if (type === 'assignment') {
+            return (
+                <div className={styles.writingContent}>
+                    <div 
+                        className="prose"
+                        style={{lineHeight: '1.8', color: '#333'}}
+                        dangerouslySetInnerHTML={{ __html: submission.content }} 
+                    />
+                </div>
+            );
+        }
+
+        // Default: Text plain
+        return <div className={styles.textContent}>{submission.content}</div>;
+    };
+
+    if (loading) return <div className={styles.loading}>Loading...</div>;
+    if (!submission) return <div className={styles.error}>Not found.</div>;
 
     return (
         <div className={styles.detailContainer}>
-            {/* --- CỘT TRÁI: BÀI LÀM CỦA HỌC SINH --- */}
+            {/* --- CỘT TRÁI: BÀI LÀM --- */}
             <div className={styles.leftPanel}>
                 <div className={styles.panelHeader}>
                     <button onClick={() => navigate(-1)} className={styles.backBtn}>&larr; Back</button>
-                    <h3>Student Submission</h3>
+                    <h3>
+                        {submission.lesson?.type === 'assignment' ? 'Writing Submission' : 'Speaking Submission'}
+                    </h3>
                 </div>
 
                 <div className={styles.studentProfileCard}>
@@ -104,41 +210,11 @@ const GradingDetail = () => {
                 </div>
 
                 <div className={styles.submissionContent}>
-                    <h4>Student's Answer</h4>
-                    
-                    {/* Nếu là Speaking, backend sẽ gửi về các file audio */}
-                    {/* Giả sử logic: backend trả về field audio_0, audio_1... hoặc map với câu hỏi */}
-                    {/* Ở đây tôi demo hiển thị đơn giản dựa trên model Submission.content (URL file) */}
-                    
-                    {/* Cách 1: Nếu submission lưu từng file riêng trong 1 object/array */}
-                    {questionData.length > 0 ? (
-                        questionData.map((q, index) => (
-                            <div key={index} className={styles.questionBlock}>
-                                <p className={styles.questionText}><strong>Q{index + 1}:</strong> {q.text}</p>
-                                
-                                {/* Logic tìm file audio tương ứng */}
-                                {/* Giả sử bạn cần update Backend để trả về URL file audio chuẩn xác */}
-                                {/* Tạm thời hiển thị placeholder player */}
-                                <audio controls className={styles.audioPlayer}>
-                                    <source src={`${api.defaults.baseURL}/uploads/audio/${submission._id}_${index}.webm`} type="audio/webm" />
-                                    Your browser does not support the audio element.
-                                </audio>
-                            </div>
-                        ))
-                    ) : (
-                        // Fallback cho bài writing hoặc single file
-                        <div className={styles.singleContent}>
-                            {submission.lesson?.type === 'speaking_prompt' ? (
-                                <audio controls src={submission.content} className={styles.audioPlayer} />
-                            ) : (
-                                <div className={styles.textContent}>{submission.content}</div>
-                            )}
-                        </div>
-                    )}
+                    {renderStudentContent()}
                 </div>
             </div>
 
-            {/* --- CỘT PHẢI: FORM CHẤM ĐIỂM --- */}
+            {/* --- CỘT PHẢI: FORM CHẤM --- */}
             <div className={styles.rightPanel}>
                 <div className={styles.panelHeader}>
                     <h3>Grading & Feedback</h3>
@@ -146,34 +222,33 @@ const GradingDetail = () => {
 
                 <div className={styles.gradingForm}>
                     <div className={styles.scoreGrid}>
-                        <div className={styles.scoreInputGroup}>
-                            <label>Fluency (0-9)</label>
-                            <input type="number" name="fluency" min="0" max="9" step="0.5" value={scores.fluency} onChange={handleScoreChange} />
-                        </div>
-                        <div className={styles.scoreInputGroup}>
-                            <label>Vocabulary (0-9)</label>
-                            <input type="number" name="vocabulary" min="0" max="9" step="0.5" value={scores.vocabulary} onChange={handleScoreChange} />
-                        </div>
-                        <div className={styles.scoreInputGroup}>
-                            <label>Grammar (0-9)</label>
-                            <input type="number" name="grammar" min="0" max="9" step="0.5" value={scores.grammar} onChange={handleScoreChange} />
-                        </div>
-                        <div className={styles.scoreInputGroup}>
-                            <label>Pronunciation (0-9)</label>
-                            <input type="number" name="pronunciation" min="0" max="9" step="0.5" value={scores.pronunciation} onChange={handleScoreChange} />
-                        </div>
+                        {criteriaList.map((crit) => (
+                            <div key={crit.key} className={styles.scoreInputGroup}>
+                                <label>{crit.label}</label>
+                                <input 
+                                    type="number" 
+                                    name={crit.key}
+                                    min="0" 
+                                    max="9" 
+                                    step="0.5" 
+                                    value={scores[crit.key] || ''} 
+                                    onChange={handleScoreChange} 
+                                    placeholder="0-9"
+                                />
+                            </div>
+                        ))}
                     </div>
 
                     <div className={styles.totalScore}>
-                        <span>Overall Band Score:</span>
+                        <span>Overall Score:</span>
                         <strong>{calculateOverall()}</strong>
                     </div>
 
                     <div className={styles.feedbackSection}>
                         <label>Detailed Feedback</label>
                         <textarea 
-                            rows="8" 
-                            placeholder="Write your feedback to the student here..."
+                            rows="10" 
+                            placeholder="Nhận xét chi tiết về bài làm..."
                             value={feedback}
                             onChange={(e) => setFeedback(e.target.value)}
                         ></textarea>

@@ -72,9 +72,10 @@ const SpeakingPlayer = ({ lesson }) => {
 
 return (
         <div className={styles.playerContainer}>
-            {/* Header tiến độ - Thêm class styles.header */}
             <div className={styles.header}>
-                <h3>Speaking Practice - Part {currentQuestion?.part || '1'}</h3>
+                <h3>
+                    Speaking Practice - {currentQuestion?.part?.replace('part', 'Part ') || 'Part 1'}
+                </h3>                
                 <div className={styles.progressBar}>
                     <div className={styles.progressFill} style={{ width: `${((currentQIndex + 1) / questions.length) * 100}%` }}></div>
                 </div>

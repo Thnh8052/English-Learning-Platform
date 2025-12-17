@@ -4,7 +4,7 @@ import { lessonStorage } from '../config/cloudinary.js';
 import { getLessonsByCourse,createLesson,updateLesson,deleteLesson,getLessonById } from "../controllers/lesson.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
-import { addQuizQuestion, deleteQuizQuestion,addSpeakingQuestion,deleteSpeakingQuestion } from '../controllers/quiz.controller.js';
+import { addQuizQuestion, deleteQuizQuestion,addSpeakingQuestion,deleteSpeakingQuestion,deleteMultipleQuizQuestions } from '../controllers/quiz.controller.js';
 
 
 const router = express.Router();
@@ -27,11 +27,13 @@ router.post(
     createLesson
 );
 router.put('/:id', updateLesson);
+router.delete('/:lessonId/questions/bulk', deleteMultipleQuizQuestions);
 router.delete('/:id', deleteLesson);
 
 // Quiz question routes
 router.post('/:lessonId/questions', protect, authorizeRoles('teacher'), addQuizQuestion);
 router.delete('/:lessonId/questions/:questionId', protect, authorizeRoles('teacher'), deleteQuizQuestion);
+
 // Speaking question routes
 router.post('/:lessonId/speaking-questions', protect, authorizeRoles('teacher'), addSpeakingQuestion);
 router.delete('/:lessonId/speaking-questions/:questionId', protect, authorizeRoles('teacher'), deleteSpeakingQuestion);

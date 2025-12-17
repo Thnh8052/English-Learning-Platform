@@ -1,26 +1,37 @@
 .StudentHeader {
-  background: var(--color-bg-surface);
+  background-color: var(--bg-card); /* Hoặc var(--color-white) nếu muốn header luôn sáng */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 40px;
-  border-bottom: 1px solid var(--color-border);
+  padding: 0.8rem 2rem;
+  border-bottom: 1px solid var(--color-gray-200);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+@media (prefers-color-scheme: dark) {
+  .StudentHeader {
+    border-bottom-color: var(--color-gray-700);
+  }
 }
 
 /* Logo */
 .logo {
-  color: var(--color-primary);
-  font-size: 24px;
-  font-weight: bold;
+  color: var(--color-student-primary); /* Đổi sang màu student */
+  font-size: 1.5rem;
+  font-weight: 800;
   text-decoration: none;
   cursor: pointer;
+  letter-spacing: -0.5px;
 }
 
-/* Notification */
+/* Notification Section */
 .rightSection {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--spacing-3);
 }
 
 .notificationWrapper {
@@ -33,81 +44,120 @@
   font-size: 1.4rem;
   position: relative;
   cursor: pointer;
-  transition: 0.2s;
   padding: 6px;
   transition: transform 0.2s;
+  color: var(--text-secondary);
 }
 
 .bellBtn:hover {
-  transform: scale(1.2);
+  transform: scale(1.1);
+  color: var(--text-primary);
 }
 
 .bellDot {
   width: 8px;
   height: 8px;
-  background: var(--color-danger);
+  background: var(--color-error);
   border-radius: 50%;
   position: absolute;
-  top: 4px;
-  right: 5px;
+  top: 6px;
+  right: 6px;
+  border: 2px solid var(--bg-card); /* Tạo viền trắng xung quanh chấm đỏ */
 }
 
-/* Dropdown for Notifications */
-.notifDropdown {
+/* Dropdown Shared Styles */
+.notifDropdown,
+.dropdown {
   position: absolute;
   right: 0;
-  top: 115%;
-  background: var(--color-bg-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  width: 260px;
+  top: 120%;
+  background: var(--bg-card);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
-  z-index: 20;
+  z-index: 1000;
+  color: var(--text-primary);
+}
+
+@media (prefers-color-scheme: dark) {
+  .notifDropdown,
+  .dropdown {
+    border-color: var(--color-gray-700);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Notification Dropdown Specifics */
+.notifDropdown {
+  width: 300px;
 }
 
 .notifTitle {
-  font-weight: bold;
+  font-weight: 600;
   font-size: 1rem;
-  color: var(--color-text-base);
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--color-border);
+  color: var(--text-primary);
+  padding: var(--spacing-2) var(--spacing-3);
+  border-bottom: 1px solid var(--color-gray-200);
+  background-color: var(--color-gray-50);
+}
+
+@media (prefers-color-scheme: dark) {
+  .notifTitle {
+    border-bottom-color: var(--color-gray-700);
+    background-color: var(--color-gray-800);
+  }
 }
 
 .notifList {
-  max-height: 200px;
+  max-height: 250px;
   overflow-y: auto;
 }
 
 .notifItem {
-  padding: 10px 14px;
-  font-size: 0.95rem;
-  border-bottom: 1px solid var(--color-border);
-  color: var(--color-text-muted);
-  background: var(--color-bg-surface);
-  transition: 0.2s;
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--color-gray-100);
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  transition: var(--transition-base);
+  cursor: default;
+}
+
+@media (prefers-color-scheme: dark) {
+  .notifItem {
+    border-bottom-color: var(--color-gray-700);
+  }
 }
 
 .notifItem:hover {
-  background: var(--color-bg-hover);
-  color: var(--color-text-base);
+  background: var(--color-gray-50);
+  color: var(--text-primary);
+}
+@media (prefers-color-scheme: dark) {
+  .notifItem:hover { background: var(--color-gray-700); }
 }
 
 .viewAllBtn {
   width: 100%;
   text-align: center;
-  padding: 10px;
-  background: var(--color-bg-hover);
+  padding: 12px;
+  background: var(--bg-card);
   border: none;
-  color: var(--color-primary);
+  border-top: 1px solid var(--color-gray-200);
+  color: var(--color-student-primary);
   cursor: pointer;
-  font-weight: 500;
-  transition: 0.2s;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: var(--transition-base);
 }
 
 .viewAllBtn:hover {
-  background: var(--color-primary);
-  color: white;
+  background: var(--color-gray-50);
+}
+@media (prefers-color-scheme: dark) {
+  .viewAllBtn { border-top-color: var(--color-gray-700); }
+  .viewAllBtn:hover { background: var(--color-gray-700); }
 }
 
 /* Profile Menu */
@@ -122,42 +172,42 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 6px;
-  transition: transform 0.2s;
+  padding: 4px;
+  border-radius: var(--border-radius-full);
+  transition: background-color 0.2s;
 }
 .avatarBtn:hover {
-  transform: scale(1.05);
-} 
+  background-color: var(--color-gray-100);
+}
+@media (prefers-color-scheme: dark) {
+  .avatarBtn:hover { background-color: var(--color-gray-800); }
+}
 
 .avatar {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   object-fit: cover;
+  border: 1px solid var(--color-gray-200);
 }
 
 .userName {
-  color: var(--color-text-base);
+  color: var(--text-primary);
   font-weight: 500;
+  font-size: 0.95rem;
 }
 
 .arrow {
   font-size: 0.8rem;
-  color: var(--color-text-muted);
+  color: var(--text-secondary);
 }
 
+/* Dropdown Menu Items */
 .dropdown {
-  position: absolute;
-  right: 0;
-  top: 115%;
-  background: var(--color-bg-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
-  min-width: 160px;
-  z-index: 10;
+  min-width: 180px;
+  padding: var(--spacing-1) 0;
 }
 
 .dropdown a,
@@ -165,30 +215,38 @@
   text-decoration: none;
   background: none;
   border: none;
-  padding: 10px 14px;
+  padding: 10px 16px;
   text-align: left;
-  color: var(--color-text-base);
+  color: var(--text-primary);
   cursor: pointer;
   font-size: 0.95rem;
-  transition: 0.2s;
+  transition: background-color 0.2s;
+  display: block;
+  width: 100%;
 }
 
 .dropdown a:hover,
 .dropdown button:hover {
-  background: var(--color-bg-hover);
-  color: var(--color-primary);
+  background: var(--color-gray-100);
+  color: var(--color-student-primary);
+}
+@media (prefers-color-scheme: dark) {
+  .dropdown a:hover,
+  .dropdown button:hover {
+    background: var(--color-gray-700);
+  }
 }
 
-/* Links khi chưa đăng nhập */
+/* Links (Login/Register) */
 .links a {
-  margin-left: 20px;
+  margin-left: var(--spacing-3);
   text-decoration: none;
-  color: var(--color-text-base);
-  transition: 0.2s;
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: color 0.2s;
 }
 
 .links a:hover,
 .links a.active {
-  font-weight: bold;
-  color: var(--color-primary);
+  color: var(--color-student-primary);
 }
