@@ -18,7 +18,8 @@ import {
   deleteCourse,
   getCourseDashboard,
   getEnrolledStudents,
-  getStudentSubmissionsInCourse 
+  getStudentSubmissionsInCourse,
+  removeStudentFromCourse
 } from "../controllers/courses.controller.js";
 import { getSubmissionsByCourse } from '../controllers/submissions.controller.js';
 
@@ -57,6 +58,7 @@ router.post('/:id/submit-for-review', protect, authorizeRoles('teacher'), submit
 
 // Lấy danh sách bài nộp của khóa học
 router.get('/:courseId/submissions', protect, authorizeRoles('teacher'), getSubmissionsByCourse);
+router.delete('/:courseId/students/:studentId', protect, authorizeRoles('teacher', 'admin'), removeStudentFromCourse);
 
 // POST /api/courses/:id/retract -> Giáo viên rút lại khóa học từ xem xét
 router.post('/:id/retract', protect, authorizeRoles('teacher'), retractCourse);

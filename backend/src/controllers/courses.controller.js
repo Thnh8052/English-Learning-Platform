@@ -489,3 +489,44 @@ export const getStudentSubmissionsInCourse = async (req, res) => {
         res.status(500).json({ message: 'Lỗi server khi lấy danh sách bài nộp.' });
     }
 };
+/**
+ * @desc    Xóa học sinh khỏi khóa học (Hủy ghi danh)
+ * @route   DELETE /api/courses/:courseId/students/:studentId
+ * @access  Private/Teacher
+ */
+export const removeStudentFromCourse = async (req, res) => {
+    try {
+        const { courseId, studentId } = req.params;
+
+        // 1. Kiểm tra quyền (Giáo viên của khóa học hoặc Admin)
+        const course = await Course.findById(courseId);
+        if (!course) {
+            return res.status(404).json({ message: "Khóa học không tồn tại" });
+        }
+
+        // Chỉ giáo viên chủ nhiệm hoặc admin mới được xóa
+        if (course.teacher.toString() !== req.user.id && req.user.role !== 'admin') {
+            return res.status(403).json({ message: "Bạn không có quyền xóa học viên khỏi khóa học này" });
+        }
+
+        // 2. Xóa bản ghi ghi danh (Enrollment)
+        const deletedEnrollment = await Enrollment.findOneAndDelete({
+            course: courseId,
+            student: studentId
+        });
+
+        if (!deletedEnrollment) {
+            return res.status(404).json({ message: "Học viên này chưa đăng ký khóa học hoặc đã bị xóa" });
+        }
+
+        // 3. (Tùy chọn) Xóa luôn bài nộp của học sinh này trong khóa học để sạch data
+        // Nếu muốn giữ lịch sử bài nộp thì comment dòng dưới lại
+        await Submission.deleteMany({ course: courseId, student: studentId });
+
+        res.json({ message: "Đã xóa học viên khỏi khóa học thành công" });
+
+    } catch (err) {
+        console.error("Lỗi khi xóa học viên:", err);
+        res.status(500).json({ message: "Lỗi máy chủ" });
+    }
+};
