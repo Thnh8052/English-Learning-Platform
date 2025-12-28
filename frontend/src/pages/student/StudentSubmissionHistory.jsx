@@ -44,9 +44,7 @@ const StudentSubmissionHistory = () => {
             
             <div className={styles.tableContainer}>
                 {submissions.length === 0 ? (
-                    <div className={styles.emptyState}>
-                        Bạn chưa nộp bài tập nào.
-                    </div>
+                    <div className={styles.emptyState}>Bạn chưa nộp bài tập nào.</div>
                 ) : (
                     <table className={styles.table}>
                         <thead>
@@ -55,7 +53,7 @@ const StudentSubmissionHistory = () => {
                                 <th>Khóa học</th>
                                 <th>Ngày nộp</th>
                                 <th>Trạng thái</th>
-                                <th>Điểm</th>
+                                <th className={styles.cellScore}>Điểm</th>
                                 <th>Thao tác</th>
                             </tr>
                         </thead>
@@ -63,7 +61,7 @@ const StudentSubmissionHistory = () => {
                             {submissions.map((sub) => (
                                 <tr key={sub._id} className={styles.row}>
                                     <td>
-                                        <span className={styles.cellTitle}>{sub.lesson?.title || 'Unknown Lesson'}</span>
+                                        <span className={styles.cellTitle}>{sub.lesson?.title}</span>
                                         <span className={styles.cellType}>{sub.lesson?.type}</span>
                                     </td>
                                     <td>{sub.lesson?.module?.course?.name}</td>
@@ -73,15 +71,13 @@ const StudentSubmissionHistory = () => {
                                             {sub.status === 'completed' ? 'Đã chấm' : 'Đang chờ'}
                                         </span>
                                     </td>
-                                    <td className={styles.cellScore}>
-                                        {renderScorePreview(sub)}
-                                    </td>
+                                    <td className={styles.cellScore}>{renderScorePreview(sub)}</td>
                                     <td>
                                         <button 
-                                            className="btn btn-sm btn-outline"
+                                            className="btn btn-outline"
                                             onClick={() => navigate(`/student/submissions/${sub._id}`)}
                                         >
-                                            Xem chi tiết
+                                            Chi tiết
                                         </button>
                                     </td>
                                 </tr>

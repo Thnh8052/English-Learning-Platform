@@ -113,40 +113,31 @@ const StudentSubmissionDetail = () => {
 
     // --- 2. RENDER BÀI LÀM CỦA HỌC SINH ---
     const renderStudentWork = () => {
-        // Case A: WRITING
+// Case A: WRITING
         if (lesson?.type === 'assignment') {
             return (
                 <div className={styles.writingPaper}>
-                    <div className="prose" dangerouslySetInnerHTML={{ __html: content }} />
+                    <div className="prose-content" dangerouslySetInnerHTML={{ __html: content }} />
                 </div>
             );
         }
 
-        // Case B: SPEAKING (SỬA ĐOẠN NÀY ĐỂ NGHE ĐƯỢC AUDIO)
+        // Case B: SPEAKING
         if (lesson?.type === 'speaking_prompt') {
             if (!answers || answers.length === 0) return <div>Không tìm thấy file ghi âm.</div>;
-            
             return (
                 <div className={styles.audioList}>
                     {answers.map((ans, idx) => (
                         <div key={idx} className={styles.audioItem}>
                             <div className={styles.questionLabel}>
-                                <strong>Question {idx + 1}:</strong> {ans.questionText || `Câu hỏi số ${idx+1}`}
+                                <strong>Question {idx + 1}:</strong> {ans.questionText}
                             </div>
-                            
-                            {ans.audioUrl ? (
-                                <div style={{marginTop: '10px'}}>
+                            {ans.audioUrl && (
+                                <div className={styles.audioContainer}>
                                     <audio controls className={styles.audioPlayer} preload="metadata">
-                                        <source src={getAudioSrc(ans.audioUrl)} type="audio/webm" />
-                                        <source src={getAudioSrc(ans.audioUrl)} type="audio/mp3" />
-                                        <source src={getAudioSrc(ans.audioUrl)} type="audio/wav" />
-                                        Trình duyệt của bạn không hỗ trợ phát file này.
+                                        <source src={getAudioSrc(ans.audioUrl)} />
                                     </audio>
-                                    {/* Debug link: Nếu vẫn lỗi thì bỏ comment dòng dưới để xem link tạo ra là gì */}
-                                    {/* <small style={{color:'#999', fontSize:'10px'}}>{getAudioSrc(ans.audioUrl)}</small> */}
                                 </div>
-                            ) : (
-                                <span className={styles.textError}>File lỗi hoặc chưa ghi âm</span>
                             )}
                         </div>
                     ))}
@@ -170,7 +161,7 @@ const StudentSubmissionDetail = () => {
                                     <strong>Câu {idx + 1}: {originalQuestion.questionText || "Câu hỏi"}</strong>
                                     {status === 'completed' && (
                                         <span className={ans.isCorrect ? styles.tagSuccess : styles.tagError}>
-                                            {ans.isCorrect ? "Đúng" : "Sai"}
+                                            {ans.isCorrect ? " Đúng" : " Sai"}
                                         </span>
                                     )}
                                 </div>

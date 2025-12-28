@@ -91,7 +91,7 @@
 .cardImage {
     position: relative;
     height: 140px;
-    background-color: var(--color-gray-200);
+    background-color: var(--course-bg, var(--color-gray-200)); 
     border-bottom: 1px solid var(--color-gray-100);
 }
 @media (prefers-color-scheme: dark) {
@@ -178,8 +178,9 @@
 /* Grading Alert */
 .gradingAlert {
     font-size: 0.85rem;
-    color: #92400e; /* Amber 800 */
-    background-color: #fef3c7; /* Amber 100 */
+    color: var(--color-warning-hover); 
+    background-color: var(--color-warning-light);
+    border: 1px solid var(--color-warning);
     padding: 8px 12px;
     border-radius: var(--border-radius-md);
     display: flex;
@@ -187,12 +188,11 @@
     gap: 8px;
     font-weight: 600;
     margin-bottom: var(--spacing-2);
-    border: 1px solid #fcd34d;
 }
 @media (prefers-color-scheme: dark) {
     .gradingAlert {
         background-color: rgba(245, 158, 11, 0.15);
-        color: #fbbf24; /* Amber 400 */
+        color: #fbbf24;
         border-color: rgba(245, 158, 11, 0.3);
     }
 }

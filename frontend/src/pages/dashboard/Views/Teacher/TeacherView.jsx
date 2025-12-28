@@ -26,7 +26,7 @@ const CourseCard = ({ course, onEdit, onSubmitReview, onRetract, onDelete, onMan
 
     return (
         <div className={styles.courseCard}>
-            <div className={styles.cardImage} style={{ backgroundColor: course.color || '#e2e8f0' }}>
+            <div className={styles.cardImage} style={{ '--course-bg': course.color }}>
                 <StatusBadge />
                 
                 {isPublished && (

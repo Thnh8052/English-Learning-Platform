@@ -137,7 +137,7 @@ const GradingDetail = () => {
                                 <source src={getAudioSrc(ans.audioUrl)} />
                                 Trình duyệt không hỗ trợ file này.
                             </audio>
-                        ) : <span style={{color:'red'}}>Audio missing</span>}
+                        ) : <span className={styles.audioError}>Audio missing</span>}
                     </div>
                  ));
             }
@@ -168,17 +168,16 @@ const GradingDetail = () => {
         }
 
         // Case 2: Writing (Assignment) - Render HTML
-        if (type === 'assignment') {
-            return (
-                <div className={styles.writingContent}>
-                    <div 
-                        className="prose"
-                        style={{lineHeight: '1.8', color: '#333'}}
-                        dangerouslySetInnerHTML={{ __html: submission.content }} 
-                    />
-                </div>
-            );
-        }
+if (type === 'assignment') {
+    return (
+        <div className={styles.writingContent}>
+            <div 
+                className="prose-content" 
+                dangerouslySetInnerHTML={{ __html: submission.content }} 
+            />
+        </div>
+    );
+}
 
         // Default: Text plain
         return <div className={styles.textContent}>{submission.content}</div>;
