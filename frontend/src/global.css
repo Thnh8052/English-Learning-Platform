@@ -92,6 +92,7 @@
   --transition-base: all 0.2s ease-in-out;
   
   color-scheme: light;
+  --text-prose: var(--color-gray-700); /* */
 }
 
 /* 3. CSS Reset & Base Styles
@@ -140,6 +141,7 @@ body {
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
     
     color-scheme: dark;
+    --text-prose: var(--color-gray-300); /* */
   }
 
   /* Specific overrides */
@@ -482,8 +484,8 @@ input:-webkit-autofill::first-line {
 /* 10. Prose / Rich Content Styling
    ========================================================================== */
 .prose-content {
-  line-height: 1.7;
-  color: var(--text-primary);
+  line-height: 1.8;
+  color: var(--text-prose);
 }
 
 .prose-content h1,
@@ -503,6 +505,7 @@ input:-webkit-autofill::first-line {
   padding-left: 1.5em;
   margin-bottom: 1.2em;
 }
+
 
 .prose-content li > p {
   margin-bottom: 0.5em;

@@ -17,6 +17,7 @@
 .titleGroup h2 { 
     margin: 0; 
     color: var(--text-primary); 
+    font-size: 1.75rem;
 }
 
 .subTitle { 
@@ -24,160 +25,89 @@
     font-size: 0.9rem; 
 }
 
-.backBtn {
-    background: var(--bg-card);
-    border: 1px solid var(--color-gray-300);
-    padding: 0.5rem 1rem;
-    border-radius: var(--border-radius-md);
-    cursor: pointer;
-    font-weight: 500;
-    color: var(--text-secondary);
-    transition: var(--transition-base);
-}
-.backBtn:hover {
-    background: var(--color-gray-100);
-    color: var(--text-primary);
-}
-
 /* --- TABLE STYLES --- */
 .tableCard {
     background: var(--bg-card);
-    border-radius: var(--border-radius-md);
-    box-shadow: var(--shadow-sm);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
     overflow: hidden;
     border: 1px solid var(--color-gray-200);
+}
+
+.tableTitle {
+    padding: var(--spacing-3);
+    margin: 0;
+    border-bottom: 1px solid var(--color-gray-100);
+    font-size: 1.1rem;
+    color: var(--text-primary);
 }
 
 .table { 
     width: 100%; 
     border-collapse: collapse; 
-    color: var(--text-primary);
 }
 
 .table th { 
-    background: var(--color-gray-100); 
+    background: var(--color-gray-50); 
     text-align: left; 
     padding: 1rem; 
     font-weight: 600; 
-    color: var(--text-secondary); 
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    text-transform: uppercase;
 }
 
 .table td { 
     padding: 1rem; 
     border-bottom: 1px solid var(--color-gray-100); 
-    vertical-align: middle; 
+    vertical-align: middle;
+    color: var(--text-primary);
 }
 
-.table tr:last-child td { 
-    border-bottom: none; 
+/* Căn lề và độ rộng cột thay cho inline style */
+.textRight { text-align: right; }
+.textCenter { text-align: center; }
+.colStudent { width: 35%; }
+.colDate { width: 15%; }
+.colProgress { width: 20%; }
+.colActions { width: 30%; }
+
+.emptyRow td {
+    padding: var(--spacing-5);
+    color: var(--text-secondary);
+    font-style: italic;
 }
 
+/* --- AVATAR --- */
 .studentInfo { 
     display: flex; 
     align-items: center; 
-    gap: 12px; 
+    gap: var(--spacing-2); 
 }
 
 .avatar { 
     width: 40px; 
     height: 40px; 
-    background: var(--color-info);
-    color: var(--color-white); 
+    background: var(--color-teacher-primary-light);
+    color: var(--color-teacher-primary); 
     border-radius: 50%; 
     display: flex; 
     align-items: center; 
     justify-content: center; 
-    font-weight: bold; 
-}
-
-.name { 
-    font-weight: 600; 
-    color: var(--text-primary); 
-    display: block; 
-}
-
-.email { 
-    font-size: 0.85rem; 
-    color: var(--text-secondary); 
-}
-
-.actionBtn {
-    padding: 6px 12px;
-    background: var(--bg-card);
-    border: 1px solid var(--color-gray-300);
-    border-radius: var(--border-radius-sm);
-    cursor: pointer;
-    font-size: 0.85rem;
-    color: var(--color-info);
-    text-decoration: none;
-    transition: var(--transition-base);
-    display: inline-block;
-}
-
-.actionBtn:hover { 
-    background: var(--color-info-light); 
-    border-color: var(--color-info);
-}
-
-/* --- DETAIL PAGE --- */
-.profileSummary {
-    background: var(--bg-card);
-    padding: 1.5rem;
-    border-radius: var(--border-radius-md);
-    margin-bottom: var(--spacing-4);
-    display: flex;
-    gap: 2rem;
-    border: 1px solid var(--color-gray-200);
-    box-shadow: var(--shadow-sm);
-}
-
-.statGrid {
-    display: flex;
-    gap: 2rem;
-    margin-left: auto;
-}
-
-.statItem { text-align: center; }
-
-.statVal { 
-    display: block; 
-    font-size: 1.5rem; 
     font-weight: 700; 
-    color: var(--text-primary); 
+    flex-shrink: 0;
 }
 
-.statLabel { 
-    font-size: 0.85rem; 
-    color: var(--text-secondary); 
-    text-transform: uppercase; 
+.avatarLarge {
+    width: 64px;
+    height: 64px;
+    font-size: 1.5rem;
 }
 
-/* Status Badges - Map to Global Semantic Colors */
-.badge { 
-    padding: 4px 8px; 
-    border-radius: var(--border-radius-sm); 
-    font-size: 0.75rem; 
-    font-weight: 700; 
-    text-transform: uppercase; 
-}
+.name { font-weight: 600; color: var(--text-primary); display: block; }
+.nameLarge { font-size: 1.25rem; }
+.email { font-size: 0.85rem; color: var(--text-secondary); }
 
-/* Submitted -> Info (Blue) */
-.submitted { 
-    background: var(--color-info-light); 
-    color: var(--color-info); 
-}
-
-/* Completed -> Success (Green) */
-.completed { 
-    background: var(--color-success-light); 
-    color: var(--color-success); 
-}
-
-/* Grading -> Warning (Yellow/Amber) */
-.grading { 
-    background: var(--color-warning-light); 
-    color: var(--color-warning); 
-}
 /* --- PROGRESS BAR --- */
 .progressBarBg {
     width: 100%;
@@ -190,70 +120,40 @@
 
 .progressBarFill {
     height: 100%;
-    background-color: var(--color-info); /* Blue */
-    border-radius: var(--border-radius-full);
+    background-color: var(--color-teacher-primary);
     transition: width 0.3s ease;
 }
 
-/* --- ACTIONS --- */
-.actionGroup {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-}
-
-.actionBtn {
-    padding: 6px 12px;
-    border-radius: var(--border-radius-md);
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    transition: var(--transition-base);
-    border: 1px solid transparent;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Nút Xem (Màu xanh/xám nhẹ) */
-.btnView {
-    background-color: var(--color-white);
-    border-color: var(--color-gray-300);
+.progressText {
+    font-size: 0.75rem;
     color: var(--text-secondary);
 }
-.btnView:hover {
-    background-color: var(--color-gray-100);
-    color: var(--text-primary);
-    border-color: var(--color-gray-400);
+
+/* --- SUMMARY CARD --- */
+.profileSummary {
+    background: var(--bg-card);
+    padding: var(--spacing-4);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: var(--spacing-4);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--color-gray-200);
+    box-shadow: var(--shadow-sm);
 }
 
-/* Nút Xóa (Màu đỏ nhạt) */
-.btnDelete {
-    background-color: var(--color-error-light);
-    color: var(--color-error);
-    border: 1px solid transparent;
-}
-.btnDelete:hover {
-    background-color: var(--color-error);
-    color: var(--color-white);
-}
+.statGrid { display: flex; gap: var(--spacing-4); }
+.statItem { text-align: center; min-width: 80px; }
+.statVal { display: block; font-size: 1.5rem; font-weight: 800; color: var(--color-teacher-primary); }
+.statLabel { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; }
 
-/* Dark mode tweaks */
+/* --- ACTIONS --- */
+.actionGroup { display: flex; justify-content: flex-end; gap: var(--spacing-2); }
+
+/* Dark mode overrides */
 @media (prefers-color-scheme: dark) {
+    .tableCard, .profileSummary { border-color: var(--color-gray-700); }
+    .table th { background: var(--color-gray-800); }
+    .table td, .tableTitle { border-bottom-color: var(--color-gray-800); }
     .progressBarBg { background-color: var(--color-gray-700); }
-    
-    .btnView {
-        background-color: transparent;
-        border-color: var(--color-gray-600);
-        color: var(--color-gray-300);
-    }
-    .btnView:hover {
-        background-color: var(--color-gray-700);
-        color: var(--color-white);
-    }
-
-    .btnDelete {
-        background-color: rgba(220, 38, 38, 0.2); /* Red transparent */
-    }
 }

@@ -21,11 +21,6 @@
     position: sticky;
     top: 70px;
     height: calc(100vh - 70px);
-    transition: var(--transition-base);
-}
-
-@media (prefers-color-scheme: dark) {
-    .sidebar { border-right-color: var(--color-gray-700); }
 }
 
 .courseTitle {
@@ -38,10 +33,6 @@
     word-break: break-word;
 }
 
-@media (prefers-color-scheme: dark) {
-    .courseTitle { border-bottom-color: var(--color-gray-700); }
-}
-
 /* Navigation Menu */
 .navMenu {
     display: flex;
@@ -52,7 +43,7 @@
 .navItem {
     display: flex;
     align-items: center;
-    padding: 10px 12px;
+    padding: var(--spacing-2);
     border-radius: var(--border-radius-md);
     color: var(--text-secondary);
     font-weight: 500;
@@ -60,6 +51,12 @@
     transition: var(--transition-base);
     text-decoration: none;
     border: 1px solid transparent;
+    gap: var(--spacing-2);
+}
+
+.navBadge {
+    margin-left: auto;
+    font-size: 0.7rem;
 }
 
 .navItem:hover {
@@ -83,13 +80,17 @@
     width: 24px;
 }
 
-/* Dark mode overrides for Nav */
 @media (prefers-color-scheme: dark) {
-    .navItem:hover { background-color: var(--color-gray-800); }
+    .sidebar, .courseTitle, .section, .statCard { border-color: var(--color-gray-700); }
+    
     .navItem.active { 
         background-color: rgba(124, 58, 237, 0.2); 
-        color: #a78bfa; /* Lighter purple for dark mode */
-        border-color: rgba(124, 58, 237, 0.3);
+        color: var(--color-teacher-primary-light);
+    }
+
+    .statCard.warning {
+        background-color: rgba(245, 158, 11, 0.1);
+        border-color: var(--color-warning-hover);
     }
 }
 
@@ -108,6 +109,11 @@
     margin-bottom: var(--spacing-5);
 }
 
+.headerActions {
+    display: flex;
+    gap: var(--spacing-2);
+}
+
 .pageTitle {
     font-size: 1.75rem;
     color: var(--text-primary);
@@ -118,7 +124,6 @@
 /* ===========================
    STATS GRID
 =========================== */
-/* Đổi tên từ statGrid thành statsGrid để khớp JSX */
 .statsGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -137,25 +142,18 @@
     transition: var(--transition-base);
 }
 
+
 .statCard:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
     border-color: var(--color-teacher-primary-light);
 }
 
-/* Warning state for Pending Grading */
 .statCard.warning {
     border-color: var(--color-warning);
-    background-color: #fffbeb; /* Amber 50 */
+    background-color: var(--color-warning-light);
 }
 
-@media (prefers-color-scheme: dark) {
-    .statCard { border-color: var(--color-gray-700); }
-    .statCard.warning {
-        background-color: rgba(245, 158, 11, 0.1); /* Amber transparent */
-        border-color: var(--color-warning-hover);
-    }
-}
 
 .statLabel {
     font-size: 0.9rem;
@@ -173,7 +171,6 @@
     line-height: 1.2;
 }
 
-/* Thêm class này vì JSX có dùng */
 .statTrend {
     margin-top: 8px;
     font-size: 0.85rem;
@@ -182,11 +179,20 @@
     align-items: center;
     gap: 6px;
 }
+.statTrendWarning {
+    color: var(--color-warning-hover);
+    font-weight: 600;
+}
+.resetButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
 
 /* ===========================
    SECTIONS & LISTS
 =========================== */
-/* Đổi tên từ gridTwo thành sectionGrid để khớp JSX */
 .sectionGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -203,9 +209,6 @@
     box-shadow: var(--shadow-sm);
 }
 
-@media (prefers-color-scheme: dark) {
-    .section { border-color: var(--color-gray-700); }
-}
 
 .sectionHeader {
     padding: var(--spacing-3) var(--spacing-4);

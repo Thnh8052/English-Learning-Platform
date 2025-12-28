@@ -8,7 +8,7 @@
     font-size: 2rem;
     font-weight: 800;
     color: var(--text-primary);
-    margin-bottom: var(--spacing-2);
+    margin-bottom: var(--spacing-1);
 }
 
 .pageSubtitle {
@@ -27,12 +27,17 @@
     border: 1px solid var(--color-gray-200);
     box-shadow: var(--shadow-sm);
 }
+
 @media (prefers-color-scheme: dark) {
     .form { border-color: var(--color-gray-700); }
 }
 
-/* Các class input/select/textarea này nên được thay thế bằng class global
-   nhưng nếu muốn giữ style module, hãy dùng biến global */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-3);
+}
+
 .form input,
 .form select,
 .form textarea {
@@ -60,12 +65,8 @@
     min-height: 120px;
 }
 
-.form select option {
-    background-color: var(--bg-card);
-    color: var(--text-primary);
-}
-
-.form input::placeholder,
-.form textarea::placeholder {
-    color: var(--input-placeholder);
+.errorText {
+    color: var(--color-error);
+    text-align: center;
+    font-weight: 500;
 }

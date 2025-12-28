@@ -1,30 +1,31 @@
 .container {
-    padding: 2rem;
+    padding: var(--spacing-4);
     max-width: 1000px;
     margin: 0 auto;
+    color: var(--text-primary);
 }
 
 .pageTitle {
     font-size: 1.8rem;
-    color: #1e293b;
-    margin-bottom: 1.5rem;
-    border-bottom: 2px solid #e2e8f0;
-    padding-bottom: 0.5rem;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-3);
+    border-bottom: 2px solid var(--color-gray-200);
+    padding-bottom: var(--spacing-1);
 }
 
 /* --- TABLE STYLES --- */
 .tableContainer {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    background: var(--bg-card);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
     overflow-x: auto;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--color-gray-200);
 }
 
 .emptyState {
-    padding: 3rem;
+    padding: var(--spacing-5);
     text-align: center;
-    color: #64748b;
+    color: var(--text-secondary);
     font-style: italic;
 }
 
@@ -35,411 +36,297 @@
 }
 
 .table th, .table td {
-    padding: 1rem;
+    padding: var(--spacing-2);
     text-align: left;
-    border-bottom: 1px solid #f1f5f9;
-    color: #334155;
+    border-bottom: 1px solid var(--color-gray-200);
+    color: var(--text-primary);
 }
 
 .table th {
-    background-color: #f8fafc;
+    background-color: var(--color-gray-50);
     font-weight: 600;
-    color: #64748b;
+    color: var(--text-secondary);
     text-transform: uppercase;
     font-size: 0.85rem;
     letter-spacing: 0.05em;
 }
 
 .row:hover {
-    background-color: #f8fafc;
+    background-color: var(--color-gray-50);
 }
 
 .cellTitle {
     font-weight: 600;
-    color: #0f172a;
+    color: var(--text-primary);
     display: block;
 }
 
 .cellType {
-    color: #64748b;
+    color: var(--text-secondary);
     font-size: 0.85rem;
     text-transform: capitalize;
 }
 
 .cellScore {
     font-weight: 700;
-    color: #475569;
+    color: var(--text-primary);
 }
 
-/* --- BADGES --- */
 .statusBadge {
     padding: 0.25rem 0.75rem;
-    border-radius: 999px;
+    border-radius: var(--border-radius-full);
     font-size: 0.8rem;
     font-weight: 600;
     display: inline-block;
-    text-transform: capitalize;
 }
 
-/* Status variants */
 .statusCompleted {
-    background-color: #dcfce7;
-    color: #166534;
+    background-color: var(--color-success-light);
+    color: var(--color-success-hover);
 }
 
 .statusSubmitted {
-    background-color: #e0f2fe;
-    color: #0369a1;
+    background-color: var(--color-info-light);
+    color: var(--color-info-hover);
 }
 
 .statusPending {
-    background-color: #fef9c3;
-    color: #854d0e;
+    background-color: var(--color-warning-light);
+    color: var(--color-warning-hover);
 }
 
-/* --- DETAIL PAGE --- */
 .detailHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: var(--spacing-4);
 }
 
 .backBtn {
-    background: none;
-    border: 1px solid #cbd5e1;
+    background: transparent;
+    border: 1px solid var(--color-gray-300);
     padding: 0.5rem 1rem;
-    border-radius: 6px;
+    border-radius: var(--border-radius-md);
     cursor: pointer;
-    color: #64748b;
+    color: var(--text-secondary);
     font-weight: 500;
-    transition: all 0.2s;
+    transition: var(--transition-base);
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
 .backBtn:hover {
-    background: #f1f5f9;
-    color: #0f172a;
+    background: var(--color-gray-100);
+    color: var(--text-primary);
 }
 
 .headerInfo span {
-    color: #64748b;
+    color: var(--text-secondary);
 }
 
 .headerInfo strong {
-    color: #0f172a;
+    color: var(--text-primary);
     margin-left: 5px;
 }
 
 .sectionCard {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    margin-bottom: 2rem;
-    border: 1px solid #e2e8f0;
-}
-
-.resultCard {
-    border-top: 4px solid #22c55e;
+    background: var(--bg-card);
+    padding: var(--spacing-4);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--spacing-4);
+    border: 1px solid var(--color-gray-200);
 }
 
 .cardTitle {
     font-size: 1.25rem;
-    color: #1e293b;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid #f1f5f9;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-3);
+    padding-bottom: var(--spacing-1);
+    border-bottom: 1px solid var(--color-gray-200);
 }
 
-/* Feedback Box */
-.feedbackBox {
-    background-color: #f0fdf4;
-    border: 1px solid #bbf7d0;
-    padding: 1.5rem;
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
-}
-
-.feedbackLabel {
-    color: #15803d;
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 700;
-}
-
-.feedbackText {
-    white-space: pre-line;
-    color: #14532d;
-    line-height: 1.6;
-}
-
-/* Score Grid */
-.scoreGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
-}
-
-.scoreItem {
-    background: white;
-    padding: 1rem;
-    border-radius: 6px;
-    text-align: center;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    border: 1px solid #e2e8f0;
-}
-
-.scoreLabel {
-    display: block;
-    font-size: 0.75rem;
-    color: #64748b;
-    margin-bottom: 0.5rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 600;
-}
-
-.scoreValue {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: #16a34a;
-}
-
-.scoreOverall .scoreValue {
-    font-size: 2.2rem;
-    color: #15803d;
-}
-
-/* Content / Answers */
-.answerItem {
-    padding: 1rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    background-color: #fff;
-}
-
-.answerHeader {
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: #334155;
-    display: flex;
-    justify-content: space-between;
-}
-
-/* Correct/Wrong Styles */
-.correct {
-    border-color: #86efac;
-    background-color: #f0fdf4;
-}
-
-.wrong {
-    border-color: #fca5a5;
-    background-color: #fef2f2;
-}
-
-.textSuccess { color: #16a34a; font-weight: 600; }
-.textDanger { color: #dc2626; font-weight: 600; }
-.textError { color: #dc2626; font-style: italic; }
-
-.audioPlayer {
-    width: 100%;
-    margin-top: 0.5rem;
-    height: 40px;
-}
-
-.fileLink {
-    color: #2563eb;
-    text-decoration: underline;
-    font-weight: 500;
-}
-
-.textContent {
-    white-space: pre-wrap;
-    line-height: 1.6;
-    color: #334155;
-    background: #f8fafc;
-    padding: 1rem;
-    border-radius: 6px;
-}
+/* Assessment Card specific */
 .assessmentCard {
-    border-top: 4px solid #22c55e; /* Viền xanh lá trên cùng */
-    background-color: #f0fdf4; /* Nền xanh rất nhạt */
+    border-top: 4px solid var(--color-success);
+}
+.assessmentTitle {
+    color: var(--color-success-hover) !important;
 }
 
 .pendingCard {
-    border-top: 4px solid #eab308;
-    background-color: #fefce8;
+    border-top: 4px solid var(--color-warning);
 }
 
-/* Feedback */
 .feedbackBox {
-    background-color: white;
-    border: 1px solid #bbf7d0;
-    padding: 1.5rem;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    background-color: var(--color-success-light);
+    border: 1px solid var(--color-success);
+    padding: var(--spacing-3);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--spacing-4);
 }
 
 .feedbackHeader {
-    color: #15803d;
+    color: var(--color-success-hover);
     font-weight: 700;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--spacing-1);
     font-size: 0.95rem;
-    text-transform: uppercase;
 }
 
 .feedbackText {
     white-space: pre-line;
-    color: #334155;
+    color: var(--text-primary);
     line-height: 1.6;
 }
 
 /* Overall Badge */
 .overallBadge {
-    background-color: #166534;
-    color: white;
-    padding: 1rem;
-    border-radius: 8px;
+    background-color: var(--color-student-primary);
+    color: var(--color-white);
+    padding: var(--spacing-2);
+    border-radius: var(--border-radius-md);
     text-align: center;
     font-size: 1.2rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--spacing-3);
 }
 
 .overallBadge strong {
     font-size: 2rem;
     margin-left: 10px;
-    color: #4ade80;
+    color: var(--color-white);
 }
 
-/* Criteria Grid (Bảng điểm thành phần) */
+/* Criteria Grid */
 .criteriaGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--spacing-3);
+    margin-top: var(--spacing-3);
 }
-
 .criteriaItem {
-    background: white;
-    border: 1px solid #dcfce7;
-    padding: 1rem;
-    border-radius: 8px;
+    background: var(--color-gray-50);
+    border: 1px solid var(--color-gray-200);
+    padding: var(--spacing-3);
+    border-radius: var(--border-radius-md);
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
+    transition: var(--transition-base);
 }
 
 .criteriaLabel {
-    font-size: 0.8rem;
-    color: #64748b;
-    text-transform: uppercase;
+    color: var(--text-secondary);
     font-weight: 600;
-    margin-bottom: 0.5rem;
-    height: 32px; /* Cố định chiều cao để căn dòng */
-    display: flex;
-    align-items: center;
 }
 
 .criteriaScore {
     font-size: 1.8rem;
     font-weight: 800;
-    color: #15803d;
+    color: var(--color-student-primary);
 }
-
-/* --- STUDENT WORK STYLES --- */
+.scoreSingle {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+}
+.scoreSingle strong {
+    font-size: 2rem;
+    color: var(--color-student-primary);
+}
 
 /* Writing Paper Style */
 .writingPaper {
-    background: white;
-    padding: 2rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    min-height: 200px;
-    font-family: 'Georgia', serif; /* Font chữ kiểu văn bản */
+    background: var(--bg-card);
+    padding: var(--spacing-4);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--border-radius-sm);
     line-height: 1.8;
-    color: #1e293b;
+    color: var(--text-primary);
+    font-family: 'Georgia', serif;
 }
 
-/* Audio List Style */
-.audioList {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.audioItem {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    padding: 1rem;
-    border-radius: 8px;
-}
-
-.questionLabel {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: #475569;
-}
-
+/* Quiz Review */
 .quizReviewList {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: var(--spacing-4);
 }
-
 .quizReviewItem {
-    padding: 1.5rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    background: #fff;
+    padding: var(--spacing-3);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--border-radius-md);
+    background: var(--bg-card);
 }
-
-.quizReviewItem.correct { border-left: 5px solid #22c55e; }
-.quizReviewItem.wrong { border-left: 5px solid #ef4444; }
-
-.quizHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-    font-size: 1.05rem;
-    color: #1e293b;
-}
-
-.tagSuccess { background: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
-.tagError { background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
-
 .quizOptions {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--spacing-2);
+    margin-top: var(--spacing-2);
 }
+
+.quizReviewItem.correct { border-left: 5px solid var(--color-success); }
+.quizReviewItem.wrong { border-left: 5px solid var(--color-error); }
 
 .optionRow {
     padding: 10px 14px;
-    border-radius: 6px;
-    border: 1px solid transparent;
-    display: flex;
-    gap: 10px;
-    font-size: 0.95rem;
+    border-radius: var(--border-radius-md);
+    background: var(--color-gray-50);
+    border: 1px solid var(--color-gray-200);
+    color: var(--text-primary);
 }
 
-.optionLetter { font-weight: 600; color: #64748b; }
+.optionSelectedCorrect { 
+    background: var(--color-success-light); 
+    border-color: var(--color-success); 
+    color: var(--color-success-hover); 
+}
 
-/* Các trạng thái đáp án */
-.optionNormal { background: #f8fafc; border-color: #e2e8f0; }
+.optionSelectedWrong { 
+    background: var(--color-error-light); 
+    border-color: var(--color-error); 
+    color: var(--color-error-hover); 
+}
 
-/* User chọn ĐÚNG */
-.optionSelectedCorrect { background: #dcfce7; border-color: #86efac; color: #14532d; font-weight: 500; }
+.optionCorrectAnswer { 
+    border: 1px dashed var(--color-success); 
+    background: var(--color-success-light);
+}
 
-/* User chọn SAI */
-.optionSelectedWrong { background: #fee2e2; border-color: #fca5a5; color: #7f1d1d; }
+.textContent {
+    background: var(--color-gray-50);
+    color: var(--text-primary);
+    padding: var(--spacing-2);
+    border-radius: var(--border-radius-md);
+}
+.audioContainer {
+    margin-top: var(--spacing-2);
+}
+.audioPlayer {
+    width: 100%;
+    height: 40px;
+}
+@media (prefers-color-scheme: dark) {
+    .tableContainer, .sectionCard, .criteriaItem, .optionRow {
+        border-color: var(--color-gray-700);
+    }
+    .table th { background-color: var(--color-gray-800); }
+    .row:hover { background-color: var(--color-gray-800); }
+    
+    .criteriaItem, .optionRow, .textContent {
+        background-color: var(--color-gray-800);
+    }
+    
+    .feedbackBox {
+        background-color: rgba(16, 185, 129, 0.1);
+        border-color: var(--color-success-hover);
+    }
 
-/* Đáp án đúng (mà user bỏ qua) */
-.optionCorrectAnswer { background: #f0fdf4; border-color: #bbf7d0; color: #15803d; border: 1px dashed #16a34a; }
+    .optionCorrectAnswer {
+        background-color: rgba(16, 185, 129, 0.15);
+    }
+
+    .writingPaper {
+        background-color: var(--color-gray-800);
+        border-color: var(--color-gray-700);
+    }
+}

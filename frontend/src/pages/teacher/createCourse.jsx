@@ -25,7 +25,6 @@ const CreateCoursePage = () => {
         setIsSubmitting(true);
         setError('');
         try {
-            // API sẽ tạo khóa học với status mặc định là 'draft'
             const res = await api.post('/courses', formData);
             alert('Tạo khóa học nháp thành công!');
             // Chuyển hướng đến dashboard của giáo viên sau khi tạo
