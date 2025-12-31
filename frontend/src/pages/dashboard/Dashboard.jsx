@@ -132,6 +132,12 @@ export default function Dashboard() {
   const { user } = useAuth();
   if (!user) return <p>Loading...</p>;
 
+  const roleStyles = {
+    '--role-primary': `var(--color-${user.role}-primary)`,
+    '--role-primary-light': `var(--color-${user.role}-primary-light)`,
+    '--role-primary-hover': `var(--color-${user.role}-primary-hover)`
+  };
+
   const RoleView = {
     student: StudentView,
     teacher: TeacherView,
@@ -143,7 +149,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className={styles.dashboardLayout}>
+    <div className={styles.dashboardLayout} style={roleStyles}>
       <aside className={styles.navSidebar}><NavigationSidebar /></aside>
       
       <main className={styles.mainContent}>

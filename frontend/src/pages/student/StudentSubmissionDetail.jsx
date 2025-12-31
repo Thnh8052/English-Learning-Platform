@@ -3,14 +3,21 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import styles from './StudentHistory.module.css';
 
-// Map tên key sang nhãn hiển thị đẹp hơn
 const LABEL_MAP = {
     fluency: 'Fluency & Coherence',
     vocabulary: 'Lexical Resource',
     grammar: 'Grammar Range & Accuracy',
     pronunciation: 'Pronunciation',
     task_response: 'Task Response',
-    coherence: 'Coherence & Cohesion'
+    coherence: 'Coherence & Cohesion',
+    taskResponse: 'Task Response',
+    lexical: 'Lexical Resource'
+};
+
+const SCORING_METHOD_MAP = {
+    'average_per_question': 'Điểm trung bình cộng các câu hỏi',
+    'overall': 'Đánh giá tổng quát',
+    'manual': 'Giáo viên chấm thủ công'
 };
 
 const StudentSubmissionDetail = () => {
@@ -34,24 +41,14 @@ const StudentSubmissionDetail = () => {
         fetchDetail();
     }, [id]);
 
-    // --- HÀM XỬ LÝ ĐƯỜNG DẪN AUDIO (QUAN TRỌNG) ---
     const getAudioSrc = (path) => {
         if (!path) return '';
-        // 1. Nếu là link online (Cloudinary/S3) -> Giữ nguyên
         if (path.startsWith('http')) return path;
 
-        // 2. Xử lý đường dẫn Local:
-        // Đổi dấu gạch ngược '\' (Windows) thành '/'
+        // Xử lý đường dẫn Windows (\) thành (/)
         let cleanPath = path.replace(/\\/g, '/');
-        
-        // Xóa dấu '/' ở đầu nếu có để tránh trùng lặp
         if (cleanPath.startsWith('/')) cleanPath = cleanPath.substring(1);
 
-        // Ghép với Base URL của Server (VD: http://localhost:5000/)
-        // api.defaults.baseURL thường là 'http://localhost:5000/api', ta cần lấy root domain
-        // Cách an toàn nhất: Hardcode hoặc lấy từ biến môi trường, hoặc cắt chuỗi từ baseURL
-        // Giả sử api.defaults.baseURL là 'http://localhost:5000/api' -> lấy 'http://localhost:5000'
-        
         const baseUrl = api.defaults.baseURL.replace('/api', ''); 
         return `${baseUrl}/${cleanPath}`;
     };
@@ -59,61 +56,93 @@ const StudentSubmissionDetail = () => {
     if (loading) return <div className={styles.container}>Đang tải...</div>;
     if (!submission) return <div className={styles.container}>Không tìm thấy dữ liệu.</div>;
 
-    const { lesson, score, feedback, status, content, answers } = submission;
+    const { lesson, score, feedback, status, content, answers, aiResult } = submission;
+    
+    // --- HÀM RENDER BOX ĐIỂM SỐ (DÙNG CHUNG CHO CẢ AI VÀ GIÁO VIÊN) ---
+    const renderScoreCard = (scoreData, title, isOfficial) => {
+        if (!scoreData) return null;
 
-    // --- 1. RENDER KẾT QUẢ ĐÁNH GIÁ ---
-    const renderAssessment = () => {
-        if (score === undefined || score === null) return null;
-
-        // A. Điểm đơn
-        if (typeof score !== 'object') {
-            return (
-                <div className={styles.scoreSingle}>
-                    <span>Điểm số:</span> <strong>{score}</strong>
-                </div>
-            );
-        }
-
-        // B. Quiz
-        if (score.total !== undefined) {
+        // Xử lý Quiz
+        if (lesson?.type === 'quiz' && scoreData.correct !== undefined) {
             return (
                 <div className={styles.scoreGrid}>
                     <div className={styles.scoreItem}>
                         <span className={styles.scoreLabel}>Câu đúng</span>
-                        <div className={styles.scoreValue}>{score.correct}/{score.total}</div>
+                        <div className={styles.scoreValue}>{scoreData.correct}/{scoreData.total}</div>
                     </div>
                     <div className={`${styles.scoreItem} ${styles.scoreOverall}`}>
                         <span className={styles.scoreLabel}>Kết quả</span>
-                        <div className={styles.scoreValue}>{score.percentage ?? 0}%</div>
+                        <div className={styles.scoreValue}>{scoreData.percentage ?? 0}%</div>
                     </div>
                 </div>
             );
         }
 
-        // C. Speaking/Writing
-        const { overall, ...criteria } = score;
+        const overall = scoreData.overall;
+        let criteria = {};
+        
+        try {
+            criteria = typeof scoreData.details === 'string' 
+                ? JSON.parse(scoreData.details) 
+                : (scoreData.details || {});
+        } catch (e) {
+            criteria = {};
+        }
+
+        const gradingMethod = criteria.method;
+
         return (
-            <div>
-                {overall !== undefined && (
-                    <div className={styles.overallBadge}>
-                        OVERALL BAND: <strong>{overall}</strong>
+            <div style={{ marginBottom: '20px' }}>
+                {/* Header của Box điểm */}
+                <h4 style={{ 
+                    borderBottom: '1px solid #e5e7eb', 
+                    paddingBottom: '8px', 
+                    marginBottom: '12px',
+                    color: isOfficial ? '#047857' : '#7c3aed', // Màu xanh lá cho GV, Tím cho AI
+                    fontWeight: '700',
+                    fontSize: '1.1rem'
+                }}>
+                    {title}
+                </h4>
+
+                {overall !== undefined && overall !== null && (
+                    <div className={styles.overallBadge} style={{ backgroundColor: isOfficial ? '#10b981' : '#8b5cf6' }}>
+                        Band Score: <strong>{overall}</strong>
                     </div>
                 )}
-                <div className={styles.criteriaGrid}>
-                    {Object.entries(criteria).map(([key, value]) => (
-                        <div key={key} className={styles.criteriaItem}>
-                            <span className={styles.criteriaLabel}>{LABEL_MAP[key] || key}</span>
-                            <span className={styles.criteriaScore}>{(value !== null && value !== '') ? value : '-'}</span>
-                        </div>
-                    ))}
-                </div>
+
+                {gradingMethod && (
+                    <div style={{ textAlign: 'center', marginBottom: '15px', color: '#6b7280', fontStyle: 'italic', fontSize: '0.9rem' }}>
+                        Phương pháp: <strong>{SCORING_METHOD_MAP[gradingMethod] || gradingMethod}</strong>
+                    </div>
+                )}
+                {Object.keys(criteria).length > 0 && (
+                    <div className={styles.criteriaGrid}>
+                        {Object.entries(criteria).map(([key, value]) => {
+                            if (key === 'overall' || key === 'method' || key === 'questionScores' || typeof value === 'object') return null;
+                            return (
+                                <div key={key} className={styles.criteriaItem}>
+                                    <div className={styles.criteriaHeader}>
+                                        <span className={styles.criteriaLabel}>
+                                            {LABEL_MAP[key] || key}
+                                        </span>
+                                    </div>
+                                    <div className={styles.criteriaBody}>
+                                        <span className={styles.criteriaScore}>
+                                            {(value !== null && value !== '') ? value : '-'}
+                                        </span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
         );
     };
 
-    // --- 2. RENDER BÀI LÀM CỦA HỌC SINH ---
     const renderStudentWork = () => {
-// Case A: WRITING
+        // Case A: WRITING
         if (lesson?.type === 'assignment') {
             return (
                 <div className={styles.writingPaper}>
@@ -121,17 +150,41 @@ const StudentSubmissionDetail = () => {
                 </div>
             );
         }
-
         // Case B: SPEAKING
         if (lesson?.type === 'speaking_prompt') {
-            if (!answers || answers.length === 0) return <div>Không tìm thấy file ghi âm.</div>;
+            if (!answers || answers.length === 0) return <div className={styles.emptyState}>Không tìm thấy dữ liệu.</div>;
             return (
-                <div className={styles.audioList}>
+                <div className={styles.quizReviewList}>
                     {answers.map((ans, idx) => (
-                        <div key={idx} className={styles.audioItem}>
-                            <div className={styles.questionLabel}>
-                                <strong>Question {idx + 1}:</strong> {ans.questionText}
+                        <div key={idx} className={styles.quizReviewItem}>
+                            <div className={styles.quizHeader}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                                    <strong>Câu {idx + 1}: {ans.questionText}</strong>
+                                    {ans.score > 0 && (
+                                        <span className={styles.statusBadge} style={{ backgroundColor: '#f3e8ff', color: '#7e22ce' }}>
+                                            AI: {ans.score}
+                                        </span>
+                                    )}
+                                </div>
                             </div>
+                            
+                            {/* Transcript */}
+                            {ans.content && (
+                                <div className={styles.textContent} style={{ marginTop: '10px' }}>
+                                    <strong style={{ display: 'block', marginBottom: '4px', fontSize: '0.85rem', color: '#6b7280' }}>TRANSCRIPT:</strong>
+                                    <p style={{ margin: 0 }}>{ans.content}</p>
+                                </div>
+                            )}
+                            
+                            {/* AI Feedback */}
+                            {ans.feedback && (
+                                <div style={{ marginTop: '10px', padding: '10px', background: '#ecfdf5', borderRadius: '6px', borderLeft: '4px solid #10b981' }}>
+                                    <strong style={{ color: '#047857', fontSize: '0.9rem' }}>🤖 AI Nhận xét:</strong>
+                                    <p style={{ margin: '4px 0 0 0', fontSize: '0.95rem', color: '#064e3b' }}>{ans.feedback}</p>
+                                </div>
+                            )}
+                            
+                            {/* Audio Player */}
                             {ans.audioUrl && (
                                 <div className={styles.audioContainer}>
                                     <audio controls className={styles.audioPlayer} preload="metadata">
@@ -144,42 +197,32 @@ const StudentSubmissionDetail = () => {
                 </div>
             );
         }
-
         // Case C: QUIZ
         if (lesson?.type === 'quiz') {
             const questions = lesson.questions || [];
-            if (!answers || answers.length === 0) return <div>Chưa có dữ liệu câu trả lời.</div>;
-
+            if (!answers) return <div className={styles.emptyState}>Chưa có dữ liệu.</div>;
             return (
                 <div className={styles.quizReviewList}>
-                     {answers.map((ans, idx) => {
+                    {answers.map((ans, idx) => {
                         const originalQuestion = questions[ans.questionIndex] || {};
                         const options = originalQuestion.options || [];
                         return (
                             <div key={idx} className={`${styles.quizReviewItem} ${status === 'completed' ? (ans.isCorrect ? styles.correct : styles.wrong) : ''}`}>
                                 <div className={styles.quizHeader}>
-                                    <strong>Câu {idx + 1}: {originalQuestion.questionText || "Câu hỏi"}</strong>
+                                    <strong>Câu {idx + 1}: {originalQuestion.questionText}</strong>
                                     {status === 'completed' && (
                                         <span className={ans.isCorrect ? styles.tagSuccess : styles.tagError}>
-                                            {ans.isCorrect ? " Đúng" : " Sai"}
+                                            {ans.isCorrect ? "✓ Đúng" : "✗ Sai"}
                                         </span>
                                     )}
                                 </div>
                                 <div className={styles.quizOptions}>
-                                    {options.map((opt, optIdx) => {
-                                        let optionClass = styles.optionNormal;
-                                        if (ans.selectedOptionIndex === optIdx) {
-                                            optionClass = ans.isCorrect ? styles.optionSelectedCorrect : styles.optionSelectedWrong;
-                                        } else if (status === 'completed' && originalQuestion.correctAnswerIndex === optIdx) {
-                                            optionClass = styles.optionCorrectAnswer;
-                                        }
-                                        return (
-                                            <div key={optIdx} className={`${styles.optionRow} ${optionClass}`}>
-                                                <span className={styles.optionLetter}>{String.fromCharCode(65 + optIdx)}.</span>
-                                                <span>{opt}</span>
-                                            </div>
-                                        )
-                                    })}
+                                    {options.map((opt, optIdx) => (
+                                        <div key={optIdx} className={`${styles.optionRow} ${ans.selectedOptionIndex === optIdx ? (ans.isCorrect ? styles.optionSelectedCorrect : styles.optionSelectedWrong) : (status === 'completed' && originalQuestion.correctAnswerIndex === optIdx ? styles.optionCorrectAnswer : styles.optionNormal)}`}>
+                                            <span className={styles.optionLetter}>{String.fromCharCode(65 + optIdx)}.</span>
+                                            <span>{opt}</span>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         );
@@ -187,32 +230,86 @@ const StudentSubmissionDetail = () => {
                 </div>
             );
         }
-
         return <div className={styles.textContent}>{content}</div>;
+    };
+
+    const renderImprovementTips = () => {
+        const hasTips = aiResult?.improvementTips?.length > 0;
+        if (!hasTips) return null;
+        return (
+            <div className={styles.tipsSection}>
+                <h4>💡 Mẹo nâng Band điểm:</h4>
+                <ul className={styles.tipsList}>
+                    {aiResult.improvementTips.map((tip, index) => <li key={index}>{tip}</li>)}
+                </ul>
+            </div>
+        );
     };
 
     return (
         <div className={styles.container}>
             <div className={styles.detailHeader}>
-                <button onClick={() => navigate(-1)} className={styles.backBtn}>&larr; Quay lại</button>
+                <button onClick={() => navigate(-1)} className={styles.backBtn}>← Quay lại</button>
                 <div className={styles.headerInfo}>
                     <span>Chi tiết bài nộp:</span>
                     <strong>{lesson?.title}</strong>
                 </div>
             </div>
 
-            {status === 'completed' ? (
+            {/* --- KHU VỰC HIỂN THỊ KẾT QUẢ --- */}
+            
+            {/* 1. Nếu đã có giáo viên chấm -> Hiển thị Box chính thức + Box AI (tham khảo) */}
+            {status === 'completed' && score?.teacher && (
                 <div className={`${styles.sectionCard} ${styles.assessmentCard}`}>
-                    <h3 className={styles.cardTitle} style={{color: '#166534'}}>Kết quả & Đánh giá</h3>
+                    <h3 className={styles.cardTitle}>🏆 Kết quả Chính thức</h3>
+                    
                     {feedback && (
                         <div className={styles.feedbackBox}>
-                            <div className={styles.feedbackHeader}>💬 Nhận xét của giáo viên:</div>
+                            <div className={styles.feedbackHeader}>Lời phê của giáo viên:</div>
                             <div className={styles.feedbackText}>{feedback}</div>
                         </div>
                     )}
-                    <div className={styles.scoreSection}>{renderAssessment()}</div>
+
+                    {/* Render điểm giáo viên */}
+                    {renderScoreCard(score.teacher, "Đánh giá của Giáo viên", true)}
+
+                    <hr style={{ margin: '20px 0', border: '0', borderTop: '1px dashed #cbd5e1' }} />
+                    
+                    {/* Render điểm AI (Tham khảo) */}
+                    {score?.ai && renderScoreCard(score.ai, "🤖 AI Chấm tham khảo", false)}
+                    
+                    {renderImprovementTips()}
                 </div>
-            ) : (
+            )}
+
+            {/* 2. Nếu CHƯA chấm xong nhưng đã có AI chấm (Trạng thái ai_graded) */}
+            {status === 'ai_graded' && (
+                <div className={`${styles.sectionCard} ${styles.aiPendingCard}`}>
+                    <h3 className={styles.cardTitle}>🤖 Đánh giá từ Trợ lý AI</h3>
+                    
+                    {aiResult?.isOffTopic && (
+                        <div className={styles.offTopicWarning}>
+                            <strong>⚠️ Lạc đề:</strong>
+                            <p>{aiResult.offTopicAnalysis}</p>
+                        </div>
+                    )}
+
+                    {/* Chỉ render điểm AI */}
+                    {renderScoreCard(score?.ai, "AI Chấm dự kiến", false)}
+
+                    {submission.aiFeedback && (
+                        <div className={styles.aiFeedbackBox}>
+                            <div className={styles.aiFeedbackHeader}>Phân tích tổng quan:</div>
+                            <div className={styles.feedbackText}>{submission.aiFeedback}</div>
+                        </div>
+                    )}
+
+                    {renderImprovementTips()}
+                </div>
+            )}
+
+            {/* 3. Nếu chưa có gì cả */}
+            {status === 'submitted' && (
                 <div className={`${styles.sectionCard} ${styles.pendingCard}`}>
                     <h3 className={styles.cardTitle}>Trạng thái</h3>
                     <p>Bài làm đang chờ chấm điểm.</p>

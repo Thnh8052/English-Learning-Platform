@@ -45,15 +45,12 @@ const GradingDetail = () => {
                 const criteria = GRADING_CRITERIA[type] || GRADING_CRITERIA['default'];
                 setCriteriaList(criteria);
 
-                // 2. Fill dữ liệu cũ (nếu đã chấm) hoặc khởi tạo object rỗng
                 setFeedback(sub.feedback || '');
                 
                 if (sub.status === 'completed' && sub.score && typeof sub.score === 'object') {
-                    // Đã chấm: Lấy điểm cũ (loại bỏ field 'overall' để không bị trùng input)
                     const { overall, ...detailScores } = sub.score;
                     setScores(detailScores);
                 } else {
-                    // Chưa chấm: Khởi tạo state rỗng cho các input
                     const initialScores = {};
                     criteria.forEach(c => initialScores[c.key] = '');
                     setScores(initialScores);
@@ -69,17 +66,14 @@ const GradingDetail = () => {
         fetchDetail();
     }, [submissionId]);
 
-    // --- HÀM XỬ LÝ URL AUDIO (MỚI THÊM) ---
     const getAudioSrc = (path) => {
         if (!path) return '';
         if (path.startsWith('http')) return path;
 
-        // Fix lỗi đường dẫn Windows (\ -> /)
         let cleanPath = path.replace(/\\/g, '/');
         
         if (cleanPath.startsWith('/')) cleanPath = cleanPath.substring(1);
 
-        // Loại bỏ '/api' khỏi baseURL để trỏ về root (nơi chứa thư mục uploads)
         const baseUrl = api.defaults.baseURL.replace('/api', ''); 
         return `${baseUrl}/${cleanPath}`;
     };
@@ -127,7 +121,6 @@ const GradingDetail = () => {
         
         // Case 1: Speaking (Có danh sách câu hỏi & Audio)
         if (type === 'speaking_prompt') {
-            // Kiểm tra mảng answers trước
             if (submission.answers && submission.answers.length > 0) {
                  return submission.answers.map((ans, index) => (
                     <div key={index} className={styles.questionBlock}>
@@ -188,35 +181,48 @@ if (type === 'assignment') {
 
     return (
         <div className={styles.detailContainer}>
-            {/* --- CỘT TRÁI: BÀI LÀM --- */}
             <div className={styles.leftPanel}>
                 <div className={styles.panelHeader}>
                     <button onClick={() => navigate(-1)} className={styles.backBtn}>&larr; Back</button>
-                    <h3>
-                        {submission.lesson?.type === 'assignment' ? 'Writing Submission' : 'Speaking Submission'}
-                    </h3>
                 </div>
 
-                <div className={styles.studentProfileCard}>
-                    <div className={styles.avatarLarge}>
-                        {submission.student?.name?.charAt(0)}
-                    </div>
+            <div className={styles.studentProfileCard}>
+                    <div className={styles.avatarLarge}>{submission.student?.name?.charAt(0)}</div>
                     <div>
                         <h4>{submission.student?.name}</h4>
                         <p>{submission.lesson?.title}</p>
-                        <span className={styles.date}>Submitted: {new Date(submission.createdAt).toLocaleString()}</span>
+                        <span className={styles.date}>Status: <strong>{submission.status}</strong></span>
                     </div>
                 </div>
 
                 <div className={styles.submissionContent}>
                     {renderStudentContent()}
                 </div>
+                    {submission.aiFeedback && (
+                        <div className={styles.aiResultCard}>
+                            {submission.score?.ai?.isOffTopic && (
+                            <div className={styles.offTopicWarning}>
+                                CẢNH BÁO TỪ AI: BÀI LÀM CÓ DẤU HIỆU LẠC ĐỀ
+                                <p className={styles.offTopicDetail}>
+                                    {submission.score.ai.offTopicAnalysis}
+                                </p>
+                            </div>
+                        )}
+                            <div className={styles.aiHeader}>
+                                <span>AI Assistant Suggestion</span>
+                            </div>
+                            <div className={styles.aiBody}>
+                                <p><strong>Suggested Score:</strong> {submission.score?.ai?.overall || 'N/A'}</p>
+                                <div className={styles.aiText}>{submission.aiFeedback}</div>
+                            </div>
+                        </div>
+                    )}
             </div>
 
             {/* --- CỘT PHẢI: FORM CHẤM --- */}
             <div className={styles.rightPanel}>
                 <div className={styles.panelHeader}>
-                    <h3>Grading & Feedback</h3>
+                    <h3>Teacher's Final Grade</h3>
                 </div>
 
                 <div className={styles.gradingForm}>
@@ -236,6 +242,9 @@ if (type === 'assignment') {
                                 />
                             </div>
                         ))}
+                    <button className="btn btn-primary-teacher" style={{width: '100%'}} onClick={handleSubmitGrade}>
+                        Confirm Final Grade
+                    </button>
                     </div>
 
                     <div className={styles.totalScore}>

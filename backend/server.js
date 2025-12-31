@@ -5,6 +5,7 @@ import path from "path";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import morgan from "morgan";
+import { fileURLToPath } from 'url';
 
 import connectDB from "./src/config/database.js";
 import authRoutes from "./src/routes/auth.routes.js";
@@ -16,30 +17,36 @@ import moduleRoutes from './src/routes/modules.routes.js';
 import aiRoutes from './src/routes/ai.routes.js';
 import adminRoutes from './src/routes/admin.routes.js';
 
+// --- CẤU HÌNH ES MODULES FIX PATH ---
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 dotenv.config();
 connectDB();
 
 const app = express();
 
-// 2. Cấu hình Helmet: Cho phép load tài nguyên (Audio/Image) cross-origin
+// --- MIDDLEWARES ---
+
+// 1. Helmet: Cho phép load tài nguyên cross-origin (Audio/Video)
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
+// 2. CORS & Parser
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); // Mặc định limit là 100kb, nếu gửi bài viết dài có thể tăng lên: express.json({ limit: '10mb' })
 app.use(morgan("dev"));
 
-// 3. Cấu hình đường dẫn tuyệt đối cho thư mục Uploads
-// Giúp tránh lỗi không tìm thấy file trên Windows hoặc khi deploy
-const __dirname = path.resolve(); 
+// 3. Static Files
+// Đường dẫn tuyệt đối chuẩn xác
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Rate limit cho Auth
+// 4. Rate Limiter
 const authLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
+  windowMs: 60 * 1000, 
   max: 10,
-  message: "Too many requests from this IP, try again later",
+  message: { message: "Too many requests from this IP, please try again later" }, // Trả về JSON thay vì text
 });
 
 // --- ROUTES ---
@@ -51,20 +58,46 @@ app.use('/api/submissions', submissionRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/test', testRoutes);
-app.use('/api/ai', aiRoutes);
+// Đã xóa dòng duplicate aiRoutes ở đây
 
 app.get("/", (req, res) => res.send("Backend API is running..."));
 
+// --- GLOBAL ERROR HANDLER (MỚI) ---
+// Middleware này sẽ bắt tất cả lỗi từ các controller gọi next(err) hoặc throw error
+app.use((err, req, res, next) => {
+    console.error("❌ Error:", err);
+
+    // Xử lý lỗi Mongoose Validation (ví dụ lỗi thiếu field content)
+    if (err.name === 'ValidationError') {
+        const messages = Object.values(err.errors).map(val => val.message);
+        return res.status(400).json({
+            message: "Dữ liệu đầu vào không hợp lệ",
+            errors: messages
+        });
+    }
+
+    // Xử lý lỗi CastError (ID không đúng định dạng MongoDB)
+    if (err.name === 'CastError') {
+        return res.status(404).json({ message: "Không tìm thấy dữ liệu (Invalid ID)" });
+    }
+
+    // Lỗi mặc định
+    const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+    res.status(statusCode).json({
+        message: err.message || "Lỗi Server nội bộ",
+        stack: process.env.NODE_ENV === 'production' ? null : err.stack,
+    });
+});
+
+// --- START SERVER ---
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-// Xử lý lỗi Unhandled Rejection
-process.on('unhandledRejection', (err, promise) => {
+// Xử lý lỗi Unhandled Rejection (Lỗi Promise ko được catch)
+process.on('unhandledRejection', (err) => {
     console.error(`--- LỖI UNHANDLED REJECTION ---`);
-    console.error(`Lỗi tại Promise:`, promise);
-    console.log("Tên lỗi:", err.name);
-    console.log("Thông báo lỗi:", err.message);
-    
+    console.log("Error:", err.message);
+    // Có thể cân nhắc server.close() nếu lỗi quá nghiêm trọng
 });
 
 export default app;

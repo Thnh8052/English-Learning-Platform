@@ -1,11 +1,13 @@
-import mongoose from 'mongoose';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import axios from 'axios';
 import Submission from '../models/submission.model.js';
 import Lesson from '../models/lesson.model.js';
-import Enrollment from '../models/enrollment.model.js';
-import Course from '../models/course.model.js';
-import Module from '../models/module.model.js';
+import User from '../models/user.model.js';
+import { gradeWritingTask, gradeSpeakingAnswer } from '../services/ai.services.js';
+import { transcribeAudio } from '../utils/speakToText.js';
 
-// --- HELPER FUNCTIONS ---
 const getLessonWithCourse = async (lessonId) => {
     return await Lesson.findById(lessonId).populate({
         path: 'module',
@@ -13,6 +15,7 @@ const getLessonWithCourse = async (lessonId) => {
         populate: { path: 'course', select: '_id teacher' }
     });
 };
+
 const getNextAttempt = async (studentId, lessonId) => {
     const count = await Submission.countDocuments({ student: studentId, lesson: lessonId });
     if (count >= 5) {
@@ -24,7 +27,7 @@ const getNextAttempt = async (studentId, lessonId) => {
 // --- STUDENT CONTROLLERS ---
 
 /**
- * @desc    Học viên nộp bài làm (Generic/Text)
+ * @desc    Học viên nộp bài làm
  * @route   POST /api/submissions
  * @access  Private (Student)
  */
@@ -33,46 +36,96 @@ export const createSubmission = async (req, res) => {
         const { lessonId, content } = req.body;
         const studentId = req.user.id;
 
-        if (!lessonId || !content) {
-            return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ thông tin.' });
+        // 1. Lấy lesson và populate đầy đủ
+        const lesson = await Lesson.findById(lessonId).populate({
+            path: 'module', 
+            populate: { path: 'course' }
+        });
+
+        if (!lesson) {
+            return res.status(404).json({ message: 'Bài học không tồn tại.' });
+        }
+
+        let promptForAI = "";
+
+        // Ưu tiên 1: Lấy từ field prompt
+        if (lesson.prompt && lesson.prompt.trim().length > 0) {
+            promptForAI = lesson.prompt;
+        } 
+        // Ưu tiên 2: Nếu bài Assignment nhưng đề lỡ lưu trong câu hỏi đầu tiên
+        else if (lesson.type === 'assignment' && lesson.questions?.length > 0 && lesson.questions[0].questionText) {
+            promptForAI = lesson.questions[0].questionText;
+        }
+        // Ưu tiên 3: Lấy từ content (loại bỏ thẻ HTML để AI đọc)
+        else if (lesson.content && lesson.content.trim().length > 0) {
+            promptForAI = lesson.content.replace(/<[^>]*>?/gm, '');
         }
         
-        const lesson = await getLessonWithCourse(lessonId);
-        if (!lesson) return res.status(404).json({ message: 'Bài học không tồn tại.' });
-
-        const courseId = lesson.module?.course?._id;
-        if (!courseId) return res.status(404).json({ message: 'Không tìm thấy khóa học liên quan.' });
-
-        const enrollment = await Enrollment.findOne({ student: studentId, course: courseId });
-        if (!enrollment) {
-            return res.status(403).json({ message: 'Bạn chưa ghi danh vào khóa học này.' });
+        if (!promptForAI || promptForAI === "undefined") {
+            if (lesson.type === 'assignment') {
+                console.warn(`CẢNH BÁO: Không tìm thấy đề bài cho Lesson ID: ${lessonId}`);
+            }
+            promptForAI = "Chủ đề tự do";
         }
 
-        /*
-        const existingSubmission = await Submission.findOne({ student: studentId, lesson: lessonId });
-        if (existingSubmission) {
-            return res.status(400).json({ message: 'Bạn đã nộp bài cho bài học này rồi.' });
-        } */
+        let aiResult = null;
+        let submissionStatus = 'submitted';
 
+        if (lesson.type === 'assignment') {
+            // === LOGIC CHO BÀI WRITING (Cần AI chấm) ===
+            console.log("Đang chấm bài Writing...");
+            aiResult = await gradeWritingTask(content, promptForAI); 
+            submissionStatus = 'ai_graded';
+
+        } else {
+            // === LOGIC CHO CÁC LOẠI BÀI KHÁC (Video, Reading...) ===
+            console.log("Đánh dấu hoàn thành bài học (Video/Reading)...");
+            
+            aiResult = {
+                overallScore: null,
+                criteria: {},
+                isOffTopic: false,
+                offTopicAnalysis: "",
+                improvementTips: [],
+                detailedFeedback: "Đã hoàn thành nội dung bài học."
+            };
+            submissionStatus = 'completed';
+        }
+
+        // Kiểm tra lượt làm bài
         const attempt = await getNextAttempt(studentId, lessonId);
 
+        // Tạo Submission
         const submission = new Submission({
             student: studentId,
             lesson: lessonId,
-            course: courseId,
-            content: content,
-            status: 'submitted',
+            course: lesson.module.course._id,
+            content: content || "Marked as done", // Nếu content rỗng (vd xem video xong ấn nút), điền mặc định
+            score: {
+                ai: {
+                    overall: aiResult?.overallScore || aiResult?.overall || null,
+                    details: aiResult?.criteria || {}
+                }
+            },
+            aiResult: {
+                isOffTopic: aiResult?.isOffTopic || false,
+                offTopicAnalysis: aiResult?.offTopicAnalysis || "",
+                improvementTips: aiResult?.improvementTips || [],
+            },
+            aiFeedback: aiResult?.detailedFeedback || "",
+            status: submissionStatus,
             attempt: attempt
         });
 
         await submission.save();
-        res.status(201).json({ message: 'Nộp bài thành công!', submission });
+        res.status(201).json({ message: 'Lưu kết quả thành công!', submission });
 
     } catch (err) {
-        console.error("Create submission error:", err);
-        res.status(500).json({ message: 'Lỗi máy chủ' });
+        console.error("Create Submission Error:", err);
+        res.status(500).json({ message: err.message });
     }
 };
+
 
 /**
  * @desc    Nộp bài Quiz và chấm điểm tự động
@@ -84,15 +137,17 @@ export const submitQuiz = async (req, res) => {
         const { lessonId, userAnswers } = req.body;
         const studentId = req.user.id;
 
-        const lesson = await Lesson.findById(lessonId).populate({ path: 'module', select: 'course'});
+        const lesson = await Lesson.findById(lessonId).populate({ 
+            path: 'module', 
+            select: 'course'
+        });
+        
         if (!lesson) return res.status(404).json({ message: 'Bài học không tồn tại.' });
 
         let correctCount = 0;
         
-        // Tạo mảng answers theo cấu trúc mới của Model
         const processedAnswers = lesson.questions.map((q, index) => {
             const selected = userAnswers[index];
-            // So sánh đáp án (lưu ý: kiểm tra null/undefined nếu user không chọn)
             const isCorrect = (selected !== undefined && selected === q.correctAnswerIndex);
             
             if (isCorrect) correctCount++;
@@ -108,26 +163,6 @@ export const submitQuiz = async (req, res) => {
         const totalQuestions = lesson.questions.length;
         const scorePercentage = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
 
-        // const submission = await Submission.findOneAndUpdate(
-        //     { student: studentId, lesson: lessonId },
-        //     {
-        //         student: studentId,
-        //         lesson: lessonId,
-        //         course: lesson.module.course,
-        //         content: `Quiz Result: ${scorePercentage}%`,
-                
-        //         // QUAN TRỌNG: Lưu mảng answers này vào DB
-        //         answers: processedAnswers, 
-                
-        //         score: {
-        //             correct: correctCount,
-        //             total: totalQuestions,
-        //             percentage: scorePercentage
-        //         },
-        //         status: 'completed'
-        //     },
-        //     { upsert: true, new: true, setDefaultsOnInsert: true }
-        // );
         const attempt = await getNextAttempt(studentId, lessonId);
 
         const submission = new Submission({
@@ -137,9 +172,9 @@ export const submitQuiz = async (req, res) => {
             content: `Quiz Attempt ${attempt}`,
             answers: processedAnswers,
             score: {
-                    correct: correctCount,
-                    total: totalQuestions,
-                    percentage: scorePercentage
+                correct: correctCount,
+                total: totalQuestions,
+                percentage: scorePercentage
             },
             status: 'completed',
             attempt: attempt
@@ -159,63 +194,188 @@ export const submitQuiz = async (req, res) => {
  * @route   POST /api/submissions/speaking
  * @access  Private (Student)
  */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const downloadFile = async (url, destPath) => {
+    // 1. Đảm bảo thư mục cha tồn tại trước khi ghi
+    const dir = path.dirname(destPath);
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+
+    console.log(`-> Đang tải file từ: ${url}`);
+    
+    const writer = fs.createWriteStream(destPath);
+    
+    try {
+        const response = await axios({
+            url,
+            method: 'GET',
+            responseType: 'stream',
+            timeout: 10000 // Thêm timeout 10s để tránh treo
+        });
+
+        response.data.pipe(writer);
+
+        return new Promise((resolve, reject) => {
+            writer.on('finish', resolve);
+            writer.on('error', (err) => {
+                console.error("Lỗi khi ghi file:", err);
+                writer.close(); // Đóng stream nếu lỗi
+                reject(err);
+            });
+        });
+    } catch (err) {
+        // Ném lỗi rõ ràng hơn để catch bên dưới bắt được
+        throw new Error(`Không tải được file từ Cloudinary: ${err.message}`);
+    }
+};
+
 export const submitSpeaking = async (req, res) => {
+    // Mảng chứa đường dẫn file tạm để xóa sau khi xong
+    let tempFilesToDelete = [];
+
     try {
         const { lessonId } = req.body;
         const studentId = req.user.id;
+        
+        // req.files sẽ chứa danh sách các file được upload (do dùng multer.any() hoặc .fields())
         const files = req.files || []; 
 
-        const lesson = await getLessonWithCourse(lessonId);
-        if (!lesson) return res.status(404).json({ message: 'Lesson not found' });
-
-        let questions = [];
-        try {
-            questions = JSON.parse(req.body.questions || "[]");
-        } catch (e) {
-            console.error("JSON Parse error:", e);
-            return res.status(400).json({ message: "Invalid questions data" });
+        if (files.length === 0) {
+            return res.status(400).json({ message: "Không tìm thấy file ghi âm nào." });
         }
 
-        const answers = questions.map((q, index) => {
-            const file = files.find(f => f.fieldname === `audio_${index}`);
-            return {
-                questionText: q.text,
-                questionId: q._id,
-                audioUrl: file ? file.path : null,
-                aiScore: null,
-                transcript: null
+        // 1. Lấy thông tin bài học để biết có những câu hỏi nào
+        const lesson = await Lesson.findById(lessonId).populate({
+            path: 'module', select: 'course'
+        });
+        if (!lesson) throw new Error("Bài học không tồn tại.");
+
+        console.log(`[Speaking Multi] User: ${studentId}, Lesson: ${lessonId}, Files: ${files.length}`);
+
+        // 2. Tạo thư mục tạm
+        const tempDir = path.join(__dirname, '../../temp_uploads');
+        if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+
+        // 3. Xử lý từng câu hỏi SONG SONG (Parallel Processing)
+        // Duyệt qua từng câu hỏi trong Lesson
+        const answerPromises = lesson.questions.map(async (question, index) => {
+            
+            // Tìm file audio tương ứng với câu hỏi này
+            // Quy ước Frontend gửi fieldname là "audio_0", "audio_1"...
+            const uploadedFile = files.find(f => f.fieldname === `audio_${index}`);
+
+            // Cấu trúc kết quả mặc định cho câu hỏi này
+            let resultData = {
+                questionIndex: index,
+                questionText: question.questionText,
+                audioUrl: null,
+                transcript: "",
+                score: 0,
+                feedback: "Không có câu trả lời",
+                isProcessed: false
             };
+
+            if (!uploadedFile) {
+                return resultData;
+            }
+
+            // Có file -> Bắt đầu xử lý
+            resultData.audioUrl = uploadedFile.path;
+
+            try {
+                // a. Tải file về temp
+                const tempPath = path.join(tempDir, `speak_${studentId}_q${index}_${Date.now()}.webm`);
+                tempFilesToDelete.push(tempPath); // Đánh dấu để lát xóa
+                
+                await downloadFile(uploadedFile.path, tempPath);
+
+                // b. STT (Speech to Text)
+                const transcript = await transcribeAudio(tempPath);
+                resultData.transcript = transcript || "";
+
+                // c. AI Chấm điểm (Chấm riêng câu này dựa trên context câu hỏi)
+                if (resultData.transcript) {
+                    // Gọi AI: Input là câu hỏi cụ thể + câu trả lời của HS
+                    const aiResponse = await gradeSpeakingAnswer(resultData.transcript, question.questionText);
+                    
+                    resultData.score = aiResponse?.score || 0; // Đổi overallScore -> score
+                    resultData.feedback = aiResponse?.feedback || ""; // Đổi detailedFeedback -> feedback
+                    resultData.aiAnalysis = {
+                    isOffTopic: aiResponse?.isOffTopic || false,
+                    improvementTips: aiResponse?.improvementTips || []
+                };
+                    resultData.isProcessed = true;
+                }
+
+            } catch (err) {
+                console.error(`Lỗi xử lý câu hỏi ${index}:`, err);
+                resultData.feedback = "Lỗi hệ thống khi xử lý audio này.";
+            }
+
+            return resultData;
         });
 
-        // const submission = await Submission.findOneAndUpdate(
-        //     { student: studentId, lesson: lessonId },
-        //     {
-        //         student: studentId,
-        //         lesson: lessonId,
-        //         course: lesson.module.course._id,
-        //         content: 'Speaking Submission',
-        //         answers: answers,
-        //         status: 'submitted'
-        //     },
-        //     { upsert: true, new: true, setDefaultsOnInsert: true }
-        // );
-        const attempt = await getNextAttempt(studentId, lessonId);
-        const submission = new Submission({
+        // Đợi tất cả câu hỏi xử lý xong
+        const processedAnswers = await Promise.all(answerPromises);
+
+        // 4. Tổng hợp kết quả
+        // Tính điểm trung bình cộng các câu đã làm
+        const answeredQuestions = processedAnswers.filter(a => a.isProcessed);
+        const totalScore = answeredQuestions.reduce((sum, a) => sum + a.score, 0);
+        const finalOverallScore = answeredQuestions.length > 0 
+            ? Math.round(totalScore / answeredQuestions.length) 
+            : 0;
+
+        // Tạo nội dung tổng hợp (để lưu vào field 'content' bắt buộc)
+        const combinedContent = processedAnswers.map(a => 
+            `Q${a.questionIndex + 1}: ${a.transcript || '(No answer)'}`
+        ).join('\n\n');
+
+        // 5. Lưu vào DB
+        const attemptCount = await Submission.countDocuments({ student: studentId, lesson: lessonId });
+
+        const newSubmission = new Submission({
             student: studentId,
             lesson: lessonId,
             course: lesson.module.course._id,
-            content: `Speaking Attempt ${attempt}`,
-            answers: answers,
-            status: 'submitted',
-            attempt: attempt
+            
+            content: combinedContent, // Transcript tổng hợp
+            answers: processedAnswers, // Chi tiết từng câu (có audio, điểm riêng)
+            
+            score: {
+                ai: {
+                    overall: finalOverallScore,
+                    details: { 
+                        method: "average_per_question", 
+                        questionScores: processedAnswers.map(a => a.score) 
+                    },
+                    timestamp: new Date()
+                }
+            },
+            status: 'ai_graded',
+            attempt: attemptCount + 1,
         });
-        await submission.save();
 
-        res.status(201).json({ message: 'Speaking submission received', submission });
+        await newSubmission.save();
 
-    } catch (err) {
-        console.error("Speaking submit error:", err);
-        res.status(500).json({ message: 'Error submitting speaking test' });
+        res.status(201).json({
+            message: "Nộp bài thành công",
+            submission: newSubmission
+        });
+
+    } catch (error) {
+        console.error("Lỗi Submit Speaking Multi:", error);
+        res.status(500).json({ message: "Lỗi server", error: error.message });
+    } finally {
+        // 6. Dọn dẹp tất cả file tạm
+        tempFilesToDelete.forEach(filePath => {
+            if (fs.existsSync(filePath)) {
+                try { fs.unlinkSync(filePath); } catch (e) {}
+            }
+        });
     }
 };
 
@@ -227,18 +387,17 @@ export const getMySubmissionHistory = async (req, res) => {
     try {
         const studentId = req.user.id;
 
-        // Lấy tất cả submission của học viên này, populate sâu để lấy thông tin hiển thị
         const submissions = await Submission.find({ student: studentId })
             .populate({
                 path: 'lesson',
-                select: 'title module type', // Lấy tiêu đề, loại bài học
+                select: 'title module type',
                 populate: { 
                     path: 'module', 
                     select: 'title course',
-                    populate: { path: 'course', select: 'name' } // Lấy tên khóa học
+                    populate: { path: 'course', select: 'name' }
                 }
             })
-            .sort({ createdAt: -1 }); // Mới nhất lên đầu
+            .sort({ createdAt: -1 });
 
         res.status(200).json(submissions);
     } catch (err) {
@@ -305,7 +464,6 @@ export const getSubmissionById = async (req, res) => {
         const submission = await Submission.findById(req.params.id)
             .populate('student', 'name email avatar')
             .populate('course', 'name')
-            // Vì questions nằm trực tiếp trong lesson, ta chỉ cần select nó ra
             .populate({
                 path: 'lesson',
                 select: 'title type content questions module', 
@@ -333,30 +491,40 @@ export const getSubmissionById = async (req, res) => {
  */
 export const gradeSubmission = async (req, res) => {
     try {
-        const { score, feedback } = req.body;
+        const { score, feedback } = req.body; 
+        const submission = await Submission.findById(req.params.id);
         
-        const submission = await Submission.findByIdAndUpdate(
-            req.params.id,
-            {
-                score,
-                feedback,
-                status: 'completed',
-                gradedBy: req.user.id,
-                gradedAt: new Date()
-            },
-            { new: true }
-        );
-
         if (!submission) {
-            return res.status(404).json({ message: 'Không tìm thấy bài nộp' });
+            return res.status(404).json({ message: 'Bài nộp không tồn tại.' });
         }
 
+        let overallScore = Number(score.overall); // Chuyển "6.6" -> 6.6
+
+        if (!isNaN(overallScore)) {
+            // Làm tròn đến 0.5 (6.3 -> 6.5, 6.2 -> 6.0)
+            overallScore = Math.round(overallScore * 2) / 2;
+        } else {
+            overallScore = 0;
+        }
+        
+        score.overall = overallScore;
+        submission.score.teacher = {
+            overall: overallScore,
+            details: JSON.stringify(score),
+            timestamp: new Date()
+        };
+        submission.feedback = feedback;
+        submission.status = 'completed';
+        submission.gradedBy = req.user.id;
+
+        await submission.save();
         res.json(submission);
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Lỗi server khi lưu điểm' });
+        console.error("Grade error:", err);
+        res.status(500).json({ message: 'Lỗi khi lưu điểm' });
     }
 };
+
 /**
  * @desc    Lấy bài nộp của user hiện tại cho một lesson cụ thể
  * @route   GET /api/submissions/my-submission/:lessonId
@@ -370,10 +538,11 @@ export const getMySubmissionByLesson = async (req, res) => {
         const submission = await Submission.findOne({ 
             student: studentId, 
             lesson: lessonId 
-        }).sort({ createdAt: -1 }); // Quan trọng
+        }).sort({ createdAt: -1 });
 
         res.status(200).json(submission || null); 
     } catch (err) {
+        console.error("Get submission by lesson error:", err);
         res.status(500).json({ message: 'Lỗi server' });
     }
 };

@@ -91,9 +91,11 @@ const GradingList = () => {
                                     <td>{sub.lesson?.title}</td>
                                     <td>{new Date(sub.createdAt).toLocaleDateString()} {new Date(sub.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
                                     <td>
-                                        <span className={`${styles.statusBadge} ${styles[sub.status]}`}>
-                                            {sub.status === 'submitted' ? 'Needs Grading' : 'Graded'}
-                                        </span>
+                                    <span className={`${styles.statusBadge} ${styles[sub.status]}`}>
+                                        {sub.status === 'submitted' && 'New'}
+                                        {sub.status === 'ai_graded' && 'AI Evaluated'}
+                                        {sub.status === 'completed' && 'Graded'}
+                                    </span>
                                     </td>
                                     <td>
                                         {sub.score ? (
