@@ -1,93 +1,142 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
-import AudioRecorder from '../../components/exam/audioRecord.jsx';
-import styles from './speakingPlayer.module.css'; // Tái sử dụng CSS của Quiz
+import AudioRecorder from '../../components/exam/audioRecord.jsx'; // Đảm bảo đường dẫn đúng
+import styles from './speakingPlayer.module.css';
 
 const SpeakingPlayer = ({ lesson }) => {
     const navigate = useNavigate();
+    
+    // State quản lý
     const [currentQIndex, setCurrentQIndex] = useState(0);
-    // Lưu trữ blob cho từng câu hỏi: { 0: Blob, 1: Blob }
-    const [recordings, setRecordings] = useState({}); 
+    const [recordings, setRecordings] = useState({}); // Object lưu: { 0: blob, 1: blob ... }
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const questions = lesson.questions || [];
+    // Lấy danh sách câu hỏi từ props
+    const questions = lesson?.questions || [];
     const currentQuestion = questions[currentQIndex];
     const isLastQuestion = currentQIndex === questions.length - 1;
 
+    // --- HANDLERS ---
+
+    // Khi ghi âm xong 1 câu, lưu blob vào state theo index
     const handleRecordingComplete = (blob) => {
         setRecordings(prev => ({
             ...prev,
-            [currentQIndex]: blob // Lưu blob vào index tương ứng
+            [currentQIndex]: blob
         }));
     };
 
     const handleNext = () => {
+        // (Tùy chọn) Bắt buộc ghi âm mới cho qua câu sau
         if (!recordings[currentQIndex]) {
-            alert("Please record your answer before moving to the next question.");
+            alert("Vui lòng ghi âm câu trả lời trước khi sang câu tiếp theo.");
             return;
         }
         setCurrentQIndex(prev => prev + 1);
     };
 
     const handlePrev = () => {
-        setCurrentQIndex(prev => prev - 1);
+        if (currentQIndex > 0) {
+            setCurrentQIndex(prev => prev - 1);
+        }
     };
 
     const handleSubmit = async () => {
-        if (!recordings[currentQIndex]) {
-            alert("Please record your answer for the last question.");
-            return;
+        // 1. Validate số lượng câu trả lời
+        const answeredCount = Object.keys(recordings).length;
+        const totalQuestions = questions.length;
+
+        if (answeredCount < totalQuestions) {
+            const confirmSkip = window.confirm(
+                `Bạn mới trả lời ${answeredCount}/${totalQuestions} câu hỏi. Các câu bỏ trống sẽ bị 0 điểm. Bạn có chắc chắn muốn nộp không?`
+            );
+            if (!confirmSkip) return;
+        } else {
+            if (!window.confirm("Bạn có chắc chắn muốn nộp bài không?")) return;
         }
-        if (!confirm("Submit all your speaking answers?")) return;
 
         setIsSubmitting(true);
-        const formData = new FormData();
-        formData.append('lessonId', lesson._id);
-        
-        // Gửi danh sách câu hỏi (text) để backend lưu lại đối chiếu
-        formData.append('questions', JSON.stringify(questions));
-
-        // Gửi các file ghi âm
-        // Tên field phải là `audio_${index}` để backend map đúng
-        Object.keys(recordings).forEach(index => {
-            const blob = recordings[index];
-            // File name: answer_0.webm, answer_1.webm
-            formData.append(`audio_${index}`, blob, `answer_${index}.webm`);
-        });
 
         try {
-            await api.post('/submissions/speaking', formData, {
+            const formData = new FormData();
+            
+            // Thông tin cơ bản
+            formData.append('lessonId', lesson._id);
+            // formData.append('userId', user.id); // Không cần thiết nếu backend lấy từ req.user (token)
+
+            // Loop qua state recordings để đóng gói file
+            // QUAN TRỌNG: Key phải là `audio_${index}` để khớp với Backend
+            Object.keys(recordings).forEach(key => {
+                const index = parseInt(key); // Đảm bảo index là số
+                const blob = recordings[key];
+                
+                // Append file: key, file, filename
+                formData.append(`audio_${index}`, blob, `answer_q${index}.webm`);
+            });
+
+            // Gửi request (Header 'Content-Type': 'multipart/form-data' thường được axios tự xử lý, nhưng khai báo rõ cũng tốt)
+            const response = await api.post('/submissions/speaking', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-            alert("Speaking test submitted successfully! AI result will be available soon.");
-            navigate(`/courses/${lesson.module.course}`);
+
+            console.log("Submission success:", response.data);
+            alert("Nộp bài thành công! Hệ thống đang chấm điểm...");
+            
+            // Điều hướng về trang danh sách bài học hoặc trang kết quả
+            navigate(`/courses/${lesson.module.course}`); // Hoặc trang chi tiết submission
+
         } catch (error) {
-            console.error(error);
-            alert("Failed to submit speaking test.");
+            console.error("Submission error:", error);
+            const msg = error.response?.data?.message || "Có lỗi xảy ra khi nộp bài.";
+            alert(`Nộp bài thất bại: ${msg}`);
         } finally {
             setIsSubmitting(false);
         }
     };
 
-return (
+    // Nếu không có câu hỏi nào
+    if (questions.length === 0) {
+        return <div className={styles.error}>Bài học này chưa có câu hỏi nào.</div>;
+    }
+
+    return (
         <div className={styles.playerContainer}>
+            {/* Header: Progress Bar */}
             <div className={styles.header}>
                 <h3>
-                    Speaking Practice - {currentQuestion?.part?.replace('part', 'Part ') || 'Part 1'}
+                    Speaking Practice - {currentQuestion?.part ? currentQuestion.part.replace(/(\d+)/, ' $1').toUpperCase() : 'Part 1'}
                 </h3>                
-                <div className={styles.progressBar}>
-                    <div className={styles.progressFill} style={{ width: `${((currentQIndex + 1) / questions.length) * 100}%` }}></div>
+                <div className={styles.progressBarContainer}>
+                    <div className={styles.progressBar}>
+                        <div 
+                            className={styles.progressFill} 
+                            style={{ width: `${((currentQIndex + 1) / questions.length) * 100}%` }}
+                        ></div>
+                    </div>
+                    <span className={styles.questionCount}>
+                        Question {currentQIndex + 1} / {questions.length}
+                    </span>
                 </div>
-                <p className={styles.questionCount}>Question {currentQIndex + 1} / {questions.length}</p>
             </div>
 
-            {/* Khu vực câu hỏi */}
+            {/* Question Card */}
             <div className={styles.questionCard}>
-                <h2 className={styles.questionText}>{currentQuestion?.questionText || "No question text"}</h2>
+                <div className={styles.questionContent}>
+                    <h2 className={styles.questionText}>
+                        {currentQuestion?.questionText || "Loading question..."}
+                    </h2>
+                    {/* Hiển thị gợi ý/sample nếu có (tùy chọn) */}
+                    {currentQuestion?.sampleAnswer && (
+                        <details className={styles.sampleAnswer}>
+                            <summary>Xem gợi ý câu trả lời</summary>
+                            <p>{currentQuestion.sampleAnswer}</p>
+                        </details>
+                    )}
+                </div>
                 
-                {/* Khu vực ghi âm - Thay style inline bằng class styles.recordingArea */}
                 <div className={styles.recordingArea}>
+                    {/* Key quan trọng để Reset recorder khi đổi câu hỏi */}
                     <AudioRecorder 
                         key={currentQIndex} 
                         onRecordingComplete={handleRecordingComplete}
@@ -96,18 +145,30 @@ return (
                 </div>
             </div>
 
-            {/* Điều hướng - Class styles.navigation đã được update giống footer */}
+            {/* Navigation Buttons */}
             <div className={styles.navigation}>
-                <button className="btn btn-outline" onClick={handlePrev} disabled={currentQIndex === 0}>
+                <button 
+                    className={`btn ${styles.btnPrev}`} 
+                    onClick={handlePrev} 
+                    disabled={currentQIndex === 0 || isSubmitting}
+                >
                     Previous
                 </button>
                 
                 {isLastQuestion ? (
-                    <button className="btn btn-success" onClick={handleSubmit} disabled={isSubmitting}>
+                    <button 
+                        className={`btn btn-primary ${styles.btnSubmit}`}
+                        onClick={handleSubmit} 
+                        disabled={isSubmitting}
+                    >
                         {isSubmitting ? 'Submitting...' : 'Finish & Submit'}
                     </button>
                 ) : (
-                    <button className="btn btn-primary-student" onClick={handleNext}>
+                    <button 
+                        className={`btn btn-primary ${styles.btnNext}`} 
+                        onClick={handleNext}
+                        disabled={isSubmitting}
+                    >
                         Next
                     </button>
                 )}

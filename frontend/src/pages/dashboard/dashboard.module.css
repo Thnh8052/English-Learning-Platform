@@ -72,12 +72,7 @@
 
 /* --- NAVIGATION LIST --- */
 .navList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  gap: var(--spacing-1);
 }
 
 .navLink, .navLinkActive {
@@ -94,6 +89,7 @@
   cursor: pointer;
   user-select: none;
   font-size: 0.95rem;
+  padding: var(--spacing-2);
 }
 
 .navLink:hover {
@@ -104,8 +100,8 @@
 }
 
 .navLinkActive {
-  background-color: var(--color-student-primary-light);
-  color: var(--color-student-primary);
+  background-color: var(--role-primary-light);
+  color: var(--role-primary);
   font-weight: 700;
 }
 
@@ -150,8 +146,7 @@
 }
 
 .courseSublist a:hover {
-  color: var(--color-student-primary);
-  background-color: var(--color-gray-50);
+  color: var(--role-primary);
 }
 @media (prefers-color-scheme: dark) {
   .courseSublist a:hover { background-color: var(--color-gray-800); }
@@ -194,11 +189,9 @@
   .day:hover:not(.today):not(.eventDue) { background-color: var(--color-gray-700); }
 }
 
-/* Today */
 .day.today {
-  background-color: var(--color-student-primary);
+  background-color: var(--role-primary);
   color: var(--color-white);
-  font-weight: 700;
 }
 
 /* Event Due */
@@ -219,11 +212,8 @@
 }
 
 .eventItem { 
-  margin-top: var(--spacing-3); 
-  padding: 10px;
-  background-color: var(--color-gray-50);
-  border-radius: var(--border-radius-md);
-  border-left: 3px solid var(--color-student-primary);
+  border-left: 3px solid var(--role-primary);
+  padding: 8px 12px;
 }
 @media (prefers-color-scheme: dark) {
   .eventItem { background-color: var(--color-gray-800); }

@@ -39,8 +39,14 @@ const WritingComponent = ({ lesson, onSubmit }) => {
   const [content, setContent] = useState('');
   return (
     <ExamLayout
-      instructionComponent={<div className="prose-content" dangerouslySetInnerHTML={{ __html: lesson.prompt || 'Không có đề bài.' }} />}
-      answerComponent={<ReactQuill theme="snow" value={content} onChange={setContent} style={{ height: '300px', marginBottom: '50px' }} />}
+      instructionComponent={
+        <div className="prose-content" dangerouslySetInnerHTML={{ __html: lesson.prompt || 'Không có đề bài.' }} />
+      }
+      answerComponent={
+        <div className={styles.quillWrapper}>
+            <ReactQuill theme="snow" value={content} onChange={setContent} />
+        </div>
+      }
       onSubmit={() => onSubmit({ lessonId: lesson._id, content })}
     />
   );
@@ -193,7 +199,7 @@ const LessonView = () => {
             <div className={styles.historyTitle}>Lịch sử nộp bài</div>
             <div className={styles.historyList}>
                 {history.length === 0 ? (
-                    <p style={{fontSize:'0.9rem', color:'#64748b'}}>Chưa có bài nộp nào.</p>
+                    <p className={styles.emptyHistory}>Chưa có bài nộp nào.</p>
                 ) : (
                     history.map(sub => (
                         <Link 

@@ -10,18 +10,27 @@ const AudioRecorder = ({ onRecordingComplete, existingAudioBlob }) => {
     const audioChunksRef = useRef([]);
     const timerRef = useRef(null);
 
-    //Nếu component mount lại mà đã có audio trước đó (dùng cho tính năng Resume/Back)
+    // --- 1. Xử lý file audio có sẵn (khi quay lại câu hỏi cũ) ---
     useEffect(() => {
-        if (existingAudioBlob) {
-            const url = URL.createObjectURL(existingAudioBlob);
-            setAudioUrl(url);
-        }
-        return () => {
-            if (audioUrl) URL.revokeObjectURL(audioUrl);
-        };
-    }, [existingAudioBlob]); // Thêm dependency existingAudioBlob
+        let objectUrl = null;
 
-    //Đồng hồ đếm giờ
+        if (existingAudioBlob) {
+            objectUrl = URL.createObjectURL(existingAudioBlob);
+            setAudioUrl(objectUrl);
+        } else {
+            // Quan trọng: Nếu không có blob (bị xóa hoặc chưa có), phải reset url
+            setAudioUrl(null);
+        }
+
+        // Cleanup function: Xóa URL khỏi bộ nhớ khi component unmount hoặc blob thay đổi
+        return () => {
+            if (objectUrl) {
+                URL.revokeObjectURL(objectUrl);
+            }
+        };
+    }, [existingAudioBlob]);
+
+    // --- 2. Đồng hồ đếm giờ ---
     useEffect(() => {
         if (isRecording) {
             timerRef.current = setInterval(() => {
@@ -33,37 +42,55 @@ const AudioRecorder = ({ onRecordingComplete, existingAudioBlob }) => {
         return () => clearInterval(timerRef.current);
     }, [isRecording]);
 
+    // --- 3. Bắt đầu ghi âm ---
     const startRecording = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorderRef.current = new MediaRecorder(stream);
             
-            mediaRecorderRef.current.ondataavailable = (event) => {
+            // Kiểm tra trình duyệt hỗ trợ định dạng nào
+            let mimeType = 'audio/webm';
+            if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                mimeType = 'audio/webm;codecs=opus';
+            } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                mimeType = 'audio/mp4'; // Fallback cho Safari (nếu cần)
+            }
+
+            const mediaRecorder = new MediaRecorder(stream, { mimeType });
+            mediaRecorderRef.current = mediaRecorder;
+            audioChunksRef.current = []; // Reset chunks
+
+            mediaRecorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
                     audioChunksRef.current.push(event.data);
                 }
             };
 
-            mediaRecorderRef.current.onstop = () => {
-                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-                const url = URL.createObjectURL(audioBlob);
-                setAudioUrl(url);
-                audioChunksRef.current = []; // Reset chunks
+            mediaRecorder.onstop = () => {
+                // Tạo Blob từ các chunks
+                const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
                 
-                //Gửi blob ra ngoài cho component cha
+                // Tạo URL để play ngay lập tức
+                const url = URL.createObjectURL(audioBlob);
+                setAudioUrl(url); // Cập nhật state nội bộ để hiện player ngay
+                
+                // Gửi blob ra ngoài cho SpeakingPlayer lưu trữ
                 onRecordingComplete(audioBlob);
                 
-                //Tắt mic (đèn đỏ trên tab)
+                // Tắt mic hoàn toàn (đèn đỏ trên tab tắt)
                 stream.getTracks().forEach(track => track.stop());
             };
 
-            mediaRecorderRef.current.start();
+            mediaRecorder.start();
             setIsRecording(true);
             setRecordingTime(0);
-            setAudioUrl(null); //Xóa audio cũ nếu có
+            
+            // Xóa URL cũ nếu có để tránh rác bộ nhớ (dù useEffect đã lo, nhưng làm kỹ không thừa)
+            if (audioUrl) URL.revokeObjectURL(audioUrl); 
+            setAudioUrl(null); 
+
         } catch (error) {
             console.error("Error accessing microphone:", error);
-            alert("Microphone access denied or not found.");
+            alert("Không thể truy cập Microphone. Vui lòng kiểm tra quyền truy cập.");
         }
     };
 
@@ -75,13 +102,15 @@ const AudioRecorder = ({ onRecordingComplete, existingAudioBlob }) => {
     };
 
     const handleRecordAgain = () => {
-        if (confirm("This will delete your current recording. Are you sure?")) {
+        if (window.confirm("Bản ghi âm hiện tại sẽ bị xóa. Bạn có chắc chắn muốn ghi âm lại?")) {
+            // Xóa URL cũ khỏi bộ nhớ
+            if (audioUrl) URL.revokeObjectURL(audioUrl);
+            
             setAudioUrl(null);
-            onRecordingComplete(null); //Xóa blob ở cha
+            onRecordingComplete(null); // Báo cho cha biết là đã xóa
         }
     };
 
-    //Format giây thành mm:ss
     const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
@@ -90,32 +119,31 @@ const AudioRecorder = ({ onRecordingComplete, existingAudioBlob }) => {
 
     return (
         <div className={styles.recorderContainer}>
-            
-            {/*Trạng thái chưa ghi âm & chưa có file */}
+            {/* Case 1: Chưa ghi âm & Chưa có file */}
             {!isRecording && !audioUrl && (
                 <button onClick={startRecording} className="btn btn-primary-student">
                     🎙️ Start Recording
                 </button>
             )}
 
-            {/* Đang ghi âm */}
+            {/* Case 2: Đang ghi âm */}
             {isRecording && (
                 <div className={styles.recordingStatus}>
                     <div className={styles.indicator}>
-                        ● Recording {formatTime(recordingTime)}
+                        <span>●</span> Recording {formatTime(recordingTime)}
                     </div>
-                <button onClick={stopRecording} className="btn btn-primary-admin">
-                    ⏹️ Stop
-                </button>
+                    <button onClick={stopRecording} className="btn btn-danger">
+                        ⏹️ Stop
+                    </button>
                 </div>
             )}
 
-            {/*Đã ghi âm xong (Playback & Retry) */}
-            {audioUrl && (
+            {/* Case 3: Đã có file (Vừa ghi xong hoặc Load từ history) */}
+            {audioUrl && !isRecording && (
                 <div className={styles.playbackContainer}>
                     <audio src={audioUrl} controls className={styles.audioPlayer} />
                     <div className={styles.actions}>
-                        <button onClick={handleRecordAgain} className="btn btn-outline">
+                        <button onClick={handleRecordAgain} className="btn btn-outline-danger">
                             ↺ Record Again
                         </button>
                     </div>

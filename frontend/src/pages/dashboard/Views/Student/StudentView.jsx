@@ -1,20 +1,20 @@
 import { useRef, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import styles from './studentView.module.css';
 import { useCourses } from '../../../../contexts/CoursesContext.jsx'; 
 
-// --- Component CourseCard (cập nhật để dùng _id) ---
 const CourseCard = ({ course }) => (
     <div className={styles.courseCard}>
-      <div className={styles.courseCardImage} style={{ backgroundColor: course.color }}></div>
+      <div 
+        className={styles.courseCardImage} 
+        style={{ '--card-bg': course.color }}
+      ></div>
       <div className={styles.courseCardContent}>
-        <h4><a href="#">{course.name}</a></h4>
-        {/* Chúng ta sẽ bỏ progress bar vì dữ liệu thật không có */}
+        <h4><Link to={`/courses/${course._id}`}>{course.name}</Link></h4>
       </div>
     </div>
-);
+)
 
-// --- Component Carousel (SỬA LỖI Ở ĐÂY) ---
-// Nó phải nhận 'courses' như một prop
 const CourseCarousel = ({ courses }) => { 
   const scrollContainerRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -24,7 +24,6 @@ const CourseCarousel = ({ courses }) => {
   const GAP_PX = 24;
   const SCROLL_PAGE_SIZE = 4;
 
-  // --- THÊM LẠI CÁC HÀM NÀY ---
   const checkScrollability = () => {
     const el = scrollContainerRef.current;
     if (el) {
@@ -55,16 +54,13 @@ const CourseCarousel = ({ courses }) => {
     };
   }, [courses]);
 
-  // THÊM LỚP BẢO VỆ: Nếu 'courses' chưa có hoặc không phải mảng, không render gì cả
   if (!Array.isArray(courses)) {
-    return null; // Hoặc một fallback UI khác
+    return null;
   }
 
-  // SỬA LỖI: Dùng prop `courses` thay vì `studentCourses`
-  if (courses.length <= 4) { // Điều kiện dựa trên dữ liệu thật
+  if (courses.length <= 4) { 
     return (
       <div className={styles.courseList}>
-        {/* Lặp qua dữ liệu thật và dùng _id cho key */}
         {courses.map(course => <CourseCard key={course._id} course={course} />)}
       </div>
     )
@@ -90,7 +86,6 @@ const CourseCarousel = ({ courses }) => {
   );
 };
 
-// --- Component chính: StudentView ---
 const StudentView = () => {
   const { myCourses, loading } = useCourses(); 
   
@@ -101,8 +96,7 @@ const StudentView = () => {
   return (
     <div>
       <h3>My Enrolled Courses ({myCourses.length})</h3>
-      {myCourses && myCourses.length > 0 ? ( // Thêm kiểm tra `myCourses` tồn tại
-         // Dữ liệu thật `myCourses` được truyền vào đây
+      {myCourses && myCourses.length > 0 ? (
          <CourseCarousel courses={myCourses} />
       ) : (
         <p>You haven't enrolled in any courses yet. <a href="/courses">Browse courses now!</a></p>

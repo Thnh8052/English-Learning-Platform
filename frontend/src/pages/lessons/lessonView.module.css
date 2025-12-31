@@ -9,6 +9,14 @@
     min-height: calc(100vh - 80px);
 }
 
+.quillWrapper :global(.ql-container) {
+    height: 300px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+}
+.quillWrapper {
+    margin-bottom: var(--spacing-5);
+}
 @media (max-width: 992px) {
     .container { grid-template-columns: 1fr; }
     .sidebar { display: none; } 
@@ -42,6 +50,12 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
+
+.emptyHistory {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
 @media (prefers-color-scheme: dark) {
     .historyTitle { border-bottom-color: var(--color-gray-700); }
 }
@@ -194,28 +208,16 @@
 
 .videoWrapper {
     position: relative;
-    background-color: #000;
+    background-color: var(--color-black);
     border-radius: var(--border-radius-lg);
     overflow: hidden;
-    line-height: 0;
-    
-    /* Hiệu ứng khung tranh */
     border: 8px solid var(--bg-card); 
     outline: 1px solid var(--color-gray-200); 
     box-shadow: var(--shadow-lg); 
-    
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-@media (prefers-color-scheme: dark) {
-    .videoWrapper { 
-        border-color: var(--bg-card);
-        outline-color: var(--color-gray-700); 
-    }
 }
 
-.videoWrapper:hover {
-    box-shadow: var(--shadow-xl);
-    transform: translateY(-2px);
+@media (prefers-color-scheme: dark) {
+    .videoWrapper { outline-color: var(--color-gray-700); }
 }
 
 .videoWrapper video {
