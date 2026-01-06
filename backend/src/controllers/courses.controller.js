@@ -38,6 +38,25 @@ export const getAllCourses = async (req, res) => {
         res.status(500).json({ message: "Lỗi máy chủ" });
     }
 };
+/**
+ * @desc    Lấy danh sách khóa học hiển thị trên Homepage
+ * @route   GET /api/courses/home
+ * @access  Public
+ */
+export const getHomeCourses = async (req, res) => {
+    try {
+        const courses = await Course.find({ status: 'published' })
+            .sort({ createdAt: -1 })   // mới nhất trước
+            .limit(6)                  // chỉ lấy 6 khóa
+            .select('name summary color category level teacher')
+            .populate('teacher', 'name');
+
+        res.json(courses);
+    } catch (err) {
+        console.error("Lỗi khi lấy khóa học trang chủ:", err);
+        res.status(500).json({ message: "Lỗi máy chủ" });
+    }
+};
 
 /**
  * @desc    Lấy chi tiết một khóa học dựa trên ID

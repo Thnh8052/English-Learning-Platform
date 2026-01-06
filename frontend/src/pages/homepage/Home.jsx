@@ -1,5 +1,6 @@
-import React from "react";
+import { useEffect, useState,useRef  } from "react";
 import { useNavigate } from "react-router-dom";
+import api from '../../services/api';
 import styles from "./home.module.css";
 
 const scrollImages = [
@@ -27,6 +28,52 @@ function ScrollingImageList() {
 }
 export function Home() {
   const navigate = useNavigate();
+  const [homeCourses, setHomeCourses] = useState([]);
+  const [loadingCourses, setLoadingCourses] = useState(true);
+
+  useEffect(() => {
+    const fetchHomeCourses = async () => {
+      try {
+        const res = await api.get("/courses/home");
+        setHomeCourses(res.data);
+      } catch (err) {
+        console.error("Failed to fetch home courses", err);
+      } finally {
+        setLoadingCourses(false);
+      }
+    };
+
+    fetchHomeCourses();
+  }, []);
+  const scrollRef = useRef(null);
+
+  const smoothScroll = (direction) => {
+    if (!scrollRef.current) return;
+
+    const container = scrollRef.current;
+    const distance = 280;
+    const duration = 400;
+    const start = container.scrollLeft;
+    const startTime = performance.now();
+
+    const animate = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const ease =
+        progress < 0.5
+          ? 4 * progress * progress * progress
+          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+      container.scrollLeft =
+        start + (direction === "left" ? -1 : 1) * distance * ease;
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  };
 
   return (
     <div className={styles.homeContainer}>
@@ -85,33 +132,40 @@ export function Home() {
       {/* COURSES PREVIEW */}
       <section className={styles.courses}>
         <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Popular Courses</h2>
-          <p className={styles.sectionSubtitle}>Start with our most rated modules</p>
+          <h2 className={styles.sectionTitle}>Our Newest Courses</h2>
+          <p className={styles.sectionSubtitle}>Start with our most latest modules</p>
         </div>
 
-        <div className={styles.courseGrid}>
-          <CourseCard 
-            id="1"
-            title="Speaking Mastery" 
-            desc="Conquer Part 1, 2, and 3 with confidence and fluency strategies."
-            imgIndex={1}
+    <div className={styles.carouselWrapper}>
+      <button
+        className={styles.navButton}
+        onClick={() => smoothScroll("left")}
+        aria-label="Scroll left"
+      >
+        ‹
+      </button>
+      <div className={styles.carousel} ref={scrollRef}>
+        {homeCourses.map(course => (
+          <CourseCard
+            key={course._id}
+            id={course._id}
+            title={course.name}
+            desc={course.summary}
+            color={course.color}
+            teacher={course.teacher?.name}
             navigate={navigate}
           />
-          <CourseCard 
-            id="2"
-            title="Writing Task 2 Pro" 
-            desc="Learn essay structures, vocabulary, and grammar for high band scores."
-            imgIndex={2}
-            navigate={navigate}
-          />
-          <CourseCard 
-            id="3"
-            title="Listening Boost" 
-            desc="Train your ear with accents from UK, US, and Australia."
-            imgIndex={3}
-            navigate={navigate}
-          />
-        </div>
+        ))}
+      </div>
+
+      <button
+        className={styles.navButton}
+        onClick={() => smoothScroll("right")}
+        aria-label="Scroll right"
+      >
+        ›
+      </button>
+    </div>
       </section>
     </div>
   );
@@ -127,22 +181,22 @@ function FeatureCard({ icon, title, desc }) {
   );
 }
 
-function CourseCard({ id, title, desc, imgIndex, navigate }) {
+function CourseCard({ id, title, desc, color, teacher, navigate }) {
   return (
     <div className={styles.courseCard}>
-      <div className={styles.courseImageWrapper}>
-        <img
-          src={`/assets/course-${imgIndex}.jpg`}
-          alt={title}
-          className={styles.courseImage}
-          onError={(e) => {
-             e.target.style.display = 'none';
-             e.target.parentNode.style.backgroundColor = 'var(--color-student-primary-light)'; 
-          }}
-        />
-      </div>
+      <div
+        className={styles.courseImageWrapper}
+        style={{
+          backgroundColor: color || "var(--color-student-primary-light)"
+        }}
+      />
       <div className={styles.courseContent}>
         <h3>{title}</h3>
+        {teacher && (
+          <p className={styles.teacherName}>
+            By {teacher}
+          </p>
+        )}
         <p className={styles.courseDescription}>{desc}</p>
         <button
           className={styles.learnMore}

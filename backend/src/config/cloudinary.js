@@ -19,4 +19,14 @@ export const lessonStorage = new CloudinaryStorage({
         type: 'upload'
     }
 });
-
+export const avatarStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'avatars',          // Cloudinary folder
+    resource_type: 'image',     // Avatar = image only
+    allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+    transformation: [
+      { width: 300, height: 300, crop: 'fill' }
+    ],
+  },
+});
