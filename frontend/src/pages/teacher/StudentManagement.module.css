@@ -64,7 +64,6 @@
     color: var(--text-primary);
 }
 
-/* Căn lề và độ rộng cột thay cho inline style */
 .textRight { text-align: right; }
 .textCenter { text-align: center; }
 .colStudent { width: 35%; }
@@ -148,9 +147,9 @@
 .statLabel { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; }
 
 /* --- ACTIONS --- */
-.actionGroup { display: flex; justify-content: flex-end; gap: var(--spacing-2); }
+.actionGroup { display: flex; gap: var(--spacing-2); }
 
-/* Dark mode overrides */
+/* Dark mode */
 @media (prefers-color-scheme: dark) {
     .tableCard, .profileSummary { border-color: var(--color-gray-700); }
     .table th { background: var(--color-gray-800); }

@@ -36,10 +36,10 @@ const CourseDashboard = () => {
                 <div className={styles.courseTitle}>{course.name}</div>
                 <nav className={styles.navMenu}>
                     <button className={`${styles.navItem} ${styles.active}`}>
-                        <span className={styles.navIcon}>📊</span> Dashboard
+                        <span className={styles.navIcon}></span> Dashboard
                     </button>
                     <button className={styles.navItem} onClick={() => navigate(`/teacher/courses/${courseId}/grading`)}>
-                        <span className={styles.navIcon}>📝</span> Grading 
+                        <span className={styles.navIcon}></span> Grading 
                         {stats.pendingGrading > 0 && (
                             <span className={`badge badge-warning ${styles.navBadge}`}>
                                 {stats.pendingGrading}
@@ -47,10 +47,10 @@ const CourseDashboard = () => {
                         )}
                     </button>
                     <button className={styles.navItem} onClick={() => navigate(`/teacher/courses/${courseId}/students`)}>
-                        <span className={styles.navIcon}>👥</span> Students
+                        <span className={styles.navIcon}></span> Students
                     </button>
                     <button className={styles.navItem} onClick={() => navigate(`/teacher/edit-course/${courseId}`)}>
-                        <span className={styles.navIcon}>⚙️</span> Settings
+                        <span className={styles.navIcon}></span> Settings
                     </button>
                 </nav>
             </aside>
@@ -83,7 +83,7 @@ const CourseDashboard = () => {
                     <div className={styles.statCard}>
                         <span className={styles.statLabel}>Submissions</span>
                         <span className={styles.statValue}>{stats.totalSubmissions}</span>
-                        <div className={styles.statTrend}><span>📚 Total assignments</span></div>
+                        <div className={styles.statTrend}><span>Total assignments</span></div>
                     </div>
                 </div>
 
@@ -112,7 +112,7 @@ const CourseDashboard = () => {
                                     </div>
                                 ))
                             ) : (
-                                <div className={styles.emptyState}><p>🎉 No pending submissions.</p></div>
+                                <div className={styles.emptyState}><p>No pending submissions.</p></div>
                             )}
                         </div>
                     </div>

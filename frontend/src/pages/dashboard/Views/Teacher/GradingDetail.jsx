@@ -186,7 +186,7 @@ if (type === 'assignment') {
                     <button onClick={() => navigate(-1)} className={styles.backBtn}>&larr; Back</button>
                 </div>
 
-            <div className={styles.studentProfileCard}>
+                <div className={styles.studentProfileCard}>
                     <div className={styles.avatarLarge}>{submission.student?.name?.charAt(0)}</div>
                     <div>
                         <h4>{submission.student?.name}</h4>
@@ -242,9 +242,9 @@ if (type === 'assignment') {
                                 />
                             </div>
                         ))}
-                    <button className="btn btn-primary-teacher" style={{width: '100%'}} onClick={handleSubmitGrade}>
-                        Confirm Final Grade
-                    </button>
+                        <button className="btn btn-primary-teacher" onClick={handleSubmitGrade}>
+                            Confirm Final Grade
+                        </button>
                     </div>
 
                     <div className={styles.totalScore}>
@@ -263,7 +263,7 @@ if (type === 'assignment') {
                     </div>
 
                     <div className={styles.actionButtons}>
-                        <button className="btn btn-primary-teacher" style={{width: '100%'}} onClick={handleSubmitGrade}>
+                        <button className="btn btn-primary-teacher" onClick={handleSubmitGrade}>
                             Submit Grade
                         </button>
                     </div>

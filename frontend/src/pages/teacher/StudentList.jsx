@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useCourses } from "../../contexts/CoursesContext";
 import api from '../../services/api';
 import styles from './StudentManagement.module.css';
 
@@ -8,6 +9,8 @@ const StudentList = () => {
     const navigate = useNavigate();
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { refreshMyCourses } = useCourses();
+
 
     useEffect(() => { fetchStudents(); }, [courseId]);
 
@@ -21,6 +24,18 @@ const StudentList = () => {
 
     if (loading) return <div className={styles.container}><p className={styles.textCenter}>Loading students...</p></div>;
 
+    const handleRemoveStudent = async (studentId) => {
+    if (!window.confirm("Remove this student from the course?")) return;
+
+    try {
+    await api.delete(`/courses/${courseId}/students/${studentId}`);
+    setStudents(prev => prev.filter(s => s._id !== studentId));
+    refreshMyCourses();
+    } catch (err) {
+        console.error(err);
+        alert("Failed to remove student");
+    }
+    };
     return (
         <div className={styles.container}>
             <div className={styles.header}>
@@ -76,10 +91,9 @@ const StudentList = () => {
                                     </td>
                                     <td className={styles.textRight}>
                                         <div className={styles.actionGroup}>
-                                            <Link to={`/teacher/courses/${courseId}/students/${std._id}`} className="btn btn-outline">
-                                                View Progress
-                                            </Link>
-                                            <button className="btn btn-secondary">Remove</button>
+                                            <button className="btn btn-secondary" onClick={() => handleRemoveStudent(std._id)}>
+                                            Remove
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>

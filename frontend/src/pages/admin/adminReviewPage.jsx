@@ -10,7 +10,7 @@ const AdminReviewPage = () => {
     const [feedback, setFeedback] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    //xử lý từ chối khóa học
+    // Handle rejection with required reason
     const handleReject = async () => {
         const reason = prompt("Please provide a reason for rejecting this course. This will be shown to the teacher.");
         if (!reason) return; // Nếu admin hủy prompt
@@ -27,7 +27,7 @@ const AdminReviewPage = () => {
         }
     };
 
-    //xử lý phê duyệt khóa học
+    // Approve and publish course
     const handleApprove = async () => {
         if (!window.confirm("Are you sure you want to approve and publish this course?")) return;
         setIsSubmitting(true);
@@ -42,7 +42,7 @@ const AdminReviewPage = () => {
         }
     };
 
-    //xử lý yêu cầu chỉnh sửa
+    // Request teacher changes with feedback
     const handleRequestChanges = async () => {
         if (!feedback.trim()) {
             alert('Please provide feedback for the teacher.');
@@ -61,48 +61,58 @@ const AdminReviewPage = () => {
     };
 
    return (
-    <div>
+    <div className={styles.page}>
       <CourseDetailPage />
 
-      {}
-      <div className={styles.adminContainer}>
-        <div className={styles.sectionBox}>
-          <h3>Admin Actions</h3>
+      <section className={`section ${styles.adminContainer}`}>
+        <div className={`card ${styles.sectionBox}`}>
+          <header className="section-header">
+            <div>
+              <p className={styles.eyebrow}>Review</p>
+              <h3 className="section-title">Admin Actions</h3>
+              <p className={styles.subtitle}>Approve, request changes, or reject this course with clear reasoning.</p>
+            </div>
+          </header>
 
           <div className={styles.formGroup}>
-            <label className={styles.formLabel}>
+            <label className={styles.formLabel} htmlFor="feedback">
               Request Changes (provide feedback)
             </label>
             <textarea
+              id="feedback"
               className={styles.formInput}
               rows="4"
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
-              placeholder="e.g., 'Please improve the course thumbnail.' or 'Module 2 is missing video content.'"
+              placeholder="e.g., “Please improve the course thumbnail.” or “Module 2 is missing video content.”"
             ></textarea>
           </div>
 
-          <div className={styles.buttonRow}>
+          <div className={styles.buttonRow} aria-live="polite">
             <button
               onClick={handleRequestChanges}
-              className={`${styles.btn} ${styles.btnWarning}`}
+              className={`btn ${styles.btnWarning}`}
               disabled={isSubmitting}
             >
               Request Changes
             </button>
             <button
               onClick={handleApprove}
-              className={`${styles.btn} ${styles.btnSuccess}`}
+              className={`btn ${styles.btnSuccess}`}
               disabled={isSubmitting}
             >
               Approve & Publish
             </button>
-            <button onClick={handleReject} className={`${styles.btn} ${styles.btnReject}`} disabled={isSubmitting}>
+            <button
+              onClick={handleReject}
+              className={`btn ${styles.btnReject}`}
+              disabled={isSubmitting}
+            >
               Reject Course
             </button>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 };

@@ -16,17 +16,24 @@ const CourseCard = ({ course, onEdit, onSubmitReview, onRetract, onDelete, onMan
 
     const StatusBadge = () => {
         switch (course.status) {
-            case 'draft': return <span className={`${styles.badge} ${styles.draft}`}>Draft</span>;
-            case 'pending_review': return <span className={`${styles.badge} ${styles.pending}`}>Pending Review</span>;
-            case 'published': return <span className={`${styles.badge} ${styles.published}`}>Published</span>;
-            case 'requires_changes': return <span className={`${styles.badge} ${styles.requiresChanges}`}>Requires Changes</span>;
-            default: return null;
+            case 'draft':
+                return <span className={`${styles.badge} ${styles.draft}`}>Draft</span>;
+            case 'pending_review':
+                return <span className={`${styles.badge} ${styles.pending}`}>Pending Review</span>;
+            case 'published':
+                return <span className={`${styles.badge} ${styles.published}`}>Published</span>;
+            case 'requires_changes':
+                return <span className={`${styles.badge} ${styles.requiresChanges}`}>Requires Changes</span>;
+            case 'rejected':
+                return <span className={`${styles.badge} ${styles.rejected}`}>Rejected</span>;
+            default:
+                return null;
         }
     };
 
     return (
         <div className={styles.courseCard}>
-            <div className={styles.cardImage} style={{ '--course-bg': course.color }}>
+            <div className={styles.cardImage} data-course-bg={course.color}>
                 <StatusBadge />
                 
                 {isPublished && (
@@ -67,7 +74,7 @@ const CourseCard = ({ course, onEdit, onSubmitReview, onRetract, onDelete, onMan
                 <div className={styles.cardActions}>
                     {isPublished ? (
                         <>
-                            <button onClick={() => onManage(course._id)} className="btn btn-primary-teacher" style={{flex: 1}}>
+                            <button onClick={() => onManage(course._id)} className="btn btn-primary-teacher">
                                 Manage
                             </button>
                             
@@ -92,8 +99,11 @@ const CourseCard = ({ course, onEdit, onSubmitReview, onRetract, onDelete, onMan
                             {(course.status === 'draft' || course.status === 'requires_changes') && (
                                 <button onClick={() => onSubmitReview(course._id)} className="btn btn-primary-teacher">Submit</button>
                             )}
+                            {(course.status === 'rejected') && (
+                                <button onClick={() => onSubmitReview(course._id)} className="btn btn-primary-teacher">Re-submit</button>
+                            )}
                             
-                            {(course.status === 'draft' || course.status === 'requires_changes') && (
+                            {(course.status === 'draft' || course.status === 'requires_changes' || course.status === 'rejected') && (
                                 <button onClick={() => onDelete(course._id)} className={`${styles.btn} ${styles.btnDanger}`}>Delete</button>
                             )}
                         </>
@@ -114,7 +124,8 @@ const TeacherView = () => {
         if (!myCourses) return [];
         switch (activeTab) {
             case 'published': return myCourses.filter(c => c.status === 'published');
-            case 'rejected': return myCourses.filter(c => c.status === 'requires_changes');
+            case 'requires': return myCourses.filter(c => c.status === 'requires_changes');
+            case 'rejected': return myCourses.filter(c => c.status === 'rejected');
             case 'pending':
             default: return myCourses.filter(c => c.status === 'draft' || c.status === 'pending_review');
         }
@@ -130,7 +141,7 @@ const TeacherView = () => {
 
     const handleSubmitReview = async (courseId) => {
         if (!window.confirm("Are you sure you want to submit this course for review?")) return;
-        try {
+        try {   
             const res = await api.post(`/courses/${courseId}/submit-for-review`);
             setMyCourses(prev => prev.map(c => c._id === courseId ? res.data : c));
             alert("Course submitted successfully!");
@@ -162,14 +173,24 @@ const TeacherView = () => {
         navigate(`/teacher/edit-course/${course._id}`);
     };
 
-    if (loading) return <div className="p-8 text-center">Loading your courses...</div>;
+    if (loading) {
+        return <p className={styles.loadingText}>Loading your courses...</p>;
+    }
 
     return (
-        <div>
-            <div className={styles.header}>
-                <h3>Your Courses</h3>
-                <Link to="/teacher/create-course" className="btn btn-primary-teacher">+ New Course</Link>
-            </div>
+        <section className="section">
+            <header className={styles.header}>
+                <div>
+                    <p className={styles.eyebrow}>Teacher</p>
+                    <h3 className={styles.title}>Your Teaching Courses</h3>
+                    <p className={styles.subtitle}>
+                        Draft, publish, and manage all of your courses in one place.
+                    </p>
+                </div>
+                <Link to="/teacher/create-course" className="btn btn-primary-teacher">
+                    + New Course
+                </Link>
+            </header>
 
             <div className={styles.tabContainer}>
                 <button 
@@ -185,10 +206,16 @@ const TeacherView = () => {
                     Published
                 </button>
                 <button 
+                    className={`${styles.tabButton} ${activeTab === 'requires' ? styles.active : ''}`}
+                    onClick={() => setActiveTab('requires')}
+                >
+                    Requires Changes
+                </button>
+                <button 
                     className={`${styles.tabButton} ${activeTab === 'rejected' ? styles.active : ''}`}
                     onClick={() => setActiveTab('rejected')}
                 >
-                    Requires Changes
+                    Rejected
                 </button>
             </div>
             
@@ -212,7 +239,7 @@ const TeacherView = () => {
                     </div>
                 )}
             </div>
-        </div>
+        </section>
     );
 };
 

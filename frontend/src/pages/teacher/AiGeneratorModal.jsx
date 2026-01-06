@@ -46,7 +46,7 @@ const AiGeneratorModal = ({ isOpen, onClose, onQuestionsReceived }) => {
         <div className={styles.modalOverlay}>
             <div className={styles.modalContent}>
                 <div className={styles.modalHeader}>
-                    <h3 className={styles.modalTitle}>✨ AI Quiz Generator</h3>
+                    <h3 className={styles.modalTitle}>AI Quiz Generator</h3>
                     <button className={styles.closeBtn} onClick={onClose}>&times;</button>
                 </div>
 
@@ -74,7 +74,7 @@ const AiGeneratorModal = ({ isOpen, onClose, onQuestionsReceived }) => {
                                     accept=".pdf,.docx,.txt"
                                     onChange={(e) => setFile(e.target.files[0])}
                                 />
-                                <p>{file ? `📄 ${file.name}` : "Bấm để chọn file (PDF, DOCX)"}</p>
+                                <p>{file ? ` ${file.name}` : "Bấm để chọn file (PDF, DOCX)"}</p>
                             </div>
                         </div>
                     )}
@@ -99,7 +99,7 @@ const AiGeneratorModal = ({ isOpen, onClose, onQuestionsReceived }) => {
                         onClick={handleGenerate} 
                         disabled={loading || (activeTab === 'text' && !inputText) || (activeTab === 'file' && !file)}
                     >
-                        {loading ? 'Đang xử lý...' : '🚀 Tạo câu hỏi'}
+                        {loading ? 'Đang xử lý...' : ' Tạo câu hỏi'}
                     </button>
                 </div>
             </div>

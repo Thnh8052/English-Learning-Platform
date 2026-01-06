@@ -1,29 +1,36 @@
+.page {
+  padding: var(--section-gap) 0;
+  background: var(--bg-body);
+}
+
 .adminContainer {
-  max-width: 1200px;
+  max-width: var(--max-content-width);
   margin: 0 auto;
-  padding: 0 var(--spacing-3);
+  padding: 0 var(--container-padding);
 }
 
 .sectionBox {
-  /* Chuyển sang dùng màu background chuẩn của card thay vì hardcode màu đỏ nhạt */
-  background-color: var(--bg-card); 
-  padding: var(--spacing-4);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--color-gray-200); /* Thêm viền nhẹ để tách biệt */
+  width: 100%;
+  border: var(--surface-border);
+  box-shadow: var(--shadow-md);
+  padding: clamp(var(--spacing-3), 3vw, var(--spacing-4));
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
 }
 
-/* Riêng Dark mode chỉnh lại viền */
-@media (prefers-color-scheme: dark) {
-    .sectionBox {
-        border-color: var(--color-gray-700);
-    }
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+  font-size: 0.85rem;
 }
 
-.sectionBox h3 {
-  margin-bottom: var(--spacing-3);
-  font-size: 1.25rem;
-  color: var(--text-primary);
+.subtitle {
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
 }
 
 .formGroup {
@@ -55,7 +62,7 @@
 
 .formInput:focus {
     outline: none;
-    border-color: var(--color-admin-primary); /* Dùng màu admin cho trang admin */
+    border-color: var(--color-admin-primary); 
     box-shadow: 0 0 0 3px var(--color-admin-primary-light);
 }
 
@@ -80,7 +87,6 @@
   background-color: var(--color-warning);
   color: var(--color-white);
 }
-
 .btnWarning:hover {
   background-color: var(--color-warning-hover);
 }
@@ -89,7 +95,6 @@
   background-color: var(--color-success);
   color: var(--color-white);
 }
-
 .btnSuccess:hover {
   background-color: var(--color-success-hover);
 }
@@ -98,7 +103,6 @@
   background-color: var(--color-error);
   color: var(--color-white);
 }
-
 .btnReject:hover {
   background-color: var(--color-error-hover);
 }
@@ -106,4 +110,24 @@
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: var(--spacing-4) 0;
+  }
+
+  .sectionBox {
+    padding: var(--spacing-3);
+  }
+
+  .buttonRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
 }

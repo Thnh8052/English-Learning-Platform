@@ -1,29 +1,107 @@
-/* Carousel Container */
-.carouselContainer {
-  position: relative;
-  max-width: fit-content;
-  margin: 0 auto;
-  padding: 0 var(--spacing-2);
+/* Layout & Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-4);
+  flex-wrap: wrap;
 }
 
-/* Variables local cho carousel */
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.subtitle {
+  margin-top: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.badgeCount {
+  padding: 6px 12px;
+  border-radius: var(--border-radius-full);
+  background-color: var(--color-student-primary-light);
+  color: var(--color-student-primary);
+  font-weight: 700;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+
+.loadingText {
+  color: var(--text-secondary);
+}
+
+.carouselContainer {
+  position: relative;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 :root {
   --card-width: 280px;
   --gap: var(--spacing-3);
 }
 
 .scrollWrapper {
-  width: calc((var(--card-width) * 4) + (var(--gap) * 3));
-  overflow: hidden;
+  width: 100%;
+  max-height: 800px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 4px;
   scroll-behavior: smooth;
-  padding: 4px; /* Để shadow không bị cắt */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Custom scrollbar styling */
+.scrollWrapper::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollWrapper::-webkit-scrollbar-track {
+  background: var(--color-gray-100);
+  border-radius: 4px;
+}
+
+.scrollWrapper::-webkit-scrollbar-thumb {
+  background: var(--color-gray-300);
+  border-radius: 4px;
+}
+
+.scrollWrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--color-student-primary);
+}
+
+@media (prefers-color-scheme: dark) {
+  .scrollWrapper::-webkit-scrollbar-track {
+    background: var(--color-gray-800);
+  }
+  
+  .scrollWrapper::-webkit-scrollbar-thumb {
+    background: var(--color-gray-600);
+  }
 }
 
 .courseList {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: var(--gap);
-  padding-bottom: 8px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-3);
+  padding-bottom: var(--spacing-2);
 }
 
 /* Navigation Buttons */
@@ -78,8 +156,7 @@
 
 /* Course Card Styles */
 .courseCard {
-  width: var(--card-width);
-  flex-shrink: 0;
+  width: 100%;
   background-color: var(--bg-card);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-sm);
@@ -88,23 +165,31 @@
   border: 1px solid var(--color-gray-200);
   display: flex;
   flex-direction: column;
+  position: relative;
+  cursor: pointer;
 }
 @media (prefers-color-scheme: dark) {
   .courseCard { border-color: var(--color-gray-700); }
 }
 
-.courseCard:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
+/* Only apply hover on non-touch devices */
+@media (hover: hover) {
+  .courseCard:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--color-student-primary-light);
+  }
 }
 
 .courseCardImage { 
-  height: 140px; 
-  background-color: var(--card-bg, var(--color-gray-200)); 
-  border-bottom: 1px solid var(--color-gray-100);
+  height: 160px; 
+  background: linear-gradient(135deg, var(--color-gray-200), var(--color-gray-300));
+  position: relative;
 }
 @media (prefers-color-scheme: dark) {
-  .courseCardImage { border-bottom-color: var(--color-gray-700); }
+  .courseCardImage { 
+    background: linear-gradient(135deg, var(--color-gray-700), var(--color-gray-600));
+  }
 }
 
 .courseCardContent { 
@@ -112,31 +197,40 @@
   flex-grow: 1; 
   display: flex; 
   flex-direction: column; 
+  justify-content: space-between;
 }
 
 .courseCardContent h4 { 
-  font-size: 1.05rem; 
+  font-size: 1.125rem; 
   font-weight: 700; 
-  margin: 0 0 8px 0; 
-  color: var(--text-primary);
+  margin: 0 0 var(--spacing-2) 0; 
   line-height: 1.4;
+  color: var(--text-primary);
+  
+  /* Prevent overflow */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
 }
 
 .courseCardContent a { 
-  color: inherit; 
+  color: var(--text-primary); 
   text-decoration: none; 
+  display: block;
+  transition: var(--transition-base);
 }
 .courseCardContent a:hover { 
-  color: var(--color-student-primary); 
+  color: var(--color-student-primary);
+  text-decoration: none;
 }
-
 .courseProgress { 
-    margin-top: auto; 
-    padding-top: var(--spacing-2); 
+    margin-top: var(--spacing-2); 
 }
 .progressBar { 
     height: 6px; 
-    background-color: var(--color-gray-200); 
+    background-color: var(--color-gray-100); 
     border-radius: var(--border-radius-full); 
     overflow: hidden; 
 }
@@ -146,13 +240,96 @@
 
 .progressBarFill { 
     height: 100%; 
-    background-color: var(--color-success); 
+    background: linear-gradient(90deg, var(--color-student-primary), var(--color-student-primary-hover));
     border-radius: var(--border-radius-full); 
 }
 
 .progressLabel { 
-    font-size: 0.8rem; 
+    font-size: 0.75rem; 
     color: var(--text-secondary); 
     margin-top: 6px; 
-    font-weight: 500;
+    display: flex; 
+    justify-content: space-between;
+}
+
+.emptyState {
+  margin-top: var(--spacing-4);
+  padding: var(--spacing-5);
+  border-radius: var(--border-radius-lg);
+  border: 2px dashed var(--color-gray-300);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--spacing-3);
+}
+
+.emptyState p {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .emptyState {
+    border-color: var(--color-gray-600);
+    background-color: var(--color-gray-800);
+  }
+}
+
+@media (max-width: 1400px) {
+  .courseList {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .courseList {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .scrollWrapper {
+    max-height: 600px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-2);
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .carouselContainer {
+    margin-top: var(--spacing-2);
+  }
+
+  .courseList {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-2);
+  }
+  
+  .scrollWrapper {
+    max-height: none;
+    padding: 4px;
+  }
+  
+  .courseCardImage {
+    height: 140px;
+  }
+  
+  .emptyState {
+    padding: var(--spacing-4);
+  }
+
+  :root {
+    --card-width: 100%;
+  }
 }

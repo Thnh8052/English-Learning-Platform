@@ -7,7 +7,6 @@ import ForgotPasswordPage from "../pages/auth/ForgotPassword.jsx";
 import ResetPasswordPage from "../pages/auth/ResetPassword.jsx";
 
 import Courses from "../pages/courses/CourseList.jsx";
-import Discussion from "../pages/discussion/Discussion.jsx";
 import NotFound from "../pages/notFound/NotFound.jsx";
 import Dashboard from "../pages/dashboard/Dashboard.jsx";
 import CourseDashboard from "../pages/teacher/courseDashboard.jsx";
@@ -41,7 +40,6 @@ const router = createBrowserRouter([
       { path: "forgot-password", element: <ForgotPasswordPage /> },
       { path: "reset-password/:token", element: <ResetPasswordPage /> },
       { path: "courses", element: <Courses /> },
-      { path: "discussion", element: <Discussion /> },
       { path: "courses/:courseId", element: <CourseDetailPage /> },
       { path: "lessons/:lessonId", element: <LessonView /> },
 

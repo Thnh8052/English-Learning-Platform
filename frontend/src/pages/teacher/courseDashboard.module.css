@@ -82,7 +82,10 @@
 
 @media (prefers-color-scheme: dark) {
     .sidebar, .courseTitle, .section, .statCard { border-color: var(--color-gray-700); }
-    
+      .navItem:hover {
+    background-color: var(--color-gray-800);
+    color: var(--text-primary);
+    }
     .navItem.active { 
         background-color: rgba(124, 58, 237, 0.2); 
         color: var(--color-teacher-primary-light);

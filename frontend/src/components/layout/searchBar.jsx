@@ -1,30 +1,36 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './searchBar.module.css';
 
 const Searchbar = () => {
-    const [query, setQuery] = useState('');
-    const navigate = useNavigate();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-    const handleSearch = (e) => {
-        e.preventDefault();
-        if (query.trim()) {
-            navigate(`/courses?search=${encodeURIComponent(query)}`);
-            setQuery('');
-        }
-    };
+  const params = new URLSearchParams(location.search);
+  const query = params.get('search') || '';
 
-    return (
-        <form onSubmit={handleSearch} className={styles.searchBar}>
-            <input
-                type="search"
-                placeholder="Search courses..."
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-            />
-            {}
-        </form>
-    );
+  const handleChange = (e) => {
+    const value = e.target.value;
+    const newParams = new URLSearchParams(location.search);
+
+    if (value.trim()) {
+      newParams.set('search', value);
+    } else {
+      newParams.delete('search');
+    }
+
+    navigate(`/courses?${newParams.toString()}`, { replace: true });
+  };
+
+  return (
+    <form className={styles.searchBar} onSubmit={(e) => e.preventDefault()}>
+      <input
+        type="search"
+        placeholder="Search courses..."
+        value={query}
+        onChange={handleChange}
+      />
+    </form>
+  );
 };
 
 export default Searchbar;
