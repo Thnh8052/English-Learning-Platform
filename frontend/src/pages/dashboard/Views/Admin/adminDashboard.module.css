@@ -1,0 +1,162 @@
+.page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+  }
+  
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .subtitle {
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+  }
+  
+  .tabContainer {
+    display: flex;
+    gap: var(--spacing-2);
+    border-bottom: 2px solid var(--color-gray-200);
+    padding-bottom: var(--spacing-2);
+  }
+  @media (prefers-color-scheme: dark) {
+    .tabContainer { border-bottom-color: var(--color-gray-700); }
+  }
+  
+  .tabButton {
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: var(--transition-base);
+  }
+  
+  .tabButton:hover {
+    color: var(--text-primary);
+  }
+  
+  .tabButton.active {
+    color: var(--color-admin-primary);
+    border-bottom-color: var(--color-admin-primary);
+  }
+  
+  .listWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+  
+  .stateCard {
+    background: var(--bg-card);
+    border: var(--surface-border);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-3);
+    color: var(--text-secondary);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .courseList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+  
+  .courseItem {
+    padding: var(--spacing-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+    border: var(--surface-border);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .courseMeta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-2);
+  }
+  
+  .courseName {
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.05rem;
+  }
+  
+  .courseTeacher {
+    margin: 0.1rem 0 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+  }
+  
+  .status {
+    padding: 6px 12px;
+    border-radius: var(--border-radius-full);
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: capitalize;
+  }
+  
+  .pending {
+    background: var(--color-warning-light);
+    color: var(--color-warning-hover);
+  }
+  
+  .published {
+    background: var(--color-success-light);
+    color: var(--color-success-hover);
+  }
+  
+  .rejected {
+    background: var(--color-error-light);
+    color: var(--color-error-hover);
+  }
+  
+  .viewButton {
+    width: fit-content;
+  }
+  
+  
+  @media (max-width: 768px) {
+    .tabContainer {
+      flex-wrap: wrap;
+      gap: var(--spacing-1);
+    }
+  
+    .courseMeta {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .viewButton {
+      width: 100%;
+    }
+    .courseItem {
+    padding: var(--spacing-2);
+  }
+
+  .courseMeta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-1);
+  }
+
+  .viewButton {
+    width: 100%;
+  }
+  }
+  

@@ -7,139 +7,180 @@ import styles from './course.module.css';
 import CourseTooltip from '../../components/course/CourseTooltip.jsx';
 
 const CourseListPage = () => {
-    const location = useLocation();
-    const navigate = useNavigate();
-    const { user } = useAuth();
-    const { myCourses } = useCourses(); // Chỉ lấy myCourses để kiểm tra đã ghi danh chưa
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { myCourses } = useCourses();
 
-    const [displayedCourses, setDisplayedCourses] = useState([]);
-    const [loading, setLoading] = useState(true);
-    
-    // Đọc các giá trị filter ban đầu từ URL để khởi tạo state
-    const initialUrlParams = new URLSearchParams(location.search);
-    const [filters, setFilters] = useState({
-        category: initialUrlParams.get('category') || '',
-        level: initialUrlParams.get('level') || '',
-    });
+  const [displayedCourses, setDisplayedCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    const handleFilterChange = (e) => {
-        const { name, value } = e.target;
-        // Cập nhật URL khi người dùng thay đổi bộ lọc
-        const params = new URLSearchParams(location.search);
-        if (value) {
-            params.set(name, value);
-        } else {
-            params.delete(name);
-        }
-        navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+  // ✅ URL is the source of truth
+  const params = new URLSearchParams(location.search);
+  const category = params.get('category') || '';
+  const level = params.get('level') || '';
+  const hasActiveFilters = params.toString().length > 0;
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    const newParams = new URLSearchParams(location.search);
+
+    if (value) {
+      newParams.set(name, value);
+    } else {
+      newParams.delete(name);
+    }
+
+    navigate(`${location.pathname}?${newParams.toString()}`, { replace: true });
+  };
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      setLoading(true);
+      try {
+        const res = await api.get(`/courses${location.search}`);
+        setDisplayedCourses(res.data);
+      } catch (err) {
+        console.error('Failed to fetch courses:', err);
+        setDisplayedCourses([]);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    // useEffect sẽ chạy mỗi khi URL (location.search) thay đổi
-    useEffect(() => {
-        // Cập nhật lại state của filter từ URL (để giữ đồng bộ khi người dùng back/forward)
-        const params = new URLSearchParams(location.search);
-        setFilters({
-            category: params.get('category') || '',
-            level: params.get('level') || ''
-        });
+    fetchCourses();
+  }, [location.search]);
 
-        const fetchCourses = async () => {
-            setLoading(true);
-            try {
-                // Gửi toàn bộ query string của URL đến backend
-                const res = await api.get(`/courses${location.search}`);
-                setDisplayedCourses(res.data);
-            } catch (error) {
-                console.error("Failed to fetch courses:", error);
-                setDisplayedCourses([]);
-            } finally {
-                setLoading(false);
-            }
-        };
+  const myCourseIds = Array.isArray(myCourses)
+    ? myCourses.map(c => c._id)
+    : [];
 
-        fetchCourses();
-    }, [location.search]); // Dependency chính là location.search
+  return (
+    <div className={styles.pageContainer}>
+      {/* 🔹 Sticky Header + Filters */}
+      <div className={styles.headerBlock}>
+        <h1 className={styles.pageTitle}>
+          <p>Explore Courses</p>
+        </h1>
 
-    const myCourseIds = Array.isArray(myCourses) ? myCourses.map(course => course._id) : [];
+        <div className={styles.filterBar}>
+          <div className="form-group">
+            <label className="form-label">Category</label>
+            <select
+              name="category"
+              value={category}
+              onChange={handleFilterChange}
+              className="form-select"
+            >
+              <option value="">All Categories</option>
+              <option value="Speaking">Speaking</option>
+              <option value="Writing">Writing</option>
+              <option value="Listening">Listening</option>
+              <option value="Reading">Reading</option>
+              <option value="Grammar">Grammar</option>
+              <option value="Vocabulary">Vocabulary</option>
+            </select>
+          </div>
 
-    return (
-        <div className={styles.pageContainer}>
-            <h1 className={styles.pageTitle}>Explore Courses</h1>
-            <div className={styles.filterBar}>
-                <div className="form-group">
-                    <label className="form-label">Category</label>
-                    <select name="category" value={filters.category} onChange={handleFilterChange}  className="form-select">
-                        <option value="">All Categories</option>
-                        <option value="Speaking">Speaking</option>
-                        <option value="Writing">Writing</option>
-                        <option value="Listening">Listening</option>
-                        <option value="Reading">Reading</option>
-                        <option value="Grammar">Grammar</option>
-                        <option value="Vocabulary">Vocabulary</option>
-                        {/* Thêm các option khác */}
-                    </select>
-                </div>
-                <div className="form-group">
-                    <label className="form-label">Level</label>
-                    <select name="level" value={filters.level} onChange={handleFilterChange} className="form-select">
-                        <option value="">All</option>
-                        <option value="Beginner">Beginner</option>
-                        <option value="Intermediate">Intermediate</option>
-                        <option value="Advanced">Advanced</option>
-                    </select>
-                </div>
-            </div>
-
-            {loading ? (
-                <p className={styles.loadingText}>Loading...</p>
-            ) : displayedCourses.length === 0 ? (
-                <p className={styles.noCoursesText}>No courses found matching your criteria.</p>
-            ) : (
-                <div className={styles.courseGrid}>
-                    {displayedCourses.map(course => {
-                        const isEnrolled = user && user.role === 'student' && myCourseIds.includes(course._id);
-                        const isMyTeachingCourse = user && user.role === 'teacher' && course.teacher?._id === user.id;
-
-                        return (
-                            <Link to={`/courses/${course._id}`} key={course._id} className={styles.cardLink}>
-                                <div className={styles.courseCardContainer}>
-                                    <div className={styles.courseCard}>
-                                        <div className={styles.cardImage} style={{ backgroundColor: course.color }}>
-                                        </div>
-                                        <div className={styles.cardContent}>
-                                            <h4>{course.name}</h4>
-                                                  <div className={styles.cardMeta}>
-                                                    {course.bestseller && (
-                                                      <span className={styles.bestsellerTag}>
-                                                        Bestseller
-                                                      </span>
-                                                    )}
-                                                  </div>
-                                            <p className={styles.teacherName}>Taught by: {course.teacher?.name || '...'}</p>
-                                            {user && user.role === 'student' && (isEnrolled ? (
-                                                <div className={`${styles.btn} ${styles.btnUnenroll}`}>
-                                                    <span>✓ Enrolled</span>
-                                                </div>
-                                            ) : (
-                                                <div className={`${styles.btn} ${styles.btnEnroll}`}>View Details</div>
-                                            ))}
-
-                                            {user && isMyTeachingCourse && (
-                                                <div className={styles.tag}>
-                                                    <span>Your  Course</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    {<CourseTooltip course={course} />}
-                                </div>
-                            </Link>
-                        );
-                    })}
-                </div>
-            )}
+          <div className="form-group">
+            <label className="form-label">Level</label>
+            <select
+              name="level"
+              value={level}
+              onChange={handleFilterChange}
+              className="form-select"
+            >
+              <option value="">All</option>
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+          </div>
         </div>
-    );
+      </div>
+
+      {/* 🔹 Content */}
+      {loading ? (
+        <p className={styles.loadingText}>Loading...</p>
+      ) : displayedCourses.length === 0 ? (
+        <div className={styles.emptyState}>
+          <p className={styles.noCoursesText}>
+            No courses match your current filters.
+          </p>
+
+          {hasActiveFilters && (
+            <button
+              className="btn btn-outline"
+              onClick={() => navigate('/courses')}
+            >
+              Clear filters & view all courses
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className={styles.courseGrid}>
+          {displayedCourses.map(course => {
+            const isEnrolled =
+              user?.role === 'student' && myCourseIds.includes(course._id);
+
+            const isMyTeachingCourse =
+              user?.role === 'teacher' && course.teacher?._id === user.id;
+
+            return (
+              <Link
+                to={`/courses/${course._id}`}
+                key={course._id}
+                className={styles.cardLink}
+              >
+                <div className={styles.courseCardContainer}>
+                  <div className={styles.courseCard}>
+                    <div
+                      className={styles.cardImage}
+                      style={{ backgroundColor: course.color }}
+                    />
+
+                    <div className={styles.cardContent}>
+                      <h4>{course.name}</h4>
+
+                      <div className={styles.cardMeta}>
+                        {course.bestseller && (
+                          <span className={styles.bestsellerTag}>
+                            Bestseller
+                          </span>
+                        )}
+                      </div>
+
+                      <p className={styles.teacherName}>
+                        Taught by: {course.teacher?.name || '...'}
+                      </p>
+
+                      {user?.role === 'student' && (
+                        isEnrolled ? (
+                          <div className={`${styles.btn} ${styles.btnUnenroll}`}>
+                            ✓ Enrolled
+                          </div>
+                        ) : (
+                          <div className={`${styles.btn} ${styles.btnEnroll}`}>
+                            View Details
+                          </div>
+                        )
+                      )}
+
+                      {isMyTeachingCourse && (
+                        <div className={styles.tag}>Your Course</div>
+                      )}
+                    </div>
+                  </div>
+
+                  <CourseTooltip course={course} />
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default CourseListPage;

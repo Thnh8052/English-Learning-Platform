@@ -1,8 +1,7 @@
-// src/pages/dashboard/Views/Admin/AdminView.jsx
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../../../services/api';
-import styles from '../Teacher/teacherView.module.css';
+import styles from './adminDashboard.module.css';
 
 const AdminView = ({ user }) => {
     const [activeTab, setActiveTab] = useState('pending');
@@ -41,41 +40,65 @@ const AdminView = ({ user }) => {
     }, [activeTab]);
 
 return (
-        <div>
-            <h2>🛠️ Admin Dashboard, {user.name}</h2>
-            
-            <div className={styles.tabContainer} style={{ marginTop: 'var(--spacing-4)' }}>
-                <button className={`${styles.tabButton} ${activeTab === 'pending' ? styles.active : ''}`} onClick={() => setActiveTab('pending')}>
+        <section className={`section ${styles.page}`}>
+            <header className="section-header">
+                <div>
+                    <p className={styles.eyebrow}>Admin</p>
+                    <h2 className="section-title">Course Review</h2>
+                    <p className={styles.subtitle}>
+                        Approve, request changes, or reject courses awaiting your review.
+                    </p>
+                </div>
+            </header>
+
+            <div className={styles.tabContainer}>
+                <button
+                    className={`${styles.tabButton} ${activeTab === 'pending' ? styles.active : ''}`}
+                    onClick={() => setActiveTab('pending')}
+                >
                     Pending Review
                 </button>
-                <button className={`${styles.tabButton} ${activeTab === 'published' ? styles.active : ''}`} onClick={() => setActiveTab('published')}>
+                <button
+                    className={`${styles.tabButton} ${activeTab === 'published' ? styles.active : ''}`}
+                    onClick={() => setActiveTab('published')}
+                >
                     Published
                 </button>
-                <button className={`${styles.tabButton} ${activeTab === 'rejected' ? styles.active : ''}`} onClick={() => setActiveTab('rejected')}>
+                <button
+                    className={`${styles.tabButton} ${activeTab === 'rejected' ? styles.active : ''}`}
+                    onClick={() => setActiveTab('rejected')}
+                >
                     Rejected
                 </button>
             </div>
             
-            <div style={{ marginTop: 'var(--spacing-3)' }}>
-                {loading ? <p>Loading...</p> : (
-                    courses.length === 0 ? <p>No courses in this category.</p> : (
-                        <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            {courses.map(course => (
-                                <li key={course._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: '#fff', borderRadius: '8px', border: '1px solid #eee' }}>
+            <div className={styles.listWrapper} aria-live="polite">
+                {loading ? (
+                    <div className={styles.stateCard}>Loading...</div>
+                ) : courses.length === 0 ? (
+                    <div className={styles.stateCard}>No courses in this category.</div>
+                ) : (
+                    <ul className={styles.courseList}>
+                        {courses.map(course => (
+                            <li key={course._id} className={`card ${styles.courseItem}`}>
+                                <div className={styles.courseMeta}>
                                     <div>
-                                        <strong>{course.name}</strong>
-                                        <p style={{ margin: 0, color: 'var(--color-gray-500)' }}>by {course.teacher?.name}</p>
+                                        <p className={styles.courseName}>{course.name}</p>
+                                        <p className={styles.courseTeacher}>by {course.teacher?.name || 'Unknown'}</p>
                                     </div>
-                                    <Link to={`/admin/review/${course._id}`} className="btn btn-secondary">
-                                        View & Review
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    )
+                                    <span className={`${styles.status} ${styles[activeTab]}`}>
+                                        {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+                                    </span>
+                                </div>
+                                <Link to={`/admin/review/${course._id}`} className={`btn btn-outline ${styles.viewButton}`}>
+                                    View & Review
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
                 )}
             </div>
-        </div>
+        </section>
     );
 };
 

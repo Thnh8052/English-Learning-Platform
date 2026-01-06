@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./Header.module.css";
-import avatarDefault from "../../assets/default-avatar.png";
+import avatarDefault from "/assets/default-avatar.png";
 import Searchbar from "./searchBar";
 
 
@@ -20,7 +20,7 @@ export default function StudentHeader() {
   const profileRef = useRef(null);
   const notifRef = useRef(null);
 
-  // 🔹 Đóng dropdown khi click ra ngoài
+  //Đóng dropdown khi click ra ngoài
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) {
@@ -36,7 +36,6 @@ export default function StudentHeader() {
 
   return (
     <nav className={styles.StudentHeader}>
-      {/* Logo */}
       <NavLink to="/" className={styles.logo}>
         IELTS Hub
       </NavLink>
