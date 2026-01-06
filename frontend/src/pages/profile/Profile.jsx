@@ -1,203 +1,229 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import styles from "./Profile.module.css";
+import api from "../../services/api";
+import styles from "./profile.module.css";
+import { DEFAULT_AVATAR } from "../../constants/media";
 
-export default function Profile() {
-  const { user, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState("general");
-  const fileInputRef = useRef(null);
+const Profile = () => {
+  const { user, logout, updateUser } = useAuth();
 
-  // State giả lập dữ liệu form (lấy user làm default)
+  const [activeTab, setActiveTab] = useState("profile");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+
+  /* ---------------- PROFILE INFO ---------------- */
   const [formData, setFormData] = useState({
     name: user?.name || "",
-    email: user?.email || "",
-    phone: "",
-    bio: "",
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: ""
+    bio: user?.bio || "",
   });
 
-  const [avatarPreview, setAvatarPreview] = useState(user?.avatar || null);
+  /* ---------------- PASSWORD ---------------- */
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
 
-  // Xử lý thay đổi input
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  /* ---------------- AVATAR ---------------- */
+  const [avatarPreview, setAvatarPreview] = useState(user?.avatar || "");
+
+  /* ---------------- HANDLERS ---------------- */
+  const handleProfileChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Xử lý click chọn ảnh
-  const handleAvatarClick = () => {
-    fileInputRef.current.click();
+  const handlePasswordChange = (e) => {
+    setPasswordData({ ...passwordData, [e.target.name]: e.target.value });
   };
 
-  // Xử lý xem trước ảnh khi chọn file
-  const handleFileChange = (e) => {
+  /* ---------------- AVATAR UPLOAD (CLOUDINARY) ---------------- */
+  const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    setAvatarPreview(URL.createObjectURL(file));
+
+    try {
+      const form = new FormData();
+      form.append("avatar", file);
+
+      const res = await api.post("/users/upload/avatar", form);
+      updateUser({ ...user, avatar: res.data.url });
+      setMessage("Avatar updated");
+    } catch (err) {
+      console.error(err);
+      setAvatarPreview(user.avatar);
+      setMessage("Avatar upload failed");
     }
   };
 
-  // Giả lập lưu thông tin
-  const handleSubmit = (e) => {
+  /* ---------------- UPDATE PROFILE ---------------- */
+const handleProfileSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setMessage("");
+
+  try {
+    const res = await api.put("/users/profile", formData);
+
+    updateUser({
+      ...user,
+      ...res.data,
+      avatar: user.avatar, // preserve avatar from upload endpoint
+    });
+
+    setMessage("Profile updated successfully");
+  } catch (err) {
+    console.error(err);
+    setMessage("Profile update failed");
+  } finally {
+    setLoading(false);
+  }
+};
+
+  /* ---------------- CHANGE PASSWORD ---------------- */
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault();
-    alert("Đã lưu thông tin thành công (UI Only)!");
-    // Sau này sẽ gọi API updateProfile tại đây
+    setMessage("");
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      return setMessage("Passwords do not match");
+    }
+
+    try {
+      await api.put("/users/change-password", {
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+      });
+
+      setMessage("Password updated successfully");
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    } catch (err) {
+      console.error(err);
+      setMessage("Password update failed");
+    }
   };
 
   return (
     <div className={styles.container}>
-      
-      {/* --- SIDEBAR TRÁI --- */}
       <aside className={styles.sidebar}>
-        <div className={styles.profileHeader}>
-          <div className={styles.avatarWrapper} onClick={handleAvatarClick}>
-            <div className={styles.avatar}>
-              {avatarPreview ? (
-                <img src={avatarPreview} alt="Avatar" />
-              ) : (
-                user?.name?.charAt(0).toUpperCase() || "U"
-              )}
-            </div>
-            <div className={styles.editOverlay}>📷</div>
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              style={{display: 'none'}} 
-              onChange={handleFileChange} 
-              accept="image/*"
-            />
-          </div>
-          <h3 className={styles.userName}>{user?.name}</h3>
-          <span className={styles.userRole}>{user?.role}</span>
-        </div>
+        <label className={styles.avatarWrapper}>
+          <img src={avatarPreview || user.avatar || DEFAULT_AVATAR} alt="avatar"
+            onError={(e) => {
+            e.currentTarget.src = DEFAULT_AVATAR;
+          }}/>
+          <input type="file" hidden onChange={handleAvatarChange} />
+        </label>
+
+        <h3 className={styles.userName}>{user.name}</h3>
+        <span className={styles.userRole}>{user.role}</span>
 
         <nav className={styles.navMenu}>
-          <button 
-            className={`${styles.navItem} ${activeTab === 'general' ? styles.active : ''}`}
-            onClick={() => setActiveTab('general')}
+          <button
+            className={`${styles.navItem} ${activeTab === "profile" ? styles.active : ""}`}
+            onClick={() => setActiveTab("profile")}
           >
-            <span>👤</span> Thông tin chung
+            Profile
           </button>
-          <button 
-            className={`${styles.navItem} ${activeTab === 'password' ? styles.active : ''}`}
-            onClick={() => setActiveTab('password')}
+          <button
+            className={`${styles.navItem} ${activeTab === "password" ? styles.active : ""}`}
+            onClick={() => setActiveTab("password")}
           >
-            <span>🔒</span> Đổi mật khẩu
+            Password
           </button>
-          
-          <button className={`${styles.navItem} ${styles.logoutBtn}`} onClick={logout}>
-            <span>🚪</span> Đăng xuất
+          <button
+            className={`${styles.navItem} ${activeTab === "security" ? styles.active : ""}`}
+            onClick={() => setActiveTab("security")}
+          >
+            Security
           </button>
         </nav>
       </aside>
 
-      {/* --- NỘI DUNG PHẢI --- */}
-      <main className={styles.contentPanel}>
-        {activeTab === 'general' && (
-          <form onSubmit={handleSubmit}>
-            <h2 className={styles.panelTitle}>Thông tin cá nhân</h2>
-            <p className={styles.panelDesc}>Quản lý thông tin hiển thị của bạn</p>
+      <section className={styles.contentPanel}>
+        {message && <p className={styles.message}>{message}</p>}
 
-            <div className={styles.formGrid}>
-              <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label>Họ và tên</label>
-                <input 
-                  type="text" 
-                  name="name" 
-                  className={styles.input}
-                  value={formData.name} 
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>Email</label>
-                <input 
-                  type="email" 
-                  className={styles.input}
-                  value={formData.email} 
-                  disabled // Thường email không cho sửa trực tiếp
-                  title="Không thể thay đổi email"
-                />
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>Số điện thoại</label>
-                <input 
-                  type="text" 
-                  name="phone"
-                  className={styles.input}
-                  value={formData.phone} 
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label>Giới thiệu bản thân (Bio)</label>
-                <textarea 
-                  name="bio"
-                  rows="4"
-                  className={styles.input}
-                  value={formData.bio} 
-                  onChange={handleChange}
-                ></textarea>
-              </div>
+        {activeTab === "profile" && (
+          <form onSubmit={handleProfileSubmit} className={styles.formGrid}>
+            <div className={styles.formGroup}>
+              <label>Full name</label>
+              <input
+                className={styles.input}
+                name="name"
+                value={formData.name}
+                onChange={handleProfileChange}
+              />
             </div>
 
-            <button type="submit" className={styles.saveBtn}>Lưu thay đổi</button>
+            <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+              <label>Bio</label>
+              <textarea
+                className={styles.input}
+                name="bio"
+                value={formData.bio}
+                onChange={handleProfileChange}
+              />
+            </div>
+
+            <button className={styles.saveBtn} disabled={loading}>
+              {loading ? "Saving..." : "Save changes"}
+            </button>
           </form>
         )}
 
-        {activeTab === 'password' && (
-          <form onSubmit={handleSubmit}>
-            <h2 className={styles.panelTitle}>Đổi mật khẩu</h2>
-            <p className={styles.panelDesc}>Vui lòng đặt mật khẩu mạnh để bảo mật tài khoản</p>
-
-            <div className={styles.formGrid}>
-              <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label>Mật khẩu hiện tại</label>
-                <input 
-                  type="password" 
-                  name="currentPassword"
-                  className={styles.input}
-                  value={formData.currentPassword} 
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label>Mật khẩu mới</label>
-                <input 
-                  type="password" 
-                  name="newPassword"
-                  className={styles.input}
-                  value={formData.newPassword} 
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label>Xác nhận mật khẩu mới</label>
-                <input 
-                  type="password" 
-                  name="confirmPassword"
-                  className={styles.input}
-                  value={formData.confirmPassword} 
-                  onChange={handleChange}
-                />
-              </div>
+        {activeTab === "password" && (
+          <form onSubmit={handlePasswordSubmit} className={styles.formGrid}>
+            <div className={styles.formGroup}>
+              <label>Current password</label>
+              <input
+                className={styles.input}
+                type="password"
+                name="currentPassword"
+                value={passwordData.currentPassword}
+                onChange={handlePasswordChange}
+              />
             </div>
 
-            <button type="submit" className={styles.saveBtn}>Cập nhật mật khẩu</button>
+            <div className={styles.formGroup}>
+              <label>New password</label>
+              <input
+                className={styles.input}
+                type="password"
+                name="newPassword"
+                value={passwordData.newPassword}
+                onChange={handlePasswordChange}
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label>Confirm password</label>
+              <input
+                className={styles.input}
+                type="password"
+                name="confirmPassword"
+                value={passwordData.confirmPassword}
+                onChange={handlePasswordChange}
+              />
+            </div>
+
+            <button className={styles.saveBtn}>Update password</button>
           </form>
         )}
-      </main>
+
+        {activeTab === "security" && (
+          <div className={styles.dangerZone}>
+            <button className={styles.logoutBtn} onClick={logout}>
+              Log out
+            </button>
+          </div>
+        )}
+      </section>
     </div>
   );
-}
+};
+
+export default Profile;

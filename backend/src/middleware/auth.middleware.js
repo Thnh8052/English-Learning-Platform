@@ -12,13 +12,13 @@ export const protect = async (req, res, next) => {
       token = req.headers.authorization.split(" ")[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.user = await User.findById(decoded.id).select("-password");
-      next();
+      return next();
     } catch (err) {
       return res.status(401).json({ message: "Token không hợp lệ" });
     }
   }
 
-  if (!token) return res.status(401).json({ message: "Không có token" });
+  return res.status(401).json({ message: "Không có token" });
 };
 
 
