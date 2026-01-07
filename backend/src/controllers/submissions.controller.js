@@ -518,11 +518,15 @@ export const gradeSubmission = async (req, res) => {
         
         score.overall = overallScore; 
 
+        if (!submission.score) submission.score = {};
+
         submission.score.teacher = {
             overall: overallScore,
             details: JSON.stringify(score),
             timestamp: new Date()
         };
+
+        submission.markModified('score'); 
         submission.feedback = feedback;
         submission.status = 'completed';
         submission.gradedBy = req.user.id;

@@ -340,13 +340,6 @@ const EditCoursePage = () => {
                                                     )}
 
                                                     <button
-                                                        onClick={() => handleOpenEditLessonModal(lesson)}
-                                                        className="btn btn-outline btn-sm"
-                                                    >
-                                                        Edit Info
-                                                    </button>
-
-                                                    <button
                                                         onClick={() => handleDeleteLesson(module._id, lesson._id)}
                                                         className="btn btn-danger-outline btn-sm"
                                                     >

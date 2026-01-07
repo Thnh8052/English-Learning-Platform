@@ -60,7 +60,6 @@ const LessonModal = ({ isOpen, onClose, onSave, moduleId }) => {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 
-                {/* --- NEW HEADER WITH CLOSE BUTTON --- */}
                 <div className={styles.modalHeader}>
                     <h3>Add New Lesson</h3>
                     <button type="button" className={styles.closeBtn} onClick={onClose}>

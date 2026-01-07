@@ -23,8 +23,7 @@ const Login = () => {
     setLoading(false);
 
     if (res.success) {
-      const from = location.state?.from?.pathname || "/dashboard";
-      navigate(from, { replace: true });
+    navigate("/", { replace: true });
     } else {
       setError(res.message);
     }

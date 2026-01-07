@@ -44,8 +44,6 @@ const StudentSubmissionDetail = () => {
     const getAudioSrc = (path) => {
         if (!path) return '';
         if (path.startsWith('http')) return path;
-
-        // Xử lý đường dẫn Windows (\) thành (/)
         let cleanPath = path.replace(/\\/g, '/');
         if (cleanPath.startsWith('/')) cleanPath = cleanPath.substring(1);
 
@@ -57,9 +55,7 @@ const StudentSubmissionDetail = () => {
     if (!submission) return <div className={styles.container}>Không tìm thấy dữ liệu.</div>;
 
     const { lesson, score, feedback, status, content, answers, aiResult } = submission;
-    
-    // --- HÀM RENDER BOX ĐIỂM SỐ (DÙNG CHUNG CHO CẢ AI VÀ GIÁO VIÊN) ---
-    const renderScoreCard = (scoreData, title, isOfficial) => {
+        const renderScoreCard = (scoreData, title, isOfficial) => {
         if (!scoreData) return null;
 
         // Xử lý Quiz

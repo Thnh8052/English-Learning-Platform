@@ -30,7 +30,7 @@ const ResetPasswordPage = () => {
             setAuthData(res.data);
 
             setTimeout(() => {
-                navigate('/dashboard');
+                navigate('/login');
             }, 2000);
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to reset password.');
@@ -77,7 +77,7 @@ const ResetPasswordPage = () => {
                 )}
                 
                 <div className={styles.switchText} style={{ marginTop: '1.5rem' }}>
-                    <Link to="/login" className={styles.link}>← Back to Dashboard</Link>
+                    <Link to="/login" className={styles.link}>← Back to Login</Link>
                 </div>
             </div>
         </div>

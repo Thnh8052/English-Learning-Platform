@@ -1,7 +1,7 @@
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { useState } from "react";
-import styles from "./Auth.module.css";
+import styles from "./Auth.module.css"; 
 
 export function Register() {
   const { register } = useAuth();
@@ -46,7 +46,7 @@ export function Register() {
     setLoading(false);
 
     if (res.success) {
-      navigate("/");
+    navigate("/login");
     } else {
       setError(res.message);
     }
@@ -62,6 +62,7 @@ export function Register() {
 
         <form onSubmit={handleSubmit} className={styles.form}>
           
+          {/* Full Name */}
           <div className={styles.formGroup}>
             <label className={styles.label}>Full Name</label>
             <input
@@ -75,6 +76,7 @@ export function Register() {
             />
           </div>
 
+          {/* Email */}
           <div className={styles.formGroup}>
             <label className={styles.label}>Email Address</label>
             <input
@@ -87,8 +89,21 @@ export function Register() {
               required
             />
           </div>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>I am a...</label>
+            <select
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className={styles.input}
+                style={{ cursor: 'pointer' }}
+            >
+                <option value="student">Student (I want to learn)</option>
+                <option value="teacher">Teacher (I want to teach)</option>
+            </select>
+          </div>
 
-          {/* Date of Birth Group */}
+          {/* Date of Birth */}
           <div className={styles.formGroup}>
             <label className={styles.label}>Date of Birth</label>
             <div className={styles.dobGroup}>
