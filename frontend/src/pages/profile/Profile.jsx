@@ -11,6 +11,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
+
   /* ---------------- PROFILE INFO ---------------- */
   const [formData, setFormData] = useState({
     name: user?.name || "",
@@ -26,6 +27,8 @@ const Profile = () => {
 
   /* ---------------- AVATAR ---------------- */
   const [avatarPreview, setAvatarPreview] = useState(user?.avatar || "");
+  const [uploadedAvatarUrl, setUploadedAvatarUrl] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   /* ---------------- HANDLERS ---------------- */
   const handleProfileChange = (e) => {
@@ -36,50 +39,66 @@ const Profile = () => {
     setPasswordData({ ...passwordData, [e.target.name]: e.target.value });
   };
 
-  /* ---------------- AVATAR UPLOAD (CLOUDINARY) ---------------- */
-  const handleAvatarChange = async (e) => {
+  /* ---------------- AVATAR UPLOAD (FIXED) ---------------- */
+const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    setAvatarPreview(URL.createObjectURL(file));
+    setAvatarPreview(URL.createObjectURL(file)); 
+    setIsUploading(true);
+    setMessage("Uploading image...");
 
     try {
       const form = new FormData();
       form.append("avatar", file);
 
-      const res = await api.post("/users/upload/avatar", form);
-      updateUser({ ...user, avatar: res.data.url });
-      setMessage("Avatar updated");
+      //Upload to Cloudinary
+      const uploadRes = await api.post("/users/upload/avatar", form);
+      
+      //Store the returned URL in a temporary state (Don't save to DB yet)
+      setUploadedAvatarUrl(uploadRes.data.url);
+      
+      setMessage("Image uploaded. Click 'Save changes' to apply.");
     } catch (err) {
       console.error(err);
       setAvatarPreview(user.avatar);
       setMessage("Avatar upload failed");
+    } finally {
+      setIsUploading(false);
     }
   };
 
-  /* ---------------- UPDATE PROFILE ---------------- */
+  /* ---------------- UPDATE PROFILE (TEXT) ---------------- */
 const handleProfileSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setMessage("");
+    e.preventDefault();
+    setLoading(true);
+    setMessage("");
 
-  try {
-    const res = await api.put("/users/profile", formData);
+    try {
+      const payload = {
+        name: formData.name,
+        bio: formData.bio,
+      };
 
-    updateUser({
-      ...user,
-      ...res.data,
-      avatar: user.avatar, // preserve avatar from upload endpoint
-    });
+      if (uploadedAvatarUrl) {
+        payload.avatar = uploadedAvatarUrl;
+      }
 
-    setMessage("Profile updated successfully");
-  } catch (err) {
-    console.error(err);
-    setMessage("Profile update failed");
-  } finally {
-    setLoading(false);
-  }
-};
+      const res = await api.put("/users/profile", payload);
+
+      updateUser({
+        ...user,
+        ...res.data,
+      });
+
+      setMessage("Profile updated successfully!");
+    } catch (err) {
+      console.error(err);
+      setMessage("Profile update failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   /* ---------------- CHANGE PASSWORD ---------------- */
   const handlePasswordSubmit = async (e) => {
@@ -112,11 +131,16 @@ const handleProfileSubmit = async (e) => {
     <div className={styles.container}>
       <aside className={styles.sidebar}>
         <label className={styles.avatarWrapper}>
-          <img src={avatarPreview || user.avatar || DEFAULT_AVATAR} alt="avatar"
-            onError={(e) => {
-            e.currentTarget.src = DEFAULT_AVATAR;
-          }}/>
-          <input type="file" hidden onChange={handleAvatarChange} />
+          <img 
+            src={avatarPreview || user.avatar || DEFAULT_AVATAR} 
+            alt="avatar"
+            className={styles.avatarImage}
+            onError={(e) => { e.currentTarget.src = DEFAULT_AVATAR; }}
+          />
+          <div className={styles.avatarOverlay}>
+             <span>Change</span>
+          </div>
+          <input type="file" hidden onChange={handleAvatarChange} accept="image/*" />
         </label>
 
         <h3 className={styles.userName}>{user.name}</h3>
@@ -168,10 +192,12 @@ const handleProfileSubmit = async (e) => {
                 onChange={handleProfileChange}
               />
             </div>
-
-            <button className={styles.saveBtn} disabled={loading}>
-              {loading ? "Saving..." : "Save changes"}
-            </button>
+          <button 
+            className={styles.saveBtn} 
+            disabled={loading || isUploading}
+          >
+            {loading ? "Saving..." : isUploading ? "Uploading Image..." : "Save changes"}
+          </button>
           </form>
         )}
 

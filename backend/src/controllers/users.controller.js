@@ -76,13 +76,12 @@ export const uploadAvatarController = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
-
-    // Cloudinary returns the URL in req.file.path
-    const avatarUrl = req.file.path;
-
-    res.json({ url: avatarUrl });
+    res.json({
+      message: "Avatar uploaded successfully",
+      url: req.file.path, 
+    });
   } catch (err) {
-    console.error("❌ Avatar upload error:", err);
-    res.status(500).json({ message: "Avatar upload failed" });
+    console.error("❌ Upload avatar error:", err);
+    res.status(500).json({ message: "Failed to upload avatar" });
   }
 };
