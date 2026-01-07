@@ -67,7 +67,7 @@ const refreshMyCourses = async () => {
   }
 };
   const visibleMyCourses = useMemo(() => {
-    return myCourses.filter(course => course.status !== "rejected");
+    return myCourses.filter(course => course && course.status !== "rejected");
   }, [myCourses]);
   const addCourse = async (courseData) => {};
   const enrollCourse = async (courseId) => {

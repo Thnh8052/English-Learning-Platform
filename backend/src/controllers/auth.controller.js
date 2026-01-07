@@ -40,6 +40,8 @@ export const register = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        avatar: user.avatar,
+        bio: user.bio,
       },
     });
   } catch (err) {
@@ -65,6 +67,8 @@ export const login = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        avatar: user.avatar,
+        bio: user.bio,
       },
     });
   } catch (err) {
@@ -154,6 +158,8 @@ export const resetPassword = async (req, res) => {
             name: user.name,
             email: user.email,
             role: user.role,
+            avatar: user.avatar,
+            bio: user.bio,
         },
     });
   } catch (err) {

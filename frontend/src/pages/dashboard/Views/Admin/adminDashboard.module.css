@@ -129,6 +129,185 @@
   .viewButton {
     width: fit-content;
   }
+  /* Table Styles */
+.tableWrapper {
+  overflow-x: auto;
+  border: var(--surface-border);
+  border-radius: var(--border-radius-lg);
+  background: var(--bg-card);
+}
+
+.userTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.userTable th {
+  text-align: left;
+  padding: var(--spacing-3);
+  background: var(--bg-body);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.userTable td {
+  padding: var(--spacing-3);
+  border-top: 1px solid var(--surface-border);
+  color: var(--text-primary);
+}
+
+.userCell {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.miniAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.userName {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.userEmail {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.roleBadge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.roleBadge.admin { background: #e0e7ff; color: #4338ca; }
+.roleBadge.teacher { background: #dcfce7; color: #166534; }
+.roleBadge.student { background: #f3f4f6; color: #374151; }
+
+.deleteBtn {
+  background: transparent;
+  color: var(--color-error);
+  border: 1px solid var(--color-error);
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+.deleteBtn:hover {
+  background: var(--color-error);
+  color: white;
+}
+
+/* Modal Styles */
+.modalOverlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.modalContent {
+  background: var(--bg-card);
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeader {
+  padding: var(--spacing-3);
+  border-bottom: 1px solid var(--surface-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modalHeader h3 { margin: 0; font-size: 1.25rem; }
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+.modalBody {
+  padding: var(--spacing-3);
+  overflow-y: auto;
+}
+
+.studentList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.studentItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-2) 0;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.actionRow {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+}
+
+.dateInfo {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.kickBtn {
+    background: var(--color-error-light);
+    color: var(--color-error);
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+.kickBtn:hover {
+    background: var(--color-error);
+    color: white;
+}
+
+/* Button Helpers */
+.actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.secondaryBtn {
+  background: var(--bg-body);
+  color: var(--text-primary);
+  border: 1px solid var(--surface-border);
+  padding: 0.5rem 1rem;
+}
   
   
   @media (max-width: 768px) {

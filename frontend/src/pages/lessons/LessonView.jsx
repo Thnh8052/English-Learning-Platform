@@ -54,14 +54,26 @@ const WritingComponent = ({ lesson, onSubmit }) => {
 
 const SubmissionResultCard = ({ submission, onReview, onRetry, canRetry }) => {
     const getScoreDisplay = () => {
-        const { score } = submission;
-        if (score === null || score === undefined) return 'Chờ chấm';
-        if (typeof score === 'object') {
-            if (score.overall !== undefined && score.overall !== null) return score.overall;
-            if (score.correct !== undefined) return `${score.correct}/${score.total}`;
-            return 'Đã nộp';
+        const { score, status } = submission;
+        if (!score) return 'Chờ chấm';
+
+        if (score.percentage !== undefined) return `${score.percentage}%`;
+        if (score.correct !== undefined) return `${score.correct}/${score.total}`;
+
+        if (score.teacher) {
+            if (score.teacher.overall !== undefined) return score.teacher.overall;
+            if (score.teacher.percentage !== undefined) return `${score.teacher.percentage}%`;
         }
-        return score;
+
+        if (score.ai && score.ai.overall !== undefined) {
+            return `${score.ai.overall} (AI)`;
+        }
+
+        if (score.overall !== undefined) return score.overall;
+
+        if (status === 'completed') return 'Đã chấm';
+
+        return 'Chờ chấm';
     };
 
     const isCompleted = submission.status === 'completed';
@@ -181,14 +193,18 @@ const LessonView = () => {
   };
 
   const getHistoryScore = (sub) => {
-      if (!sub.score) return '...';
-      if (typeof sub.score === 'object') {
-          if (sub.score.overall !== undefined) return sub.score.overall;
-          if (sub.score.percentage !== undefined) return `${sub.score.percentage}%`;
-          return '-';
-      }
-      return sub.score;
-  };
+    if (!sub.score) return '-';
+    // Check Teacher Score
+    if (sub.score.teacher) {
+        if (sub.score.teacher.overall !== undefined) return sub.score.teacher.overall;
+        if (sub.score.teacher.percentage !== undefined) return `${sub.score.teacher.percentage}%`;
+    }
+    // Check Flat Score (Quiz)
+    if (sub.score.percentage !== undefined) return `${sub.score.percentage}%`;
+    if (sub.score.overall !== undefined) return sub.score.overall;
+    
+    return '-';
+};
 
   if (loading) return <div className={styles.container}>Đang tải...</div>;
   if (error) return <div className={styles.container}><p className={styles.errorText}>{error}</p></div>;
