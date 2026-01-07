@@ -66,7 +66,7 @@ app.get("/", (req, res) => res.send("Backend API is running..."));
 app.use((err, req, res, next) => {
     console.error("❌ Error:", err);
 
-    // Xử lý lỗi Mongoose Validation (ví dụ lỗi thiếu field content)
+    // Xử lý lỗi Mongoose Validation
     if (err.name === 'ValidationError') {
         const messages = Object.values(err.errors).map(val => val.message);
         return res.status(400).json({
