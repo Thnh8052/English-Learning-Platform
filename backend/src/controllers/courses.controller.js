@@ -38,6 +38,25 @@ export const getAllCourses = async (req, res) => {
         res.status(500).json({ message: "Lỗi máy chủ" });
     }
 };
+/**
+ * @desc    Lấy danh sách khóa học hiển thị trên Homepage
+ * @route   GET /api/courses/home
+ * @access  Public
+ */
+export const getHomeCourses = async (req, res) => {
+    try {
+        const courses = await Course.find({ status: 'published' })
+            .sort({ createdAt: -1 })   // mới nhất trước
+            .limit(6)                  // chỉ lấy 6 khóa
+            .select('name summary color category level teacher')
+            .populate('teacher', 'name');
+
+        res.json(courses);
+    } catch (err) {
+        console.error("Lỗi khi lấy khóa học trang chủ:", err);
+        res.status(500).json({ message: "Lỗi máy chủ" });
+    }
+};
 
 /**
  * @desc    Lấy chi tiết một khóa học dựa trên ID
@@ -103,15 +122,17 @@ export const getMyEnrolledCourses = async (req, res) => {
     try {
         const enrollments = await Enrollment.find({ student: req.user.id })
             .populate({
-                path: 'course', // Populate thông tin khóa học từ Enrollment
+                path: 'course', 
                 populate: {
-                    path: 'teacher', // Populate tiếp thông tin giáo viên từ trong Course
-                    select: 'name' // Chỉ lấy tên
+                    path: 'teacher', 
+                    select: 'name' 
                 }
             });
 
-        // Trả về một mảng chỉ chứa thông tin các khóa học
-        const courses = enrollments.map(enrollment => enrollment.course);
+        const courses = enrollments
+            .map(enrollment => enrollment.course)
+            .filter(course => course !== null); //
+
         res.json(courses);
     } catch (err) {
         console.error("Lỗi khi lấy khóa học đã đăng ký:", err);
@@ -440,26 +461,29 @@ export const getCourseDashboard = async (req, res) => {
 
 /**
  * @desc    Lấy danh sách học viên đã đăng ký khóa học
- * @route   GET /api/courses/:courseId/students
+ * @route   GET /api/courses/:id/students
  */
 export const getEnrolledStudents = async (req, res) => {
     try {
-        const { courseId } = req.params;
+        const courseId = req.params.id;
         
         // Tìm enrollment và populate thông tin student
         const enrollments = await Enrollment.find({ course: courseId })
             .populate('student', 'name email avatar')
             .sort({ createdAt: -1 });
 
-        // Format lại dữ liệu trả về cho gọn
-        const students = enrollments.map(enroll => ({
-            _id: enroll.student._id,
-            name: enroll.student.name,
-            email: enroll.student.email,
-            avatar: enroll.student.avatar,
-            enrolledAt: enroll.createdAt,
-            progress: enroll.progress || 0 // Giả sử model Enrollment có trường progress
-        }));
+        const students = enrollments.map(enroll => {
+            if (!enroll.student) return null;
+
+            return {
+                _id: enroll.student._id,
+                name: enroll.student.name,
+                email: enroll.student.email,
+                avatar: enroll.student.avatar,
+                enrolledAt: enroll.createdAt,
+                progress: enroll.progress || 0 
+            };
+        }).filter(Boolean);
 
         res.json(students);
     } catch (err) {
@@ -470,11 +494,12 @@ export const getEnrolledStudents = async (req, res) => {
 
 /**
  * @desc    Lấy tất cả bài nộp của 1 học viên trong 1 khóa học cụ thể
- * @route   GET /api/courses/:courseId/students/:studentId/submissions
+ * @route   GET /api/courses/:id/students/:studentId/submissions
  */
 export const getStudentSubmissionsInCourse = async (req, res) => {
     try {
-        const { courseId, studentId } = req.params;
+        // FIXED: Use req.params.id instead of courseId
+        const { id: courseId, studentId } = req.params;
 
         const submissions = await Submission.find({ 
             course: courseId, 
@@ -489,16 +514,17 @@ export const getStudentSubmissionsInCourse = async (req, res) => {
         res.status(500).json({ message: 'Lỗi server khi lấy danh sách bài nộp.' });
     }
 };
+
 /**
  * @desc    Xóa học sinh khỏi khóa học (Hủy ghi danh)
- * @route   DELETE /api/courses/:courseId/students/:studentId
+ * @route   DELETE /api/courses/:id/students/:studentId
  * @access  Private/Teacher
  */
 export const removeStudentFromCourse = async (req, res) => {
     try {
-        const { courseId, studentId } = req.params;
+        const { id: courseId, studentId } = req.params;
 
-        // 1. Kiểm tra quyền (Giáo viên của khóa học hoặc Admin)
+        //Kiểm tra quyền
         const course = await Course.findById(courseId);
         if (!course) {
             return res.status(404).json({ message: "Khóa học không tồn tại" });
@@ -509,7 +535,7 @@ export const removeStudentFromCourse = async (req, res) => {
             return res.status(403).json({ message: "Bạn không có quyền xóa học viên khỏi khóa học này" });
         }
 
-        // 2. Xóa bản ghi ghi danh (Enrollment)
+        // 2. Xóa Enrollment
         const deletedEnrollment = await Enrollment.findOneAndDelete({
             course: courseId,
             student: studentId
@@ -519,8 +545,6 @@ export const removeStudentFromCourse = async (req, res) => {
             return res.status(404).json({ message: "Học viên này chưa đăng ký khóa học hoặc đã bị xóa" });
         }
 
-        // 3. (Tùy chọn) Xóa luôn bài nộp của học sinh này trong khóa học để sạch data
-        // Nếu muốn giữ lịch sử bài nộp thì comment dòng dưới lại
         await Submission.deleteMany({ course: courseId, student: studentId });
 
         res.json({ message: "Đã xóa học viên khỏi khóa học thành công" });

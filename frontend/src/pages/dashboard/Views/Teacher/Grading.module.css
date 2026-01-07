@@ -514,6 +514,22 @@
     margin-top: var(--spacing-1);
     line-height: 1.5;
 }
+.labelRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.aiBadge {
+    background-color: #e0f2fe; /* Màu xanh nhạt */
+    color: #0284c7;
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+    border: 1px solid #bae6fd;
+}
 
 .labelRow {
     display: flex;

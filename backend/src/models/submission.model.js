@@ -22,46 +22,39 @@ const submissionSchema = new Schema(
     content: { 
         type: String, 
         required: function() {
-            return this.type !== 'speaking'; 
+            // Note: 'this.type' refers to the submission document, not the lesson type.
+            // If you don't store 'type' in Submission, ensure 'content' is always sent from the controller.
+            return true; 
         } 
     },
 
     answers: [{
-        questionIndex: { type: Number }, // Index của câu hỏi trong mảng lesson.questions
-        questionText: { type: String },  // Lưu lại text câu hỏi (để hiển thị Speaking)
-        audioUrl: { type: String },      // Link audio câu trả lời này
-        transcript: { type: String },    // Văn bản học viên nói câu này
-        score: { type: Number },         // Điểm số cho riêng câu này
-        feedback: { type: String },      // Nhận xét riêng cho câu nà
-        selectedOptionIndex: { type: Number }, // Dành cho Quiz
-        isCorrect: { type: Boolean }     // Dành cho Quiz (đúng/sai)
+        questionIndex: { type: Number },
+        questionText: { type: String },
+        audioUrl: { type: String },
+        transcript: { type: String },
+        score: { type: Number },
+        feedback: { type: String },
+        selectedOptionIndex: { type: Number },
+        isCorrect: { type: Boolean }
     }],
 
-status: {
+    status: {
         type: String,
         enum: ['submitted', 'ai_graded', 'completed'], 
         default: 'submitted'
     },
-    
     score: {
-        ai: {
-            overall: Number,
-            details: Object,
-            timestamp: Date
-        },
-        teacher: {
-            overall: Number,
-            details: String,
-            timestamp: Date
-        }
+        type: mongoose.Schema.Types.Mixed,
+        default: {}
     }, 
     aiResult: {
         isOffTopic: { type: Boolean, default: false },
         offTopicAnalysis: { type: String },
         improvementTips: [{ type: String }]
     },
-    feedback: { type: String }, // Nhận xét cuối cùng của giáo viên
-    aiFeedback: { type: String }, // Nhận xét của AI
+    feedback: { type: String },
+    aiFeedback: { type: String },
     gradedBy: { type: Schema.Types.ObjectId, ref: 'User' },
     attempt: { type: Number, default: 1 }
 

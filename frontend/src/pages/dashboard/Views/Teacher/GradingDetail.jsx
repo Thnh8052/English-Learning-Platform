@@ -30,8 +30,10 @@ const GradingDetail = () => {
     const [loading, setLoading] = useState(true);
     
     const [feedback, setFeedback] = useState('');
+    const [aiScores, setAiScores] = useState({});
     const [scores, setScores] = useState({});
     const [criteriaList, setCriteriaList] = useState([]);
+    
 
     useEffect(() => {
         const fetchDetail = async () => {
@@ -40,7 +42,7 @@ const GradingDetail = () => {
                 const sub = res.data;
                 setSubmission(sub);
                 
-                // 1. Xác định tiêu chí chấm dựa trên loại bài học
+                // Xác định danh sách tiêu chí
                 const type = sub.lesson?.type || 'default';
                 const criteria = GRADING_CRITERIA[type] || GRADING_CRITERIA['default'];
                 setCriteriaList(criteria);
@@ -73,20 +75,28 @@ const GradingDetail = () => {
                     const { overall, ...rest } = details;
                     teacherInputScores = rest;
                 } else {
-                    const initialScores = {};
-                    criteria.forEach(c => initialScores[c.key] = '');
-                    setScores(initialScores);
+                    // Chưa chấm ->điểm AI 
+                    teacherInputScores = { ...aiData };
                 }
+                const initialFormState = {};
+                criteria.forEach(c => {
+                    initialFormState[c.key] = teacherInputScores[c.key] || teacherInputScores[toCamelCase(c.key)] || '';
+                });
+                
+                setScores(initialFormState);
 
             } catch (error) {
                 console.error("Error fetching submission:", error);
-                alert("Failed to load submission.");
             } finally {
                 setLoading(false);
             }
         };
         fetchDetail();
     }, [submissionId]);
+
+    const toCamelCase = (str) => {
+        return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+    };
 
     const getAudioSrc = (path) => {
         if (!path) return '';
@@ -116,7 +126,10 @@ const GradingDetail = () => {
         
         if (criteriaList.length === 1) return sum; 
         
-        return (sum / validVals.length).toFixed(1);
+        const average = sum / validVals.length;
+        const roundedScore = Math.round(average * 2) / 2;
+
+        return roundedScore.toFixed(1);
     };
 
     const handleSubmitGrade = async () => {
@@ -251,7 +264,14 @@ if (type === 'assignment') {
                     <div className={styles.scoreGrid}>
                         {criteriaList.map((crit) => (
                             <div key={crit.key} className={styles.scoreInputGroup}>
-                                <label>{crit.label}</label>
+                                <div className={styles.labelRow}>
+                                    <label>{crit.label}</label>
+                                        {aiScores[toCamelCase(crit.key)] !== undefined && (
+                                        <span className={styles.aiBadge} title="AI Suggestion">
+                                            AI: {aiScores[toCamelCase(crit.key)]}
+                                        </span>
+                                    )}
+                                </div>
                                 <input 
                                     type="number" 
                                     name={crit.key}
@@ -264,9 +284,6 @@ if (type === 'assignment') {
                                 />
                             </div>
                         ))}
-                        <button className="btn btn-primary-teacher" onClick={handleSubmitGrade}>
-                            Confirm Final Grade
-                        </button>
                     </div>
 
                     <div className={styles.totalScore}>

@@ -162,6 +162,7 @@ export const submitQuiz = async (req, res) => {
 
         const totalQuestions = lesson.questions.length;
         const scorePercentage = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
+        const bandScore = (scorePercentage / 10).toFixed(1);
 
         const attempt = await getNextAttempt(studentId, lessonId);
 
@@ -172,9 +173,12 @@ export const submitQuiz = async (req, res) => {
             content: `Quiz Attempt ${attempt}`,
             answers: processedAnswers,
             score: {
-                correct: correctCount,
-                total: totalQuestions,
-                percentage: scorePercentage
+                teacher: {
+                    correct: correctCount,
+                    total: totalQuestions,
+                    percentage: scorePercentage,
+                    overall: bandScore
+                }
             },
             status: 'completed',
             attempt: attempt
@@ -437,7 +441,13 @@ export const getSubmissionHistoryByLesson = async (req, res) => {
 export const getSubmissionsByCourse = async (req, res) => {
     try {
         const { status } = req.query;
-        const filter = { course: req.params.courseId };
+        const courseId = req.params.courseId || req.params.id; 
+
+        if (!courseId) {
+             return res.status(400).json({ message: "Missing Course ID" });
+        }
+
+        const filter = { course: courseId };
         
         if (status && status !== 'all') {
             filter.status = status;
@@ -498,16 +508,16 @@ export const gradeSubmission = async (req, res) => {
             return res.status(404).json({ message: 'Bài nộp không tồn tại.' });
         }
 
-        let overallScore = Number(score.overall); // Chuyển "6.6" -> 6.6
+        let overallScore = Number(score.overall);
 
         if (!isNaN(overallScore)) {
-            // Làm tròn đến 0.5 (6.3 -> 6.5, 6.2 -> 6.0)
             overallScore = Math.round(overallScore * 2) / 2;
         } else {
             overallScore = 0;
         }
         
-        score.overall = overallScore;
+        score.overall = overallScore; 
+
         submission.score.teacher = {
             overall: overallScore,
             details: JSON.stringify(score),

@@ -16,8 +16,9 @@ import submissionRoutes from './src/routes/submissions.routes.js';
 import moduleRoutes from './src/routes/modules.routes.js';
 import aiRoutes from './src/routes/ai.routes.js';
 import adminRoutes from './src/routes/admin.routes.js';
+import usersRoutes from "./src/routes/users.routes.js";
 
-// --- CẤU HÌNH ES MODULES FIX PATH ---
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -27,7 +28,6 @@ connectDB();
 const app = express();
 
 // --- MIDDLEWARES ---
-
 // 1. Helmet: Cho phép load tài nguyên cross-origin (Audio/Video)
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
@@ -35,7 +35,7 @@ app.use(helmet({
 
 // 2. CORS & Parser
 app.use(cors());
-app.use(express.json()); // Mặc định limit là 100kb, nếu gửi bài viết dài có thể tăng lên: express.json({ limit: '10mb' })
+app.use(express.json());
 app.use(morgan("dev"));
 
 // 3. Static Files
@@ -58,16 +58,15 @@ app.use('/api/submissions', submissionRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/test', testRoutes);
-// Đã xóa dòng duplicate aiRoutes ở đây
+app.use("/api/users", usersRoutes);
 
 app.get("/", (req, res) => res.send("Backend API is running..."));
 
-// --- GLOBAL ERROR HANDLER (MỚI) ---
 // Middleware này sẽ bắt tất cả lỗi từ các controller gọi next(err) hoặc throw error
 app.use((err, req, res, next) => {
     console.error("❌ Error:", err);
 
-    // Xử lý lỗi Mongoose Validation (ví dụ lỗi thiếu field content)
+    // Xử lý lỗi Mongoose Validation
     if (err.name === 'ValidationError') {
         const messages = Object.values(err.errors).map(val => val.message);
         return res.status(400).json({
@@ -97,7 +96,6 @@ const server = app.listen(PORT, () => console.log(`Server running on port ${PORT
 process.on('unhandledRejection', (err) => {
     console.error(`--- LỖI UNHANDLED REJECTION ---`);
     console.log("Error:", err.message);
-    // Có thể cân nhắc server.close() nếu lỗi quá nghiêm trọng
 });
 
 export default app;

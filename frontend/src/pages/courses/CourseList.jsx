@@ -57,7 +57,6 @@ const CourseListPage = () => {
 
   return (
     <div className={styles.pageContainer}>
-      {/* 🔹 Sticky Header + Filters */}
       <div className={styles.headerBlock}>
         <h1 className={styles.pageTitle}>
           <p>Explore Courses</p>
