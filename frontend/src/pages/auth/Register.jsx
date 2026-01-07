@@ -1,11 +1,10 @@
 import { useAuth } from "../../contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useState } from "react";
-import api from "../../services/api";
-import styles from "./register.module.css";
+import styles from "./Auth.module.css";
 
 export function Register() {
-  const { register, login } = useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -28,168 +27,157 @@ export function Register() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
 
-  if (formData.password !== formData.confirmPassword) {
-    setError("Mật khẩu đã nhập không khớp");
-    return;
-  }
+    if (formData.password !== formData.confirmPassword) {
+      setError("Mật khẩu xác nhận không khớp");
+      return;
+    }
 
-const res = await register({
-  name: formData.name,
-  email: formData.email,
-  password: formData.password,
-  role: formData.role,
-});
+    setLoading(true);
+    const res = await register({
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      role: formData.role,
+    });
+    setLoading(false);
 
-  if (res.success) {
-    navigate("/");
-  } else {
-    setError(res.message);
-  }
-};
+    if (res.success) {
+      navigate("/");
+    } else {
+      setError(res.message);
+    }
+  };
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Create Your Account</h1>
-      {error && <p className={styles.error}>{error}</p>}
+      <div className={styles.authCard}>
+        <h1 className={styles.title}>Create Account</h1>
+        <p className={styles.subtitle}>Join us and start learning today</p>
 
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Full Name</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            className={styles.input}
-            required
-          />
-        </div>
+        {error && <div className={styles.errorMessage}>{error}</div>}
 
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Email</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className={styles.input}
-            required
-          />
-        </div>
-
-        {/* Phân Role gv và hs */}
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Role</label>
-          <select
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            className={styles.input}
-          >
-            <option value="student">Student</option>
-            <option value="teacher">Teacher</option>
-          </select>
-        </div>
-
-        {/* Ngày sinh */}
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Ngày sinh</label>
-          <div className={styles.dobGroup}>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Full Name</label>
             <input
-              type="number"
-              name="day"
-              placeholder="DD"
-              min="1"
-              max="31"
-              value={formData.day}
-              onChange={handleChange}
-              className={styles.dobInput}
-              required
-            />
-            <input
-              type="number"
-              name="month"
-              placeholder="MM"
-              min="1"
-              max="12"
-              value={formData.month}
-              onChange={handleChange}
-              className={styles.dobInput}
-              required
-            />
-            <input
-              type="number"
-              name="year"
-              placeholder="YYYY"
-              min="1900"
-              max={new Date().getFullYear()}
-              value={formData.year}
-              onChange={handleChange}
-              className={styles.dobInput}
-              required
-            />
-          </div>
-        </div>
-
-        {/* Password */}
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Password</label>
-          <div className={styles.passwordWrapper}>
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              value={formData.password}
+              type="text"
+              name="name"
+              value={formData.name}
               onChange={handleChange}
               className={styles.input}
+              placeholder="Nguyen Van A"
               required
             />
-            <button
-              type="button"
-              className={styles.toggleBtn}
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? "Hide" : "Show"}
-            </button>
           </div>
-        </div>
 
-        {/* Confirm Password */}
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Confirm Password</label>
-          <div className={styles.passwordWrapper}>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Email Address</label>
             <input
-              type={showConfirmPassword ? "text" : "password"}
-              name="confirmPassword"
-              value={formData.confirmPassword}
+              type="email"
+              name="email"
+              value={formData.email}
               onChange={handleChange}
               className={styles.input}
+              placeholder="name@example.com"
               required
             />
-            <button
-              type="button"
-              className={styles.toggleBtn}
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            >
-              {showConfirmPassword ? "Hide" : "Show"}
-            </button>
           </div>
-        </div>
 
-        <button type="submit" className={styles.button} disabled={loading}>
-          {loading ? "Registering..." : "Sign Up"}
-        </button>
-      </form>
+          {/* Date of Birth Group */}
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Date of Birth</label>
+            <div className={styles.dobGroup}>
+                <input
+                  type="number"
+                  name="day"
+                  placeholder="Day"
+                  value={formData.day}
+                  onChange={handleChange}
+                  className={`${styles.input} ${styles.dobInput}`}
+                  min="1" max="31"
+                />
+                <input
+                  type="number"
+                  name="month"
+                  placeholder="Month"
+                  value={formData.month}
+                  onChange={handleChange}
+                  className={`${styles.input} ${styles.dobInput}`}
+                  min="1" max="12"
+                />
+                <input
+                  type="number"
+                  name="year"
+                  placeholder="Year"
+                  value={formData.year}
+                  onChange={handleChange}
+                  className={`${styles.input} ${styles.dobInput}`}
+                  min="1900" max="2025"
+                />
+            </div>
+          </div>
 
-      <p className={styles.switchText}>
-       Đã có tài khoản?{" "}
-        <a href="/login" className={styles.link}>
-          Đăng nhập ngay!
-        </a>
-      </p>
+          {/* Password */}
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Password</label>
+            <div className={styles.passwordWrapper}>
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className={styles.input}
+                required
+              />
+              <button
+                type="button"
+                className={styles.toggleBtn}
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+          </div>
+
+          {/* Confirm Password */}
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Confirm Password</label>
+            <div className={styles.passwordWrapper}>
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className={styles.input}
+                required
+              />
+              <button
+                type="button"
+                className={styles.toggleBtn}
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" className={styles.submitBtn} disabled={loading}>
+            {loading ? "Registering..." : "Sign Up"}
+          </button>
+        </form>
+
+        <p className={styles.switchText}>
+          Already have an account?
+          <Link to="/login" className={styles.link}>
+            Login here
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

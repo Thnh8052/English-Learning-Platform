@@ -25,7 +25,8 @@ export const AuthProvider = ({ children }) => {
       setUser(user);
       return { success: true, user };
     } catch (err) {
-      return { success: false, message: "Registration failed" };
+      const errorMsg = err.response?.data?.message || "Đăng ký thất bại";
+      return { success: false, message: errorMsg };
     }
   };
 
@@ -38,7 +39,8 @@ export const AuthProvider = ({ children }) => {
       setUser(user);
       return { success: true, user };
     } catch (err) {
-      return { success: false, message: "Login failed" };
+      const errorMsg = err.response?.data?.message || "Đăng nhập thất bại";
+      return { success: false, message: errorMsg };
     }
   };
 

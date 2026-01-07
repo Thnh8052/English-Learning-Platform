@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
-import styles from './auth.module.css';
+import styles from './Auth.module.css';
 
 const ResetPasswordPage = () => {
     const { token } = useParams();
@@ -19,14 +19,14 @@ const ResetPasswordPage = () => {
         e.preventDefault();
         if (password !== confirmPassword) return setError("Passwords do not match.");
         if (password.length < 6) return setError("Password must be at least 6 characters long.");
+        
         setLoading(true);
         setError('');
         setMessage('');
+        
         try {
             const res = await api.put(`/auth/reset-password/${token}`, { password });
             setMessage('Password reset successfully! Logging you in...');
-            
-            // Tự động đăng nhập bằng dữ liệu trả về từ backend
             setAuthData(res.data);
 
             setTimeout(() => {
@@ -41,40 +41,43 @@ const ResetPasswordPage = () => {
 
     return (
         <div className={styles.container}>
-            <div className={styles.formWrapper}>
-                <h1 className={styles.title}>Reset Your Password</h1>
-                
-                {message ? (
-                    <p className={styles.successMessage}>{message}</p>
-                ) : error ? (
-                    <p className={styles.errorMessage}>{error}</p>
-                ) : (
-                    <p className={styles.subtitle}>Enter your new password below.</p>
-                )}
+            <div className={styles.authCard}>
+                <h1 className={styles.title}>Reset Password</h1>
+                <p className={styles.subtitle}>Enter your new password below.</p>
+
+                {message && <div className={styles.successMessage}>{message}</div>}
+                {error && <div className={styles.errorMessage}>{error}</div>}
                 
                 {!message && (
-                    <form onSubmit={handleSubmit}>
-                        <div className="form-group">
-                            <label className="form-label">New Password</label>
+                    <form onSubmit={handleSubmit} className={styles.form}>
+                        <div className={styles.formGroup}>
+                            <label className={styles.label}>New Password</label>
                             <input
-                                type="password" value={password} className="form-input"
-                                onChange={(e) => setPassword(e.target.value)} required
+                                type="password"
+                                value={password}
+                                className={styles.input}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
                             />
                         </div>
-                        <div className="form-group" style={{marginTop: '1rem'}}>
-                            <label className="form-label">Confirm New Password</label>
+                        <div className={styles.formGroup}>
+                            <label className={styles.label}>Confirm New Password</label>
                             <input
-                                type="password" value={confirmPassword} className="form-input"
-                                onChange={(e) => setConfirmPassword(e.target.value)} required
+                                type="password"
+                                value={confirmPassword}
+                                className={styles.input}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                required
                             />
                         </div>
-                        <button type="submit" className="btn btn-primary-student" disabled={loading} style={{width: '100%', marginTop: '1.5rem'}}>
+                        <button type="submit" className={styles.submitBtn} disabled={loading}>
                             {loading ? 'Resetting...' : 'Reset Password'}
                         </button>
                     </form>
                 )}
-                <div className={styles.footerLinks}>
-                    <Link to="/login">← Back to Dashboard</Link>
+                
+                <div className={styles.switchText} style={{ marginTop: '1.5rem' }}>
+                    <Link to="/login" className={styles.link}>← Back to Dashboard</Link>
                 </div>
             </div>
         </div>
