@@ -38,6 +38,7 @@ const QuizBuilder = () => {
         };
         fetchLesson();
     }, [lessonId]);
+
     const handleToggleSelect = (id) => {
         if (selectedIds.includes(id)) {
             setSelectedIds(selectedIds.filter(itemId => itemId !== id));
@@ -76,23 +77,45 @@ const QuizBuilder = () => {
         }
     };
 
-    // --- CALLBACK KHI AI TẠO XONG ---
-    const handleAiQuestionsReceived = async (aiQuestions) => {
+    //CALLBACK KHI AI TẠO XONG
+    const handleAiQuestionsReceived = async (aiData) => {
         try {
-            // Lưu từng câu vào DB
-            const promises = aiQuestions.map(q => 
-                api.post(`/lessons/${lessonId}/questions`, q)
-            );
+            //ấy mảng 'questions' từ object trả về
+            const questionsArray = aiData.questions || aiData;
+
+            if (!Array.isArray(questionsArray)) {
+                throw new Error("AI response format error: Expected an array.");
+            }
+            // AI trả về: { question: "...", options: {A: "...", B: "..."}, correct: "A" }
+            // DB cần: { questionText: "...", options: ["...", "..."], correctAnswerIndex: 0 }
+            const promises = questionsArray.map(q => {
+                const optionsList = Object.values(q.options || {});
+                
+                let correctIdx = 0;
+                if (q.correct && typeof q.correct === 'string') {
+                    const charCode = q.correct.toUpperCase().charCodeAt(0);
+                    correctIdx = charCode - 65; // 'A' is 65
+                }
+
+                const formattedQuestion = {
+                    questionText: q.question,
+                    options: optionsList,
+                    correctAnswerIndex: correctIdx >= 0 && correctIdx < 4 ? correctIdx : 0
+                };
+
+                return api.post(`/lessons/${lessonId}/questions`, formattedQuestion);
+            });
+
             await Promise.all(promises);
             
             // Refresh lại danh sách (để lấy ID thật từ DB)
             const res = await api.get(`/lessons/${lessonId}`);
             setQuestions(res.data.questions);
             
-            alert(`Đã thêm thành công ${aiQuestions.length} câu hỏi!`);
+            alert(`Đã thêm thành công ${questionsArray.length} câu hỏi!`);
         } catch (error) {
-            console.error(error);
-            alert("Lỗi khi lưu câu hỏi vào database.");
+            console.error("Error processing AI questions:", error);
+            alert("Lỗi khi lưu câu hỏi vào database. Kiểm tra console để xem chi tiết.");
         }
     };
 
@@ -122,7 +145,7 @@ const QuizBuilder = () => {
 
     if (loading) return <div className={styles.container}>Loading...</div>;
 
-return (
+    return (
         <div className={styles.container}>
             <div className={styles.header}>
                 <div className={styles.headerTitleGroup}>

@@ -46,10 +46,32 @@ const GradingDetail = () => {
                 setCriteriaList(criteria);
 
                 setFeedback(sub.feedback || '');
-                
-                if (sub.status === 'completed' && sub.score && typeof sub.score === 'object') {
-                    const { overall, ...detailScores } = sub.score;
-                    setScores(detailScores);
+
+                //ĐIỂM AI
+                let aiData = {};
+                if (sub.score?.ai?.details) {
+                    Object.entries(sub.score.ai.details).forEach(([key, val]) => {
+                        const scoreVal = (typeof val === 'object' && val?.score) ? val.score : val;
+                        aiData[key] = scoreVal; 
+                        aiData[toCamelCase(key)] = scoreVal;
+                        if (key === 'lexical') {
+                        aiData['vocabulary'] = scoreVal;
+                    }
+                    });
+                }
+                setAiScores(aiData);
+
+                //ĐIỂM Teacher
+                let teacherInputScores = {};
+
+                if (sub.score?.teacher?.details) {
+                    //Giáo viên đã chấm -> Load điểm giáo viên
+                    const details = typeof sub.score.teacher.details === 'string' 
+                        ? JSON.parse(sub.score.teacher.details) 
+                        : sub.score.teacher.details;
+                    
+                    const { overall, ...rest } = details;
+                    teacherInputScores = rest;
                 } else {
                     const initialScores = {};
                     criteria.forEach(c => initialScores[c.key] = '');
