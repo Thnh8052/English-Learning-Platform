@@ -16,7 +16,7 @@ export const transcribeAudio = async (filePath) => {
             return ""; 
         }
 
-        console.log(`🎤 Đang gửi Groq STT (Whisper): ${filePath}`);
+        console.log(`Đang gửi Groq STT (Whisper): ${filePath}`);
 
         const transcription = await groq.audio.transcriptions.create({
             file: fs.createReadStream(filePath),

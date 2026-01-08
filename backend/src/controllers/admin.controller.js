@@ -2,9 +2,8 @@ import Course from '../models/course.model.js';
 import User from '../models/user.model.js';
 import Enrollment from '../models/enrollment.model.js';
 
-/* ======================================================
-   COURSE REVIEW FEATURES (EXISTING)
-====================================================== */
+/* COURSE REVIEW */
+// các khóa học chờ duyệt
 export const getPendingCourses = async (req, res) => {
     try {
         const courses = await Course.find({ status: 'pending_review' })
@@ -15,7 +14,7 @@ export const getPendingCourses = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
-
+//các khóa học đã published
 export const getPublishedCourses = async (req, res) => {
     try {
         const courses = await Course.find({ status: 'published' }).populate('teacher', 'name');
@@ -24,7 +23,7 @@ export const getPublishedCourses = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
-
+//các khóa học bị từ chối/yêu cầu chỉnh sửa thêm
 export const getRejectedCourses = async (req, res) => {
   try {
     const courses = await Course.find({
@@ -36,6 +35,7 @@ export const getRejectedCourses = async (req, res) => {
   }
 };
 
+//các khóa học đã được duyệt
 export const approveCourse = async (req, res) => {
     try {
         const course = await Course.findByIdAndUpdate(
@@ -43,16 +43,17 @@ export const approveCourse = async (req, res) => {
             { status: 'published', adminFeedback: '' },
             { new: true }
         );
-        if (!course) return res.status(404).json({ message: 'Course not found' });
+        if (!course) return res.status(404).json({ message: 'Không tìm thấy khóa học' });
         res.json(course);
     } catch (err) {
         res.status(500).json({ message: 'Server Error' });
     }
 };
 
+//xử lý nút yêu cầu chỉnh sửa khóa học
 export const requestChanges = async (req, res) => {
     const { feedback } = req.body;
-    if (!feedback) return res.status(400).json({ message: 'Reason required' });
+    if (!feedback) return res.status(400).json({ message: 'Cần điền lý do' });
 
     try {
         const course = await Course.findByIdAndUpdate(
@@ -66,6 +67,7 @@ export const requestChanges = async (req, res) => {
     }
 };
 
+//xử lý nút từ chối khóa học
 export const rejectCourse = async (req, res) => {
     const { reason } = req.body;
     try {
@@ -73,7 +75,7 @@ export const rejectCourse = async (req, res) => {
             req.params.id,
             { 
                 status: 'rejected', 
-                adminFeedback: reason || 'Does not meet standards.' 
+                adminFeedback: reason || 'Khóa học không đáp ứng yêu cầu' 
             },
             { new: true }
         );
@@ -83,10 +85,8 @@ export const rejectCourse = async (req, res) => {
     }
 };
 
-/* ======================================================
-   USER MANAGEMENT (NEW)
-   GET /api/admin/users
-====================================================== */
+/* USER MANAGEMENT
+   GET /api/admin/users */
 export const getAllUsers = async (req, res) => {
   try {
     const users = await User.find({}).select('-password').sort({ createdAt: -1 });
@@ -99,46 +99,44 @@ export const getAllUsers = async (req, res) => {
 export const deleteUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!user) return res.status(404).json({ message: 'Người dùng không tồn tại' });
 
-    // Prevent deleting Admins
+    //không thể xóa admin
     if (user.role === 'admin') {
-        return res.status(400).json({ message: 'Cannot delete Admin accounts via API' });
+        return res.status(400).json({ message: 'Không thể xóa tài khoản Admin' });
     }
 
-    //If User is a TEACHER, clean up their courses
+    //nếu teacher bị xóa thì xóa luôn info của họ
     if (user.role === 'teacher') {
         const teacherCourses = await Course.find({ teacher: user._id });
         
         if (teacherCourses.length > 0) {
             const courseIds = teacherCourses.map(c => c._id);
 
-            //Remove all enrollments for these courses
+            //xóa các student enrolled các khóa học này
             await Enrollment.deleteMany({ course: { $in: courseIds } });
-            //Delete the courses themselves
+            //xóa các khóa học do teacher này tạo
             await Course.deleteMany({ teacher: user._id });
             
-            console.log(`[ADMIN] Deleted ${teacherCourses.length} courses owned by teacher ${user.email}`);
+            console.log(`[ADMIN] Xóa ${teacherCourses.length} khóa học của ${user.email}`);
         }
     }
 
-    //Delete the User account
+    //xóa user
     await user.deleteOne();
     
-    //Clean up where this user was a STUDENT
+    //xóa tất cả enrollment của user này
     await Enrollment.deleteMany({ student: user._id });
 
-    res.json({ message: 'User and all associated data deleted successfully' });
+    res.json({ message: 'Đã xóa người dùng và tất cả dữ liệu liên quan' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server Error' });
   }
 };
 
-/* ======================================================
-   ENROLLMENT MANAGEMENT (NEW)
-   GET /api/admin/courses/:id/students
-====================================================== */
+/* ENROLLMENT MANAGEMENT
+   GET /api/admin/courses/:id/students */
 export const getCourseStudents = async (req, res) => {
   try {
     const enrollments = await Enrollment.find({ course: req.params.id })
@@ -160,9 +158,9 @@ export const kickStudentFromCourse = async (req, res) => {
     });
 
     if (!deleted) {
-      return res.status(404).json({ message: 'Student not found in course' });
+      return res.status(404).json({ message: 'Không tìm thấy học viên trong khóa học' });
     }
-    res.json({ message: 'Student removed from course' });
+    res.json({ message: 'Đã xóa học viên khỏi khóa học' });
   } catch (err) {
     res.status(500).json({ message: 'Server Error' });
   }

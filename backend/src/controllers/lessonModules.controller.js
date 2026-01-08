@@ -32,8 +32,6 @@ export const createModule = async (req, res) => {
         });
 
         await newModule.save();
-        
-        // Trả về module mới kèm theo mảng lessons rỗng để frontend dễ cập nhật
         res.status(201).json({ ...newModule.toObject(), lessons: [] });
 
     } catch (err) {

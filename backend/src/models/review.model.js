@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Course from './course.model.js'; // Import Course model để cập nhật
+import Course from './course.model.js';
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -30,9 +30,7 @@ const reviewSchema = new mongoose.Schema(
 // Ngăn một học viên đánh giá cùng 1 khóa học nhiều lần
 reviewSchema.index({ course: 1, student: 1 }, { unique: true });
 
-// --- PHẦN LOGIC TỰ ĐỘNG CẬP NHẬT RATING ---
-
-// 1. Tạo một hàm static để tính toán rating trung bình
+//Tạo một hàm static để tính toán rating trung bình
 reviewSchema.statics.calcAverageRatings = async function (courseId) {
   const stats = await this.aggregate([
     {
@@ -66,14 +64,13 @@ reviewSchema.statics.calcAverageRatings = async function (courseId) {
   }
 };
 
-// 2. Gọi hàm đó sau khi một review mới được lưu
+//Gọi hàm đó sau khi một review mới được lưu
 reviewSchema.post('save', function () {
   // 'this' trỏ đến review hiện tại, 'this.constructor' trỏ đến model Review
   this.constructor.calcAverageRatings(this.course);
 });
 
-// 3. Gọi hàm đó sau khi một review được xóa hoặc cập nhật
-// (chạy trước khi xóa/sửa để lấy được `this.course`)
+//Gọi hàm đó sau khi một review được xóa hoặc cập nhật
 reviewSchema.pre(/^findOneAnd/, async function(next) {
   this.r = await this.findOne().clone();
   next();

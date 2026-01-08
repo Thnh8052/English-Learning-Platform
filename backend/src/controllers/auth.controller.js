@@ -10,7 +10,7 @@ dotenv.config();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 console.log('[DEBUG] SendGrid API Key being used:', process.env.SENDGRID_API_KEY ? 'Key exists' : 'Key is MISSING or undefined!');
 
-//Tạo JWT
+//Tạo JWT auth
 const generateToken = (user) =>
   jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
     expiresIn: "7d",
@@ -86,7 +86,7 @@ export const forgotPassword = async (req, res) => {
 
     if (!user) {
       console.log(`[AUTH] Yêu cầu reset cho email không tồn tại: ${req.body.email}`);
-      return res.status(200).json({ message: 'If an account with that email exists, a link has been sent.' });
+      return res.status(200).json({ message: 'Nếu có tài khoản với email này, một liên kết đặt lại mật khẩu đã được gửi.' });
     }
 
     const resetToken = user.getResetPasswordToken();
@@ -101,7 +101,7 @@ export const forgotPassword = async (req, res) => {
         email: process.env.FROM_EMAIL
       },
       subject: 'Password Reset Request',
-      text: `Please use the following link to reset your password: ${resetUrl}`,
+      text: `Hãy sử dụng đường dẫn sau để đặt lại mật khẩu của bạn: ${resetUrl}`,
     };
 
     await sgMail.send(msg);
@@ -119,7 +119,7 @@ export const forgotPassword = async (req, res) => {
             await userToClean.save({ validateBeforeSave: false });
         }
     }
-    res.status(500).json({ message: 'Error sending email.' });
+    res.status(500).json({ message: 'Lỗi khi gửi email.' });
   }
 };
 /**

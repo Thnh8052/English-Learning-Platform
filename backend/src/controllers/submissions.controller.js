@@ -36,7 +36,7 @@ export const createSubmission = async (req, res) => {
         const { lessonId, content } = req.body;
         const studentId = req.user.id;
 
-        // 1. Lấy lesson và populate đầy đủ
+        //Lấy lesson và populate đầy đủ
         const lesson = await Lesson.findById(lessonId).populate({
             path: 'module', 
             populate: { path: 'course' }
@@ -48,15 +48,15 @@ export const createSubmission = async (req, res) => {
 
         let promptForAI = "";
 
-        // Ưu tiên 1: Lấy từ field prompt
+        // Lấy từ field prompt
         if (lesson.prompt && lesson.prompt.trim().length > 0) {
             promptForAI = lesson.prompt;
         } 
-        // Ưu tiên 2: Nếu bài Assignment nhưng đề lỡ lưu trong câu hỏi đầu tiên
+        //Nếu bài Assignment nhưng đề lỡ lưu trong câu hỏi đầu tiên
         else if (lesson.type === 'assignment' && lesson.questions?.length > 0 && lesson.questions[0].questionText) {
             promptForAI = lesson.questions[0].questionText;
         }
-        // Ưu tiên 3: Lấy từ content (loại bỏ thẻ HTML để AI đọc)
+        //Lấy từ content
         else if (lesson.content && lesson.content.trim().length > 0) {
             promptForAI = lesson.content.replace(/<[^>]*>?/gm, '');
         }
@@ -72,13 +72,13 @@ export const createSubmission = async (req, res) => {
         let submissionStatus = 'submitted';
 
         if (lesson.type === 'assignment') {
-            // === LOGIC CHO BÀI WRITING (Cần AI chấm) ===
+            //LOGIC CHO BÀI WRITING (Cần AI chấm)
             console.log("Đang chấm bài Writing...");
             aiResult = await gradeWritingTask(content, promptForAI); 
             submissionStatus = 'ai_graded';
 
         } else {
-            // === LOGIC CHO CÁC LOẠI BÀI KHÁC (Video, Reading...) ===
+            //LOGIC CHO CÁC LOẠI BÀI KHÁC (Video, Reading...)
             console.log("Đánh dấu hoàn thành bài học (Video/Reading)...");
             
             aiResult = {
@@ -100,7 +100,7 @@ export const createSubmission = async (req, res) => {
             student: studentId,
             lesson: lessonId,
             course: lesson.module.course._id,
-            content: content || "Marked as done", // Nếu content rỗng (vd xem video xong ấn nút), điền mặc định
+            content: content || "Marked as done",
             score: {
                 ai: {
                     overall: aiResult?.overallScore || aiResult?.overall || null,
@@ -202,7 +202,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const downloadFile = async (url, destPath) => {
-    // 1. Đảm bảo thư mục cha tồn tại trước khi ghi
+    //Đảm bảo thư mục cha tồn tại trước khi ghi
     const dir = path.dirname(destPath);
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
@@ -251,7 +251,7 @@ export const submitSpeaking = async (req, res) => {
             return res.status(400).json({ message: "Không tìm thấy file ghi âm nào." });
         }
 
-        // 1. Lấy thông tin bài học để biết có những câu hỏi nào
+        //Lấy thông tin bài học để biết có những câu hỏi nào
         const lesson = await Lesson.findById(lessonId).populate({
             path: 'module', select: 'course'
         });
@@ -259,11 +259,10 @@ export const submitSpeaking = async (req, res) => {
 
         console.log(`[Speaking Multi] User: ${studentId}, Lesson: ${lessonId}, Files: ${files.length}`);
 
-        // 2. Tạo thư mục tạm
+        // Tạo thư mục tạm
         const tempDir = path.join(__dirname, '../../temp_uploads');
         if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
 
-        // 3. Xử lý từng câu hỏi SONG SONG (Parallel Processing)
         // Duyệt qua từng câu hỏi trong Lesson
         const answerPromises = lesson.questions.map(async (question, index) => {
             
@@ -290,23 +289,23 @@ export const submitSpeaking = async (req, res) => {
             resultData.audioUrl = uploadedFile.path;
 
             try {
-                // a. Tải file về temp
+                //Tải file về temp
                 const tempPath = path.join(tempDir, `speak_${studentId}_q${index}_${Date.now()}.webm`);
-                tempFilesToDelete.push(tempPath); // Đánh dấu để lát xóa
+                tempFilesToDelete.push(tempPath);
                 
                 await downloadFile(uploadedFile.path, tempPath);
 
-                // b. STT (Speech to Text)
+                //STT (Speech to Text)
                 const transcript = await transcribeAudio(tempPath);
                 resultData.transcript = transcript || "";
 
-                // c. AI Chấm điểm (Chấm riêng câu này dựa trên context câu hỏi)
+                //AI Chấm điểm 
                 if (resultData.transcript) {
                     // Gọi AI: Input là câu hỏi cụ thể + câu trả lời của HS
                     const aiResponse = await gradeSpeakingAnswer(resultData.transcript, question.questionText);
                     
-                    resultData.score = aiResponse?.score || 0; // Đổi overallScore -> score
-                    resultData.feedback = aiResponse?.feedback || ""; // Đổi detailedFeedback -> feedback
+                    resultData.score = aiResponse?.score || 0;
+                    resultData.feedback = aiResponse?.feedback || "";
                     resultData.aiAnalysis = {
                     isOffTopic: aiResponse?.isOffTopic || false,
                     improvementTips: aiResponse?.improvementTips || []
@@ -325,7 +324,7 @@ export const submitSpeaking = async (req, res) => {
         // Đợi tất cả câu hỏi xử lý xong
         const processedAnswers = await Promise.all(answerPromises);
 
-        // 4. Tổng hợp kết quả
+        // Tổng hợp kết quả
         // Tính điểm trung bình cộng các câu đã làm
         const answeredQuestions = processedAnswers.filter(a => a.isProcessed);
         const totalScore = answeredQuestions.reduce((sum, a) => sum + a.score, 0);
@@ -371,10 +370,10 @@ export const submitSpeaking = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Lỗi Submit Speaking Multi:", error);
+        console.error("Lỗi khi Submit Speaking:", error);
         res.status(500).json({ message: "Lỗi server", error: error.message });
     } finally {
-        // 6. Dọn dẹp tất cả file tạm
+        //Dọn dẹp tất cả file temp đã tạo
         tempFilesToDelete.forEach(filePath => {
             if (fs.existsSync(filePath)) {
                 try { fs.unlinkSync(filePath); } catch (e) {}

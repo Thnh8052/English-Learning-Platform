@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
-// Tái sử dụng CSS của QuizBuilder cho nhanh, hoặc tạo file mới nếu muốn
 import styles from './quizBuilder.module.css'; 
 
 const SpeakingBuilder = () => {
@@ -13,7 +12,7 @@ const SpeakingBuilder = () => {
     const [newQuestionText, setNewQuestionText] = useState('');
     const [loading, setLoading] = useState(true);
 
-    // 1. Load dữ liệu
+    //Load dữ liệu
     useEffect(() => {
         const fetchLesson = async () => {
             try {
@@ -29,7 +28,7 @@ const SpeakingBuilder = () => {
         fetchLesson();
     }, [lessonId]);
     
-    // 2. Thêm câu hỏi Speaking (Gọi API Mới)
+    //Thêm câu hỏi Speaking
     const handleAddQuestion = async (e) => {
         e.preventDefault();
         if (!newQuestionText.trim()) return;
@@ -48,7 +47,7 @@ const SpeakingBuilder = () => {
         }
     };
 
-    // 3. Xóa câu hỏi Speaking (Gọi API Mới)
+    //Xóa câu hỏi Speaking
     const handleDeleteQuestion = async (questionId) => {
         if (!window.confirm("Delete this question?")) return;
         try {
@@ -69,7 +68,6 @@ const SpeakingBuilder = () => {
             </div>
             
             <div className={styles.builderLayout}>
-                {/* CỘT TRÁI: Form nhập liệu đơn giản */}
                 <div className={styles.formSection}>
                     <form onSubmit={handleAddQuestion} className={styles.form}>
                         <h3>Add Speaking Question</h3>
@@ -90,7 +88,6 @@ const SpeakingBuilder = () => {
                     </form>
                 </div>
 
-                {/* CỘT PHẢI: Danh sách câu hỏi */}
                 <div className={styles.listSection}>
                     <h3>Questions List ({questions.length})</h3>
                     {questions.length === 0 && <p style={{color: '#666'}}>No questions yet.</p>}

@@ -14,16 +14,16 @@ cloudinary.config({
 export const lessonStorage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
-        folder: 'lessons', // Lưu file vào thư mục 'lessons' trên Cloudinary
-        resource_type: 'auto', // Tự động nhận diện loại file (video, image, raw)
+        folder: 'lessons',
+        resource_type: 'auto',
         type: 'upload'
     }
 });
 export const avatarStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'avatars',          // Cloudinary folder
-    resource_type: 'image',     // Avatar = image only
+    folder: 'avatars',
+    resource_type: 'image',
     allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
     transformation: [
       { width: 300, height: 300, crop: 'fill' }

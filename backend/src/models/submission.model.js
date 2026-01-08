@@ -22,8 +22,6 @@ const submissionSchema = new Schema(
     content: { 
         type: String, 
         required: function() {
-            // Note: 'this.type' refers to the submission document, not the lesson type.
-            // If you don't store 'type' in Submission, ensure 'content' is always sent from the controller.
             return true; 
         } 
     },

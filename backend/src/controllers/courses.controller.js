@@ -6,7 +6,7 @@ import Module from '../models/module.model.js';
 import Submission from '../models/submission.model.js';
 
 
-// PUBLIC CONTROLLERS (Bất kỳ ai cũng có thể truy cập)
+// PUBLIC CONTROLLERS
 /**
  * @desc    Lấy tất cả các khóa học (có thông tin giáo viên)
  * @route   GET /api/courses
@@ -18,7 +18,7 @@ export const getAllCourses = async (req, res) => {
         // Bắt đầu với bộ lọc cơ bản: chỉ lấy các khóa học đã được duyệt
         const filter = { status: 'published' };
 
-        // --- 1. LOGIC LỌC (FILTERING) ---
+        //Lọc theo category và level nếu có
         if (category) {
             filter.category = category;
         }
@@ -26,7 +26,7 @@ export const getAllCourses = async (req, res) => {
             filter.level = level;
         }
 
-        // --- 2. LOGIC TÌM KIẾM (SEARCH) ---
+        // Tìm kiếm theo từ khóa
         if (search) {
             filter.name = { $regex: search, $options: 'i' };
         }
@@ -34,7 +34,7 @@ export const getAllCourses = async (req, res) => {
         const courses = await Course.find(filter).populate('teacher', 'name');
         res.json(courses);
     } catch (err) {
-        console.error("LỖI KHI GET ALL COURSES:", err);
+        console.error("Lỗi khi lấy tất cả khóa học(Get all courses)", err);
         res.status(500).json({ message: "Lỗi máy chủ" });
     }
 };
@@ -46,8 +46,8 @@ export const getAllCourses = async (req, res) => {
 export const getHomeCourses = async (req, res) => {
     try {
         const courses = await Course.find({ status: 'published' })
-            .sort({ createdAt: -1 })   // mới nhất trước
-            .limit(6)                  // chỉ lấy 6 khóa
+            .sort({ createdAt: -1 })//mới nhất trước
+            .limit(5)
             .select('name summary color category level teacher')
             .populate('teacher', 'name');
 
@@ -177,7 +177,7 @@ export const createCourse = async (req, res) => {
 };
 
 /**
- * @desc    Lấy các khóa học một giáo viên đang dạy (KÈM THỐNG KÊ)
+ * @desc    Lấy các khóa học một giáo viên đang dạy
  * @route   GET /api/courses/my-teaching-courses
  * @access  Private/Teacher
  */
@@ -185,62 +185,60 @@ export const getMyTeachingCourses = async (req, res) => {
     try {
         // Sử dụng Aggregate để lấy thêm thông tin thống kê
         const courses = await Course.aggregate([
-            // BƯỚC 1: Lọc ra các khóa học của giáo viên hiện tại
+            //Lọc ra các khóa học của giáo viên hiện tại
             { 
                 $match: { 
                     teacher: new mongoose.Types.ObjectId(req.user.id) 
                 } 
             },
 
-            // BƯỚC 2: Đếm số lượng học viên (Lookup sang Enrollment)
+            //Đếm số lượng học viên
             {
                 $lookup: {
-                    from: 'enrollments',      // Tên collection trong DB (thường là số nhiều, viết thường)
-                    localField: '_id',        // ID của Course
-                    foreignField: 'course',   // Trường course trong Enrollment
-                    as: 'enrollmentData'      // Lưu kết quả vào mảng tạm
+                    from: 'enrollments',
+                    localField: '_id',
+                    foreignField: 'course',
+                    as: 'enrollmentData'
                 }
             },
 
-            // BƯỚC 3: Đếm số lượng bài nộp đang chờ chấm (Lookup sang Submission)
+            //Đếm số lượng bài nộp đang chờ chấm
             {
                 $lookup: {
-                    from: 'submissions',      // Tên collection Submission
-                    let: { courseId: '$_id' }, // Biến tạm lưu Course ID
+                    from: 'submissions',
+                    let: { courseId: '$_id' },
                     pipeline: [
                         { 
                             $match: {
                                 $expr: {
                                     $and: [
-                                        { $eq: ['$course', '$$courseId'] },   // Khớp Course ID
-                                        { $eq: ['$status', 'submitted'] }     // CHỈ LẤY TRẠNG THÁI 'submitted'
+                                        { $eq: ['$course', '$$courseId'] },
+                                        { $eq: ['$status', 'submitted'] }
                                     ]
                                 }
                             }
                         }
                     ],
-                    as: 'pendingData'         // Lưu kết quả vào mảng tạm
+                    as: 'pendingData'
                 }
             },
 
-            // BƯỚC 4: Tính toán số lượng và thêm vào kết quả trả về
+            //Tính toán số lượng và thêm vào kết quả trả về
             {
                 $addFields: {
-                    studentCount: { $size: '$enrollmentData' },       // Đếm số phần tử trong mảng enrollmentData
-                    pendingSubmissions: { $size: '$pendingData' },    // Đếm số phần tử trong mảng pendingData
-                    completionRate: 0 // Tạm thời để 0, tính năng này phức tạp cần xử lý sau
+                    studentCount: { $size: '$enrollmentData' },
+                    pendingSubmissions: { $size: '$pendingData' },
+                    completionRate: 0 //NEED UPDATE : chưa tính toán completion rate
                 }
             },
 
-            // BƯỚC 5: Dọn dẹp kết quả (Bỏ các mảng tạm nặng nề đi)
+            //Dọn dẹp các mảng tạm thời
             {
                 $project: {
                     enrollmentData: 0,
                     pendingData: 0
                 }
             },
-            
-            // BƯỚC 6: Sắp xếp theo ngày tạo mới nhất
             { $sort: { createdAt: -1 } }
         ]);
 
@@ -392,18 +390,18 @@ export const getCourseDashboard = async (req, res) => {
     try {
         const courseId = req.params.id;
 
-        // 1. Kiểm tra quyền sở hữu
+        //Kiểm tra quyền sở hữu khóa học
         const course = await Course.findById(courseId);
         if (!course) return res.status(404).json({ message: "Course not found" });
         if (course.teacher.toString() !== req.user.id) {
             return res.status(403).json({ message: "Unauthorized" });
         }
 
-        // 2. Lấy thống kê Enrollment (Số lượng học viên)
+        //Lấy thống kê số lượng học viên
         const totalStudents = await Enrollment.countDocuments({ course: courseId });
 
-        // 3. Lấy thống kê Submissions (Bài tập)
-        // Group theo status để đếm: submitted (chờ chấm), graded (đã chấm), ...
+        //Lấy thống kê submissions
+        // Group theo trạng thái của bài nộp để đếm: submitted (chờ chấm), graded (đã chấm), ...
         const submissionStats = await mongoose.model('Submission').aggregate([
             { $match: { course: new mongoose.Types.ObjectId(courseId) } },
             { 
@@ -413,25 +411,24 @@ export const getCourseDashboard = async (req, res) => {
                 } 
             }
         ]);
-
-        // Chuyển array thành object cho dễ dùng: { submitted: 5, graded: 10 }
+        // Chuyển mảng kết quả thành object để dễ truy cập
         const statsMap = submissionStats.reduce((acc, curr) => {
             acc[curr._id] = curr.count;
             return acc;
         }, { submitted: 0, grading: 0, completed: 0 });
 
-        // 4. Lấy danh sách 5 bài nộp mới nhất cần chấm (Recent Pending Submissions)
+        // Lấy danh sách 5 bài nộp mới nhất cần chấm 
         // Để hiển thị widget "Cần xử lý gấp"
         const recentPendingSubmissions = await mongoose.model('Submission').find({
             course: courseId,
             status: 'submitted'
         })
-        .sort({ createdAt: 1 }) // Cũ nhất lên đầu (để chấm trước)
+        .sort({ createdAt: 1 }) // Cũ nhất lên đầu
         .limit(5)
         .populate('student', 'name email avatar') // Cần thông tin học viên
-        .populate('lesson', 'title'); // Cần tên bài học
+        .populate('lesson', 'title');
 
-        // 5. Lấy danh sách học viên mới nhất (Recent Enrollments)
+        //Lấy danh sách học viên mới nhất (Recent Enrollments)
         const recentStudents = await Enrollment.find({ course: courseId })
             .sort({ createdAt: -1 })
             .limit(5)
@@ -498,7 +495,7 @@ export const getEnrolledStudents = async (req, res) => {
  */
 export const getStudentSubmissionsInCourse = async (req, res) => {
     try {
-        // FIXED: Use req.params.id instead of courseId
+        // Lấy courseId và studentId từ params
         const { id: courseId, studentId } = req.params;
 
         const submissions = await Submission.find({ 
@@ -535,7 +532,7 @@ export const removeStudentFromCourse = async (req, res) => {
             return res.status(403).json({ message: "Bạn không có quyền xóa học viên khỏi khóa học này" });
         }
 
-        // 2. Xóa Enrollment
+        //Xóa Enrollment
         const deletedEnrollment = await Enrollment.findOneAndDelete({
             course: courseId,
             student: studentId

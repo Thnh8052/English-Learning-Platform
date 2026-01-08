@@ -65,9 +65,7 @@ export const deleteQuizQuestion = async (req, res) => {
     }
 };
 
-// ============================================================
-// SPEAKING FUNCTIONS (MỚI)
-// ============================================================
+// SPEAKING FUNCTIONS
 
 /**
  * @desc    Thêm câu hỏi cho bài Speaking (Chỉ cần text)
@@ -78,12 +76,12 @@ export const addSpeakingQuestion = async (req, res) => {
         const { lessonId } = req.params;
         const { questionText } = req.body;
 
-        // 1. Validate: Chỉ cần questionText
+        //validate: Chỉ cần questionText
         if (!questionText || questionText.trim() === '') {
             return res.status(400).json({ message: "Nội dung câu hỏi là bắt buộc." });
         }
 
-        // 2. Tìm Lesson và Check quyền (Copy logic checkOwnership để an toàn)
+        //Tìm Lesson và Check quyền
         const lesson = await Lesson.findById(lessonId).populate({
             path: 'module',
             populate: { path: 'course' }
@@ -94,10 +92,10 @@ export const addSpeakingQuestion = async (req, res) => {
             return res.status(403).json({ message: "Unauthorized" });
         }
 
-        // 3. Thêm câu hỏi vào mảng (Không cần options/correctAnswer)
+        //Thêm câu hỏi vào mảng
         const newQuestion = { 
             questionText,
-            // Có thể thêm trường 'part' nếu muốn phân loại Part 1/2/3 sau này
+            // Có thể thêm trường 'part' nếu muốn phân loại Part 1/2/3
             // part: req.body.part || 'part1' 
         };
         

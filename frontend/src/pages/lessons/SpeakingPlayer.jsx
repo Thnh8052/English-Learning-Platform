@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
-import AudioRecorder from '../../components/exam/audioRecord.jsx'; // Đảm bảo đường dẫn đúng
+import AudioRecorder from '../../components/exam/audioRecord.jsx';
 import styles from './speakingPlayer.module.css';
 
 const SpeakingPlayer = ({ lesson }) => {
@@ -43,7 +43,7 @@ const SpeakingPlayer = ({ lesson }) => {
     };
 
     const handleSubmit = async () => {
-        // 1. Validate số lượng câu trả lời
+        //Validate số lượng câu trả lời
         const answeredCount = Object.keys(recordings).length;
         const totalQuestions = questions.length;
 
@@ -63,10 +63,8 @@ const SpeakingPlayer = ({ lesson }) => {
             
             // Thông tin cơ bản
             formData.append('lessonId', lesson._id);
-            // formData.append('userId', user.id); // Không cần thiết nếu backend lấy từ req.user (token)
 
             // Loop qua state recordings để đóng gói file
-            // QUAN TRỌNG: Key phải là `audio_${index}` để khớp với Backend
             Object.keys(recordings).forEach(key => {
                 const index = parseInt(key); // Đảm bảo index là số
                 const blob = recordings[key];
@@ -75,7 +73,7 @@ const SpeakingPlayer = ({ lesson }) => {
                 formData.append(`audio_${index}`, blob, `answer_q${index}.webm`);
             });
 
-            // Gửi request (Header 'Content-Type': 'multipart/form-data' thường được axios tự xử lý, nhưng khai báo rõ cũng tốt)
+            // Gửi request
             const response = await api.post('/submissions/speaking', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
@@ -83,8 +81,9 @@ const SpeakingPlayer = ({ lesson }) => {
             console.log("Submission success:", response.data);
             alert("Nộp bài thành công! Hệ thống đang chấm điểm...");
             
-            // Điều hướng về trang danh sách bài học hoặc trang kết quả
-            navigate(`/courses/${lesson.module.course}`); // Hoặc trang chi tiết submission
+            // Điều hướng về trang kết quả
+            const submissionId = response.data.submission._id;
+            navigate(`/student/submissions/${submissionId}`);
 
         } catch (error) {
             console.error("Submission error:", error);
@@ -102,7 +101,6 @@ const SpeakingPlayer = ({ lesson }) => {
 
     return (
         <div className={styles.playerContainer}>
-            {/* Header: Progress Bar */}
             <div className={styles.header}>
                 <h3>
                     Speaking Practice - {currentQuestion?.part ? currentQuestion.part.replace(/(\d+)/, ' $1').toUpperCase() : 'Part 1'}
@@ -120,13 +118,11 @@ const SpeakingPlayer = ({ lesson }) => {
                 </div>
             </div>
 
-            {/* Question Card */}
             <div className={styles.questionCard}>
                 <div className={styles.questionContent}>
                     <h2 className={styles.questionText}>
                         {currentQuestion?.questionText || "Loading question..."}
                     </h2>
-                    {/* Hiển thị gợi ý/sample nếu có (tùy chọn) */}
                     {currentQuestion?.sampleAnswer && (
                         <details className={styles.sampleAnswer}>
                             <summary>Xem gợi ý câu trả lời</summary>
@@ -136,7 +132,6 @@ const SpeakingPlayer = ({ lesson }) => {
                 </div>
                 
                 <div className={styles.recordingArea}>
-                    {/* Key quan trọng để Reset recorder khi đổi câu hỏi */}
                     <AudioRecorder 
                         key={currentQIndex} 
                         onRecordingComplete={handleRecordingComplete}
@@ -145,7 +140,6 @@ const SpeakingPlayer = ({ lesson }) => {
                 </div>
             </div>
 
-            {/* Navigation Buttons */}
             <div className={styles.navigation}>
                 <button 
                     className={`btn ${styles.btnPrev}`} 

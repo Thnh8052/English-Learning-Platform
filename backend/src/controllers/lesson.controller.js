@@ -39,106 +39,6 @@ export const getLessonsByCourse = async (req, res) => {
 };
 
 
-/**
- * @desc    Giáo viên tạo một bài học mới trong một module
- * @route   POST /api/lessons
- * @access  Private/Teacher
- */
-// export const createLesson = async (req, res) => {
-//     try {
-//         console.log("--- BẮT ĐẦU createLesson ---");
-//         console.log("Dữ liệu nhận được (req.body):", req.body);
-//         console.log("File nhận được (req.file):", req.file);
-
-//         const { title, type, moduleId } = req.body;
-//         const file = req.file;
-
-//         if (!title || !type || !moduleId || !file) {
-//             return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ thông tin và file bài học' });
-//         }
-//         if (!mongoose.Types.ObjectId.isValid(moduleId)) {
-//             return res.status(400).json({ message: 'Module ID không hợp lệ.' });
-//         }
-
-//         const module = await Module.findById(moduleId).populate('course');
-//         if (!module || !module.course || module.course.teacher.toString() !== req.user.id) {
-//             return res.status(403).json({ message: 'Bạn không có quyền thêm bài học vào khóa học này.' });
-//         }
-
-//         const lastLesson = await Lesson.findOne({ module: moduleId }).sort({ order: -1 });
-//         const newOrder = (lastLesson?.order || 0) + 1;
-        
-//         const newLesson = new Lesson({
-//             title,
-//             type,
-//             module: moduleId,
-//             order: newOrder,
-//             fileUrl: file.path,
-//             fileType: file.mimetype,
-//         });
-
-//         await newLesson.save();
-//         res.status(201).json(newLesson);
-
-//     } catch (err) {
-//         console.error("--- LỖI 500 KHI TẠO LESSON ---");
-//         console.error(err);
-//         if (err.name === 'ValidationError') {
-//             return res.status(400).json({ message: err.message });
-//         }
-//         res.status(500).json({ message: 'Lỗi máy chủ khi tạo bài học' });
-//     }
-// };
-
-
-// export const createLesson = async (req, res) => {
-//     try {
-//         console.log("--- BẮT ĐẦU createLesson ---");
-//         console.log("Dữ liệu nhận được (req.body):", req.body);
-        
-//         // --- LOG CHI TIẾT ĐỐI TƯỢNG FILE ---
-//         console.log("File nhận được từ Multer-Cloudinary (req.file):");
-//         console.dir(req.file, { depth: null });
-
-//         const { title, type, moduleId } = req.body;
-//         const file = req.file;
-
-//         if (!file) {
-//             console.error("Lỗi: Không có file nào được upload.");
-//             return res.status(400).json({ message: 'Vui lòng chọn một file để tải lên.' });
-//         }
-//        const lastLesson = await Lesson.findOne({ module: moduleId }).sort({ order: -1 });
-//         const newOrder = (lastLesson?.order || 0) + 1;
-//         const newLessonData = {
-//             title,
-//             type,
-//             module: moduleId,
-//             order: newOrder,
-//             fileUrl: file.secure_url, // `path` thường là URL đầy đủ và an toàn (https)
-//             fileType: file.mimetype,
-//         };
-
-//         // Nếu file.path không hoạt động, hãy thử file.secure_url
-//         // fileUrl: file.secure_url
-
-//         console.log("Dữ liệu chuẩn bị lưu vào DB:", newLessonData);
-
-//         const newLesson = new Lesson(newLessonData);
-//         await newLesson.save();
-//         console.log("Lưu lesson vào DB thành công.");
-
-//         res.status(201).json(newLesson);
-
-//     } catch (err) {
-//         console.error("--- LỖI 500 KHI TẠO LESSON ---");
-//         console.error(err);
-//         if (err.name === 'ValidationError') {
-//             return res.status(400).json({ message: err.message });
-//         }
-//         res.status(500).json({ message: 'Lỗi máy chủ khi tạo bài học' });
-//     }
-// };
-
 export const createLesson = async (req, res) => {
     try {
         if (!req.body) {
@@ -151,12 +51,12 @@ export const createLesson = async (req, res) => {
         const lessonFile = files.lessonFile ? files.lessonFile[0] : null;
 
         if (!title || !type || !moduleId) {
-            return res.status(400).json({ message: 'Missing required fields: title, type, or module.' });
+            return res.status(400).json({ message: 'Thiếu các thông tin bắt buộc: title, type, hoặc module' });
         }
 
         const module = await Module.findById(moduleId).populate('course');
         if (!module || !module.course || module.course.teacher.toString() !== req.user.id) {
-            return res.status(403).json({ message: 'Permission denied.' });
+            return res.status(403).json({ message: 'Quyền truy cập bị từ chối' });
         }
 
         const lastLesson = await Lesson.findOne({ module: moduleId }).sort({ order: -1 });
@@ -185,7 +85,7 @@ export const createLesson = async (req, res) => {
 
     } catch (err) {
         console.error("CREATE LESSON ERROR:", err);
-        res.status(500).json({ message: "Server error while creating lesson." });
+        res.status(500).json({ message: "Lỗi máy chủ khi tạo bài học" });
     }
 };
 
@@ -246,8 +146,6 @@ export const updateLesson = async (req, res) => {
 
         lesson.title = title;
         lesson.type = type;
-        // Lưu ý: Không xử lý upload file mới ở đây để giữ cho logic đơn giản.
-        // Việc thay đổi file nên là một quy trình riêng (xóa file cũ, upload file mới).
 
         await lesson.save();
         res.json(lesson);
@@ -273,18 +171,18 @@ export const getLessonById = async (req, res) => {
             select: 'course'
         });
 
-        if (!lesson || !lesson.module) { // Kiểm tra cả lesson và lesson.module
+        if (!lesson || !lesson.module) {
             return res.status(404).json({ message: 'Không tìm thấy bài học' });
         }
 
-        // --- KIỂM TRA QUYỀN TRUY CẬP ---
-        // 1. Kiểm tra xem user có phải là học viên đã ghi danh không
+        //KIỂM TRA QUYỀN TRUY CẬP
+        // Kiểm tra xem user có phải là học viên đã ghi danh không
         const enrollment = await Enrollment.findOne({
             student: studentId,
             course: lesson.module.course
         });
         
-        // 2. Kiểm tra xem user có phải là admin hoặc giáo viên của khóa học không
+        //Kiểm tra xem user có phải là admin hoặc giáo viên của khóa học không
         const course = await Course.findById(lesson.module.course);
         const isTeacherOrAdmin = req.user.role === 'admin' || (req.user.role === 'teacher' && course && course.teacher.toString() === req.user.id);
 
