@@ -1,13 +1,22 @@
 import OpenAI from "openai";
 import fs from "fs";
-import dotenv from "dotenv";
 
-dotenv.config();
+let groq;
 
-const groq = new OpenAI({ 
-    apiKey: process.env.GROQ_API_KEY,
-    baseURL: process.env.GROQ_API_URL || "https://api.groq.com/openai/v1" 
-});
+const getGroqClient = () => {
+    if (!process.env.GROQ_API_KEY) {
+        throw new Error("GROQ_API_KEY is not configured");
+    }
+
+    if (!groq) {
+        groq = new OpenAI({
+            apiKey: process.env.GROQ_API_KEY,
+            baseURL: process.env.GROQ_API_URL || "https://api.groq.com/openai/v1"
+        });
+    }
+
+    return groq;
+};
 
 export const transcribeAudio = async (filePath) => {
     try {
@@ -18,7 +27,7 @@ export const transcribeAudio = async (filePath) => {
 
         console.log(`Đang gửi Groq STT (Whisper): ${filePath}`);
 
-        const transcription = await groq.audio.transcriptions.create({
+        const transcription = await getGroqClient().audio.transcriptions.create({
             file: fs.createReadStream(filePath),
             model: "whisper-large-v3",
             temperature: 0.0,

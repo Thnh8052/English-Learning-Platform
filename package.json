@@ -1,5 +1,21 @@
 {
-  "dependencies": {
-    "pdf-parse": "^1.1.1"
+  "name": "english-learning-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Full-stack English learning platform with role-based course management and AI-assisted speaking/writing assessment.",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace backend",
+    "dev:api": "npm run dev --workspace backend",
+    "dev:web": "npm run dev --workspace frontend",
+    "build": "npm run build --workspace frontend",
+    "lint": "npm run lint --workspace frontend",
+    "start": "npm run start --workspace backend"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

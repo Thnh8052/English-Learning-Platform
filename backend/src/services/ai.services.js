@@ -1,13 +1,22 @@
 import OpenAI from "openai";
-import dotenv from "dotenv";
 import { calculateFullResult } from "./writingScoreCalculator.js";
 
-dotenv.config();
+let openai;
 
-const openai = new OpenAI({
+const getOpenAIClient = () => {
+  if (!process.env.DEEPSEEK_API_KEY) {
+    throw new Error("DEEPSEEK_API_KEY is not configured");
+  }
+
+  if (!openai) {
+    openai = new OpenAI({
     baseURL: process.env.DEEPSEEK_API_URL || 'https://api.deepseek.com',
     apiKey: process.env.DEEPSEEK_API_KEY,
-});
+    });
+  }
+
+  return openai;
+};
 
 const cleanJsonResponse = (text) => {
     try {
@@ -40,7 +49,7 @@ export const generateQuiz = async (content, numQuestions = 10) => {
     }
 
     try {
-        const completion = await openai.chat.completions.create({
+        const completion = await getOpenAIClient().chat.completions.create({
             model: "deepseek-chat",
             temperature: 0.2,
             max_tokens: 3500,
@@ -109,7 +118,7 @@ export const gradeWritingTask = async (essay, prompt) => {
         ? String(prompt) 
         : "Không xác định (Chấm theo chuẩn IELTS Writing Task 2 chung)";
     try {
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAIClient().chat.completions.create({
       model: "deepseek-chat",
       temperature: 0.1,
       max_tokens: 4000,
@@ -263,7 +272,7 @@ export const gradeSpeakingAnswer = async (transcript, question) => {
         };
     }
     try {
-        const completion = await openai.chat.completions.create({
+        const completion = await getOpenAIClient().chat.completions.create({
             model: "deepseek-chat",
             messages: [
                 {
