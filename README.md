@@ -37,6 +37,9 @@ Full-stack web application for managing English courses, lessons, quizzes, speak
 |   `-- .env.example
 |-- docs/
 |   |-- CV_PROJECT_SUMMARY.md
+|   |-- ARCHITECTURE.md
+|   |-- PRODUCTION_ROADMAP.md
+|   |-- REPO_CLEANUP.md
 |   `-- IMPROVEMENTS.md
 |-- package.json               # Root workspace commands
 `-- README.md
@@ -80,3 +83,9 @@ See [docs/CV_PROJECT_SUMMARY.md](docs/CV_PROJECT_SUMMARY.md) for a short CV-read
 ## Suggested Improvements
 
 See [docs/IMPROVEMENTS.md](docs/IMPROVEMENTS.md) for prioritized improvements before publishing this project on a CV or portfolio.
+
+## Production Plan
+
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): current architecture and target production boundaries.
+- [docs/PRODUCTION_ROADMAP.md](docs/PRODUCTION_ROADMAP.md): phased roadmap for linting, API validation, analytics, chatbot, testing, and deployment.
+- [docs/REPO_CLEANUP.md](docs/REPO_CLEANUP.md): repository hygiene notes and Git history cleanup checklist.
